@@ -8,23 +8,28 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
+import android.widget.Button;
 
 import java.util.Iterator;
-import java.util.LinkedList;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.GRAY;
 import static android.graphics.Color.GREEN;
 import static android.graphics.Color.RED;
-import static android.graphics.Color.WHITE;
+import static android.graphics.Color.YELLOW;
 import static android.graphics.Paint.Style.FILL;
 import static android.graphics.Paint.Style.STROKE;
+import static android.view.MotionEvent.ACTION_DOWN;
+import static android.view.MotionEvent.ACTION_MOVE;
+import static android.view.MotionEvent.ACTION_UP;
 
 /**
  * Created by cantanima on 8/8/17.
  */
 
-public class Playfield extends View implements View.OnTouchListener {
+public class Playfield extends View implements OnTouchListener, OnClickListener {
 
   public Playfield(Context context, AttributeSet attrs) {
 
@@ -41,6 +46,10 @@ public class Playfield extends View implements View.OnTouchListener {
       playable.add_generator_fast(5, 1);
       playable.sort_ideal();
     }
+
+    game_control = new Game_Control();
+    game_control.new_game(this);
+    setOnTouchListener(this);
 
   }
 
@@ -87,6 +96,25 @@ public class Playfield extends View implements View.OnTouchListener {
   public void set_coidealColor(int color) { coideal_color = color; }
 
   /**
+   * This is called during layout when the size of this view has changed. If
+   * you were just added to the view hierarchy, you're called with the old
+   * values of 0.
+   *
+   * @param w    Current width of this view.
+   * @param h    Current height of this view.
+   * @param oldw Old width of this view.
+   * @param oldh Old height of this view.
+   */
+  @Override
+  protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+    super.onSizeChanged(w, h, oldw, oldh);
+
+    step_x = ((float) w) / view_xmax;
+    step_y = ((float) h) / view_ymax;
+
+  }
+
+  /**
    * Implement this to do your drawing.
    *
    * @param canvas the canvas on which the background will be drawn
@@ -96,8 +124,6 @@ public class Playfield extends View implements View.OnTouchListener {
 
     super.onDraw(canvas);
 
-    Paint bg_paint = new Paint(), line_paint = new Paint(),
-        ideal_paint = new Paint(), coideal_paint = new Paint();
     bg_paint.setColor(background_color);
     bg_paint.setStyle(FILL);
     line_paint.setColor(BLACK);
@@ -111,10 +137,8 @@ public class Playfield extends View implements View.OnTouchListener {
     float h = getHeight(), w = getWidth();
     canvas.drawRect(0, 0, w, h, bg_paint);
 
-    float step_x = w / view_xmax, step_y = h / view_ymax;
-
     if (playable.T.size() != 0) {
-      Path coideal_path = new Path();
+      coideal_path.rewind();
       coideal_path.moveTo(0, h);
       Iterator<Position> Ti = playable.iterator();
       Position P = Ti.next();
@@ -140,7 +164,7 @@ public class Playfield extends View implements View.OnTouchListener {
     }
 
     if (gone.T.size() != 0) {
-      Path ideal_path = new Path();
+      ideal_path.rewind();
       ideal_path.moveTo(w, 0);
       Iterator<Position> Ti = gone.iterator();
       Position P = Ti.next();
@@ -161,6 +185,16 @@ public class Playfield extends View implements View.OnTouchListener {
       canvas.drawPath(ideal_path, ideal_paint);
     }
 
+    if (highlighting) {
+      highlight_paint.setColor(highlight_color);
+      highlight_paint.setStyle(FILL);
+      canvas.drawRect(
+          highlight_x * step_x, h - (highlight_y + 1)* step_y,
+          (highlight_x + 1) * step_x, h - highlight_y * step_y,
+          highlight_paint
+      );
+    }
+
     for (int i = 0; i < view_xmax; ++i)
       canvas.drawLine(i * step_x, 0, i * step_x, h, line_paint);
     for (int i = 0; i < view_xmax; ++i)
@@ -178,12 +212,70 @@ public class Playfield extends View implements View.OnTouchListener {
    */
   @Override
   public boolean onTouch(View v, MotionEvent event) {
+    float x = event.getX(), y = event.getY();
+    float w = getWidth(), h = getHeight();
+    if (x >= 0 && y >= 0 && x <= w && y <= h) {
+      int i = (int) (x / step_x);
+      int j = (int) ((h - y) / step_y);
+      switch (event.getAction()) {
+        case ACTION_UP:
+          if (playable.contains(i, j) && !gone.contains(i, j)) gone.add_generator(i, j, true);
+          highlighting = false;
+          break;
+        case ACTION_DOWN:
+          highlighting = true;
+          highlight_x = i;
+          highlight_y = j;
+          if (playable.contains(i, j) && !gone.contains(i, j)) highlight_color = YELLOW;
+          else highlight_color = BLACK;
+          break;
+        case ACTION_MOVE:
+          if (highlighting) {
+            highlight_x = i;
+            highlight_y = j;
+            if (playable.contains(i, j) && !gone.contains(i, j)) highlight_color = YELLOW;
+            else highlight_color = BLACK;
+          }
+      }
+      invalidate();
+    }
     return true;
   }
 
+  /**
+   * Called when a view has been clicked.
+   *
+   * @param v The view that was clicked.
+   */
+  @Override
+  public void onClick(View v) {
+
+    if (v == new_game_button) {
+      game_control.new_game(this);
+    }
+
+  }
+
+  public void set_buttons_to_listen(Button ng_button) {
+
+    new_game_button = ng_button;
+    new_game_button.setOnClickListener(this);
+
+  }
+
   protected int view_xmax = 10, view_ymax = 10;
-  protected int background_color = GREEN, ideal_color = GRAY, coideal_color = RED;
+  protected float step_x, step_y;
+  protected int highlight_x, highlight_y;
+  protected boolean highlighting = false;
+  protected int background_color = GREEN, ideal_color = GRAY,
+      coideal_color = RED, highlight_color = YELLOW;
+  protected Paint highlight_paint = new Paint(), ideal_paint = new Paint(),
+      coideal_paint = new Paint(), bg_paint = new Paint(), line_paint = new Paint();
+  protected Path ideal_path = new Path(), coideal_path = new Path();
   protected Ideal playable, gone;
+  protected Game_Control game_control;
+
+  protected Button new_game_button;
 
   protected String tag = "Playfield";
 

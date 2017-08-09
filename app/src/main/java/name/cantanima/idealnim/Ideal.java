@@ -1,5 +1,7 @@
 package name.cantanima.idealnim;
 
+import android.util.Log;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -39,6 +41,7 @@ public class Ideal implements Iterable<Position> {
       T.add(t);
     max_x = F.max_x;
     max_y = F.max_y;
+    mon_diag = new boolean[max_x][max_y];
     for (int i = 0; i < max_x; ++i)
       for (int j = 0; j < max_y; ++j)
         mon_diag[i][j] = F.mon_diag[i][j];
@@ -158,8 +161,20 @@ public class Ideal implements Iterable<Position> {
 
   }
 
+  public void log() {
+
+    Log.d(tag, "----");
+    for (Position t : T) {
+      Log.d(tag, "(" + String.valueOf(t.get_x()) + ", " + String.valueOf(t.get_y()) + ")");
+    }
+    Log.d(tag, "----");
+
+  }
+
   protected LinkedList<Position> T;
   protected boolean mon_diag[][];
   protected int max_x = 10, max_y = 10;
+
+  private String tag = "Ideal";
 
 }

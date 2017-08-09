@@ -8,10 +8,20 @@
     tools:showIn="@layout/activity_main">
 
     <name.cantanima.idealnim.Playfield
+        android:id="@+id/playfield"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/playfield"
-        tools:layout_editor_absoluteY="220dp"
-        tools:layout_editor_absoluteX="106dp"/>
+        android:layout_centerInParent="true"
+        android:layout_above="@+id/new_game_button"
+        />
+
+    <Button
+        android:id="@+id/new_game_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="@string/new_game"
+        android:visibility="visible"/>
 
 </RelativeLayout>

@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,8 +19,10 @@ public class MainActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     Button new_game_button = (Button) findViewById(R.id.new_game_button);
+    Button evaluate_game_button = (Button) findViewById(R.id.evaluate_game_button);
+    TextView value_textview = (TextView) findViewById(R.id.value_view);
     Playfield playfield = (Playfield) findViewById(R.id.playfield);
-    playfield.set_buttons_to_listen(new_game_button);
+    playfield.set_buttons_to_listen(new_game_button, evaluate_game_button, value_textview);
     //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     //setSupportActionBar(toolbar);
 

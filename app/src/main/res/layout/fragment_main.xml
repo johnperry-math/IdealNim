@@ -12,16 +12,42 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_above="@+id/new_game_button"
         />
 
-    <Button
-        android:id="@+id/new_game_button"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/new_game"
-        android:visibility="visible"/>
+        android:gravity="center_vertical"
+        android:layout_below="@+id/playfield"
+        >
+
+        <Button
+            android:id="@+id/evaluate_game_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/evaluate_game"/>
+
+        <TextView
+            android:id="@+id/value_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="24sp"
+            />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/new_game_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/new_game"
+            android:visibility="visible"/>
+
+    </LinearLayout>
 
 </RelativeLayout>

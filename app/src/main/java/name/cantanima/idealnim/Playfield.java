@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.util.Iterator;
 
@@ -83,6 +84,21 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
   public void set_to(Ideal F) {
     playable = new Ideal(F);
     gone = new Ideal();
+    playfield = new boolean[view_xmax][view_ymax];
+    playfield_count = 0;
+    for (int i = 0; i < view_xmax; ++i)
+      for (int j = 0; j < view_ymax; ++j)
+        playfield[i][j] = false;
+    for (Position t: playable.T) {
+      for (int i = t.get_x(); i < view_xmax; ++i)
+        for (int j = t.get_y(); j < view_ymax; ++j)
+          if (!playfield[i][j]) {
+            playfield[i][j] = true;
+            ++playfield_count;
+          }
+    }
+    playfield_max_x = view_xmax;
+    playfield_max_y = view_ymax;
   }
 
   public void set_view_xmax(int x) { view_xmax = x; }
@@ -219,8 +235,44 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
       int j = (int) ((h - y) / step_y);
       switch (event.getAction()) {
         case ACTION_UP:
-          if (playable.contains(i, j) && !gone.contains(i, j)) gone.add_generator(i, j, true);
           highlighting = false;
+          // check for valid position
+          if (playable.contains(i, j) && !gone.contains(i, j)) {
+            // add generator
+            gone.add_generator(i, j, true);
+            // update playfield
+            for (int k = i; k < playfield_max_x; ++k)
+              for (int l = j; l < playfield_max_y; ++l)
+                if (playfield[k][l]) {
+                  playfield[k][l] = false;
+                  --playfield_count;
+                }
+            // adjust playfield_max_y
+            boolean checking_y = true;
+            int old_playfield_max_y = playfield_max_y;
+            while (playfield_max_y > 0 && checking_y) {
+              boolean found_position = false;
+              for (int k = 0; !found_position && k < playfield_max_x; ++k)
+                found_position |= playfield[k][playfield_max_y - 1];
+              if (found_position) checking_y = false;
+              else --playfield_max_y;
+            }
+            // adjust playfield_max_x
+            if (j == 0) playfield_max_x = i;
+            boolean checking_x = true;
+            while (playfield_max_x > 0 && checking_x) {
+              boolean found_position = false;
+              for (int l = 0; !found_position && l < old_playfield_max_y; ++l)
+                found_position |= playfield[playfield_max_x - 1][l];
+              if (found_position) checking_x = false;
+              else --playfield_max_x;
+            }
+          }
+          Log.d(tag,
+              "count: " + String.valueOf(playfield_count) +
+                  " max_x: " + String.valueOf(playfield_max_x) +
+                  " max_y: " + String.valueOf(playfield_max_y)
+          );
           break;
         case ACTION_DOWN:
           highlighting = true;
@@ -250,16 +302,23 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
   @Override
   public void onClick(View v) {
 
-    if (v == new_game_button) {
+    if (v == new_game_button)
       game_control.new_game(this);
+    else if (v == evaluate_game_button) {
+      value_text.setText(String.valueOf(
+          game_control.game_value(playfield, playfield_count, playfield_max_x, playfield_max_y)
+      ));
     }
 
   }
 
-  public void set_buttons_to_listen(Button ng_button) {
+  public void set_buttons_to_listen(Button ng_button, Button eg_button, TextView vt_view) {
 
     new_game_button = ng_button;
     new_game_button.setOnClickListener(this);
+    evaluate_game_button = eg_button;
+    evaluate_game_button.setOnClickListener(this);
+    value_text = vt_view;
 
   }
 
@@ -272,10 +331,15 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
   protected Paint highlight_paint = new Paint(), ideal_paint = new Paint(),
       coideal_paint = new Paint(), bg_paint = new Paint(), line_paint = new Paint();
   protected Path ideal_path = new Path(), coideal_path = new Path();
+
   protected Ideal playable, gone;
+  protected boolean[][] playfield;
+  int playfield_count, playfield_max_x, playfield_max_y;
+
   protected Game_Control game_control;
 
-  protected Button new_game_button;
+  protected Button new_game_button, evaluate_game_button;
+  protected TextView value_text;
 
   protected String tag = "Playfield";
 

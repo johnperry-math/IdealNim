@@ -5,4 +5,8 @@
     <string name="new_game">New Game</string>
     <string name="evaluate_game">Evaluate Game</string>
 
+    <string name="thinking">Thinking</string>
+    <string name="please_wait">Please wait...</string>
+    <string name="unknown_game_value">\?</string>
+
 </resources>

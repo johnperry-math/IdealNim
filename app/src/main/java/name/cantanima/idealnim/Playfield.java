@@ -1,5 +1,7 @@
 package name.cantanima.idealnim;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -84,6 +86,8 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
   public void set_to(Ideal F) {
     playable = new Ideal(F);
     gone = new Ideal();
+    
+    evaluator = null;
     playfield = new boolean[view_xmax][view_ymax];
     playfield_count = 0;
     for (int i = 0; i < view_xmax; ++i)
@@ -305,8 +309,11 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
     if (v == new_game_button)
       game_control.new_game(this);
     else if (v == evaluate_game_button) {
+      if (evaluator == null)
+        evaluator
+            = new Game_Evaluation(playfield_count, playfield_max_x, playfield_max_y);
       value_text.setText(String.valueOf(
-          game_control.game_value(playfield, playfield_count, playfield_max_x, playfield_max_y)
+          evaluator.game_value(playfield, playfield_count, playfield_max_x, playfield_max_y, 0)
       ));
     }
 
@@ -337,6 +344,8 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
   int playfield_count, playfield_max_x, playfield_max_y;
 
   protected Game_Control game_control;
+
+  protected Game_Evaluation evaluator;
 
   protected Button new_game_button, evaluate_game_button;
   protected TextView value_text;

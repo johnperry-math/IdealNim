@@ -3,7 +3,8 @@
     <string name="action_settings">Settings</string>
 
     <string name="new_game">New Game</string>
-    <string name="evaluate_game">Evaluate Game</string>
+    <string name="evaluate_game">Evaluate</string>
+    <string name="hint">Hint</string>
 
     <string name="thinking">Thinking</string>
     <string name="please_wait">Please wait...</string>

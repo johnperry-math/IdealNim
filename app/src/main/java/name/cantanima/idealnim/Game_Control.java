@@ -55,6 +55,6 @@ public class Game_Control {
   protected Playfield playfield;
   protected Random random = new Random();
 
-  private String tag = "Game_Control";
+  final private static String tag = "Game_Control";
 
 }

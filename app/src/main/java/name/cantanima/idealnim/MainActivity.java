@@ -1,5 +1,6 @@
 package name.cantanima.idealnim;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -21,11 +22,27 @@ public class MainActivity extends AppCompatActivity {
     Button new_game_button = (Button) findViewById(R.id.new_game_button);
     Button evaluate_game_button = (Button) findViewById(R.id.evaluate_game_button);
     TextView value_textview = (TextView) findViewById(R.id.value_view);
+    Button hint_button = (Button) findViewById(R.id.hint_button);
     Playfield playfield = (Playfield) findViewById(R.id.playfield);
-    playfield.set_buttons_to_listen(new_game_button, evaluate_game_button, value_textview);
+    playfield.set_buttons_to_listen(
+        new_game_button, evaluate_game_button, value_textview, hint_button
+    );
     //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     //setSupportActionBar(toolbar);
 
+  }
+
+  public void showAlertDialog() {
+    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    builder.setTitle(getString(R.string.thinking));
+    builder.setMessage(getString(R.string.please_wait));
+    builder.setCancelable(false);
+    waiter = builder.create();
+    waiter.show();
+  }
+
+  public void dismissAlertDialog() {
+    waiter.dismiss();
   }
 
   @Override
@@ -49,4 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
     return super.onOptionsItemSelected(item);
   }
+
+  AlertDialog waiter;
+
 }

@@ -1,9 +1,11 @@
 package name.cantanima.idealnim;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
@@ -84,9 +86,13 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
    * @param F ideal of playable positions
    */
   public void set_to(Ideal F) {
+
     playable = new Ideal(F);
     gone = new Ideal();
-    
+    hinting = false;
+    if (value_text != null)
+      value_text.setText(getContext().getString(R.string.unknown_game_value));
+
     evaluator = null;
     playfield = new boolean[view_xmax][view_ymax];
     playfield_count = 0;
@@ -103,6 +109,7 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
     }
     playfield_max_x = view_xmax;
     playfield_max_y = view_ymax;
+
   }
 
   public void set_view_xmax(int x) { view_xmax = x; }
@@ -215,6 +222,17 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
       );
     }
 
+    if (hinting) {
+      hint_paint.setColor(hint_color);
+      hint_paint.setStyle(FILL);
+      int x = hint_position.get_x(), y = hint_position.get_y();
+      canvas.drawRect(
+          x * step_x, h - (y + 1)* step_y,
+          (x + 1) * step_x, h - y * step_y,
+          hint_paint
+      );
+    }
+
     for (int i = 0; i < view_xmax; ++i)
       canvas.drawLine(i * step_x, 0, i * step_x, h, line_paint);
     for (int i = 0; i < view_xmax; ++i)
@@ -239,7 +257,7 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
       int j = (int) ((h - y) / step_y);
       switch (event.getAction()) {
         case ACTION_UP:
-          highlighting = false;
+          highlighting = hinting = false;
           // check for valid position
           if (playable.contains(i, j) && !gone.contains(i, j)) {
             // add generator
@@ -306,50 +324,76 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
   @Override
   public void onClick(View v) {
 
-    if (v == new_game_button)
+    if (v == new_game_button) {
       game_control.new_game(this);
-    else if (v == evaluate_game_button) {
+    } else if (v == evaluate_game_button) {
+      waiter = null;
+      if (evaluator == null) {
+        /*waiter = new ProgressDialog(getContext());
+        waiter.setTitle(getContext().getString(R.string.thinking));
+        waiter.setMessage(getContext().getString(R.string.please_wait));
+        waiter.setMax(playfield_count);
+        waiter.setCancelable(false);
+        waiter.show();*/
+        evaluator
+            = new Game_Evaluation(getContext(), playfield_count, playfield_max_x, playfield_max_y);
+      }
+      value_text.setText(String.valueOf(
+          evaluator.game_value(playfield, playfield_count, playfield_max_x, playfield_max_y)
+      ));
+      if (waiter != null) waiter.dismiss();
+
+    } else if (v == hint_button) {
       if (evaluator == null)
         evaluator
-            = new Game_Evaluation(playfield_count, playfield_max_x, playfield_max_y);
-      value_text.setText(String.valueOf(
-          evaluator.game_value(playfield, playfield_count, playfield_max_x, playfield_max_y, 0)
-      ));
+            = new Game_Evaluation(getContext(), playfield_count, playfield_max_x, playfield_max_y);
+      evaluator.game_value(playfield, playfield_count, playfield_max_x, playfield_max_y);
+      hint_position = evaluator.hint_position();
+      hinting = true;
+      invalidate();
     }
 
   }
 
-  public void set_buttons_to_listen(Button ng_button, Button eg_button, TextView vt_view) {
+  public void set_buttons_to_listen(
+      Button ng_button, Button eg_button, TextView vt_view, Button h_button
+  ) {
 
     new_game_button = ng_button;
     new_game_button.setOnClickListener(this);
     evaluate_game_button = eg_button;
     evaluate_game_button.setOnClickListener(this);
     value_text = vt_view;
+    hint_button = h_button;
+    hint_button.setOnClickListener(this);
 
   }
 
   protected int view_xmax = 10, view_ymax = 10;
   protected float step_x, step_y;
   protected int highlight_x, highlight_y;
-  protected boolean highlighting = false;
+  protected boolean highlighting = false, hinting = false;
   protected int background_color = GREEN, ideal_color = GRAY,
-      coideal_color = RED, highlight_color = YELLOW;
-  protected Paint highlight_paint = new Paint(), ideal_paint = new Paint(),
-      coideal_paint = new Paint(), bg_paint = new Paint(), line_paint = new Paint();
+      coideal_color = RED, highlight_color = YELLOW, hint_color = Color.rgb(0xff, 0x80, 0x00);
+  protected Paint highlight_paint = new Paint(), hint_paint = new Paint(),
+      ideal_paint = new Paint(), coideal_paint = new Paint(),
+      bg_paint = new Paint(), line_paint = new Paint();
   protected Path ideal_path = new Path(), coideal_path = new Path();
 
   protected Ideal playable, gone;
   protected boolean[][] playfield;
-  int playfield_count, playfield_max_x, playfield_max_y;
+  protected int playfield_count, playfield_max_x, playfield_max_y;
+
+  protected Position hint_position;
 
   protected Game_Control game_control;
 
   protected Game_Evaluation evaluator;
+  protected ProgressDialog waiter;
 
-  protected Button new_game_button, evaluate_game_button;
+  protected Button new_game_button, evaluate_game_button, hint_button;
   protected TextView value_text;
 
-  protected String tag = "Playfield";
+  final protected static String tag = "Playfield";
 
 }

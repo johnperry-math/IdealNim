@@ -1,32 +1,17 @@
 package name.cantanima.idealnim;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 import android.util.Pair;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Objects;
 import java.util.TreeSet;
 import java.util.Vector;
-
-import static java.util.Calendar.MILLISECOND;
-import static java.util.Calendar.MINUTE;
-import static java.util.Calendar.SECOND;
 
 /**
  * Created by cantanima on 8/10/17.
@@ -34,21 +19,48 @@ import static java.util.Calendar.SECOND;
 
 public class Game_Evaluation {
 
-  public Game_Evaluation(Context context, int count, int max_x, int max_y) {
+  public Game_Evaluation(Context context, Ideal I, Ideal J, int view_xmax, int view_ymax) {
 
-    overall_context = context;
-    base_count = count;
-    base_max_x = max_x;
-    base_max_y = max_y;
-    cache = new Vector<>(count);
-    zero_positions = new Vector<>(count);
-    for (int i = 0; i < count; ++i) {
-      cache.addElement(new Vector<Vector<LinkedList<Pair<boolean[][], Integer>>>>(max_x));
-      zero_positions.addElement(new Vector<Vector<LinkedList<Position>>>(max_x));
-      for (int j = 0; j < max_x; ++j) {
-        cache.get(i).addElement(new Vector<LinkedList<Pair<boolean[][], Integer>>>(max_y));
-        zero_positions.get(i).addElement(new Vector<LinkedList<Position>>(max_y));
-        for (int k = 0; k < max_y; ++k) {
+    overall_context = (Activity) context;
+
+    base_configuration = new boolean[view_xmax][view_ymax];
+    base_count = 0;
+    for (int i = 0; i < view_xmax; ++i)
+      for (int j = 0; j < view_ymax; ++j)
+        base_configuration[i][j] = false;
+    for (Position t: I.T) {
+      for (int i = t.get_x(); i < view_xmax; ++i)
+        for (int j = t.get_y(); j < view_ymax; ++j)
+          if (base_configuration[i][j])
+            break;
+          else {
+            base_configuration[i][j] = true;
+            ++base_count;
+          }
+    }
+    if (J != null)
+      for (Position t : J.T) {
+        for (int i = t.get_x(); i < view_xmax; ++i)
+          for (int j = t.get_y(); j < view_ymax; ++j) {
+            if (!base_configuration[i][j])
+              break;
+            else {
+              base_configuration[i][j] = false;
+              --base_count;
+            }
+          }
+      }
+    base_max_x = view_xmax;
+    base_max_y = view_ymax;
+    cache = new Vector<>(base_count);
+    zero_positions = new Vector<>(base_count);
+    for (int i = 0; i < base_count; ++i) {
+      cache.addElement(new Vector<Vector<LinkedList<Pair<boolean[][], Integer>>>>(base_max_x));
+      zero_positions.addElement(new Vector<Vector<LinkedList<Position>>>(base_max_x));
+      for (int j = 0; j < base_max_x; ++j) {
+        cache.get(i).addElement(new Vector<LinkedList<Pair<boolean[][], Integer>>>(base_max_y));
+        zero_positions.get(i).addElement(new Vector<LinkedList<Position>>(base_max_y));
+        for (int k = 0; k < base_max_y; ++k) {
           cache.get(i).get(j).addElement(new LinkedList<Pair<boolean[][], Integer>>());
           zero_positions.get(i).get(j).addElement(new LinkedList<Position>());
         }
@@ -57,7 +69,7 @@ public class Game_Evaluation {
 
   }
 
-  public boolean same_field(boolean[][] F, boolean[][] G, int count, int max_x, int max_y) {
+  public boolean same_configuration(boolean[][] F, boolean[][] G, int count, int max_x, int max_y) {
 
     int counted = 0;
     boolean so_far_so_good = true;
@@ -71,46 +83,93 @@ public class Game_Evaluation {
 
   }
 
-  public int game_value(boolean[][] field, int count, int max_x, int max_y) {
+  public void play_point(int i, int j) {
+    
+    // update base_configuration
+    for (int k = i; k < base_max_x; ++k)
+      for (int l = j; l < base_max_y; ++l)
+        if (base_configuration[k][l]) {
+          base_configuration[k][l] = false;
+          --base_count;
+        }
+    // adjust base_max_y
+    boolean checking_y = true;
+    int old_base_max_y = base_max_y;
+    while (base_max_y > 0 && checking_y) {
+      boolean found_position = false;
+      for (int k = 0; !found_position && k < base_max_x; ++k)
+        found_position |= base_configuration[k][base_max_y - 1];
+      if (found_position) checking_y = false;
+      else --base_max_y;
+    }
+    // adjust base_max_x
+    if (j == 0) base_max_x = i;
+    boolean checking_x = true;
+    while (base_max_x > 0 && checking_x) {
+      boolean found_position = false;
+      for (int l = 0; !found_position && l < old_base_max_y; ++l)
+        found_position |= base_configuration[base_max_x - 1][l];
+      if (found_position) checking_x = false;
+      else --base_max_x;
+    }
+
+    Log.d(tag,
+        "count: " + String.valueOf(base_count) +
+            " max_x: " + String.valueOf(base_max_x) +
+            " max_y: " + String.valueOf(base_max_y)
+    );
+
+    if (base_count == 0)
+      ((Playfield) overall_context.findViewById(R.id.playfield)).game_control.notify_game_over();
+
+  }
+
+  Position hint_position() { return zero_position; }
+
+  public void choose_computer_move() {
+    computer_move = true;
+    game_value();
+  }
+
+  public int game_value() {
 
     int result = 0;
     Position winning_position = ORIGIN;
 
-    LinkedList<Pair<boolean[][], Integer>> cache_line
-        = cache.get(count - 1).get(max_x - 1).get(max_y - 1);
-    LinkedList<Position> position_line
-        = zero_positions.get(count - 1).get(max_x - 1).get(max_y - 1);
-    Iterator<Pair<boolean[][], Integer>> iter = cache_line.iterator();
-    Iterator<Position> piter = position_line.iterator();
-    boolean searching = true;
-    Pair<boolean[][], Integer> p = null;
-    while (searching && iter.hasNext()) {
-      p = iter.next();
-      Position temp_position = piter.next();
-      if (same_field(field, p.first, count, max_x, max_y)) {
-        searching = false;
-        winning_position = temp_position;
+    if (base_count != 0) {
+
+      LinkedList<Pair<boolean[][], Integer>> cache_line
+          = cache.get(base_count - 1).get(base_max_x - 1).get(base_max_y - 1);
+      LinkedList<Position> position_line
+          = zero_positions.get(base_count - 1).get(base_max_x - 1).get(base_max_y - 1);
+      Iterator<Pair<boolean[][], Integer>> iter = cache_line.iterator();
+      Iterator<Position> piter = position_line.iterator();
+
+      boolean searching = true;
+      Pair<boolean[][], Integer> p = null;
+      while (searching && iter.hasNext()) {
+        p = iter.next();
+        Position temp_position = piter.next();
+        if (same_configuration(base_configuration, p.first, base_count, base_max_x, base_max_y)) {
+          searching = false;
+          winning_position = temp_position;
+        }
       }
-    }
-    if (searching) {
-      // result = compute_scores(field, count, max_x, max_y, 0);
 
-      Compute_Task my_task = new Compute_Task(overall_context, count);
-      my_task.execute(field, count, max_x, max_y);
-      /*try {
-        result = my_task.get();
-      } catch (Exception e) {
+      if (searching) {
+        Compute_Task my_task = new Compute_Task(overall_context, base_count);
+        my_task.execute(base_configuration, base_count, base_max_x, base_max_y);
+      } else {
+        zero_position = winning_position;
+        result = configuration_value = p.second;
+        result = p.second;
+        if (computer_move) {
+          Playfield playfield = (Playfield) overall_context.findViewById(R.id.playfield);
+          playfield.hint_position = zero_position;
+          playfield.get_computer_move();
+        }
+      }
 
-      }*/
-      //ComputeThread thread = new ComputeThread(field);
-      //thread.start();
-      /*ProgressDialog waiter = new ProgressDialog(overall_context);
-      waiter.setTitle(overall_context.getString(R.string.thinking));
-      waiter.setMessage(overall_context.getString(R.string.please_wait));
-      waiter.show();*/
-    } else {
-      zero_position = winning_position;
-      result =p.second;
     }
 
     return result;
@@ -122,18 +181,17 @@ public class Game_Evaluation {
     /**
      * Creates a new asynchronous task. This constructor must be invoked on the UI thread.
      */
-    public Compute_Task(Context context, int count) {
+    public Compute_Task(Activity activity, int count) {
 
       super();
 
       current_positions = 0;
 
-      update_dialog = new ProgressDialog(context);
+      update_dialog = new ProgressDialog(activity);
       update_dialog.setMax(count);
       update_dialog.setIndeterminate(false);
       update_dialog.setCancelable(false);
       update_dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-      Activity activity = (Activity) context;
       update_dialog.setTitle(activity.getString(R.string.thinking));
       update_dialog.setMessage(activity.getString(R.string.please_wait));
 
@@ -166,8 +224,17 @@ public class Game_Evaluation {
     @Override
     protected void onPostExecute(Integer integer) {
       super.onPostExecute(integer);
-      ((TextView) ((Activity) overall_context).findViewById(R.id.value_view)).setText(integer.toString());
+      ((TextView) overall_context.findViewById(R.id.value_view)).setText(integer.toString());
+      Playfield p = ((Playfield) overall_context.findViewById(R.id.playfield));
+      p.hint_position = zero_position;
+      p.invalidate();
+      TextView tv = (TextView) overall_context.findViewById(R.id.value_view);
+      tv.setText(String.valueOf(configuration_value));
       update_dialog.dismiss();
+      if (computer_move) {
+        computer_move = false;
+        p.get_computer_move();
+      }
     }
 
     /**
@@ -206,7 +273,7 @@ public class Game_Evaluation {
       return result;
     }
 
-    public int compute_scores(boolean[][] field, int count, int max_x, int max_y, int level) {
+    public int compute_scores(boolean[][] configuration, int count, int max_x, int max_y, int level) {
 
       int result, completed = 0;
 
@@ -220,14 +287,14 @@ public class Game_Evaluation {
         case 1:
           result = 1;
           if (level == 0)
-            zero_position = find_min_pos(field, max_x, max_y);
+            zero_position = find_min_pos(configuration, max_x, max_y);
           break;
         default:
           //String header = "";
           //for (int i = 0; i < level; ++i) header += "=";
           //Log.d(tag, header);
           //Log.d(tag, "Searching for:");
-          //print_field(field, max_x, max_y);
+          //print_configuration(configuration, max_x, max_y);
           //Log.d(tag, "----");
           LinkedList<Pair<boolean[][], Integer>> cache_line
               = cache.get(count - 1).get(max_x - 1).get(max_y - 1);
@@ -241,7 +308,7 @@ public class Game_Evaluation {
           while (searching && iter.hasNext()) {
             p = iter.next();
             Position temp_position = piter.next();
-            if (same_field(field, p.first, count, max_x, max_y)) {
+            if (same_configuration(configuration, p.first, count, max_x, max_y)) {
               searching = false;
               winning_position = temp_position;
             }
@@ -250,7 +317,7 @@ public class Game_Evaluation {
             result = p.second;
             zero_position = winning_position;
             //Log.d(tag, "found with value " + String.valueOf(result));
-            //print_field(p.first, max_x, max_y);
+            //print_configuration(p.first, max_x, max_y);
             //Log.d(tag, "----");
           } else {
             //Log.d(tag, "not found, computing");
@@ -258,19 +325,21 @@ public class Game_Evaluation {
             // work our way up to largest x, y values
             for (int i = 0; i < max_x; ++i) {
               for (int j = 0; j < max_y; ++j) {
-                // we will remove the point (i,j) and all those northeast of it to create a new field
-                while (j < max_y && !field[i][j]) ++j;
-                if (j < max_y && field[i][j]) { // no point continuing if there are no points in this row
-                  // make the new field
-                  boolean[][] new_field = new boolean[max_x][max_y];
+                // we will remove the point (i,j) and all those northeast of it
+                // to create a new configuration
+                while (j < max_y && !configuration[i][j]) ++j;
+                // no point continuing if there are no points in this row
+                if (j < max_y && configuration[i][j]) {
+                  // make the new configuration
+                  boolean[][] new_configuration = new boolean[max_x][max_y];
                   int new_count = count;
                   for (int k = 0; k < max_x; ++k) {
                     for (int l = 0; l < max_y; ++l)
                       if (k < i || l < j)
-                        new_field[k][l] = field[k][l];
+                        new_configuration[k][l] = configuration[k][l];
                       else {
-                        new_field[k][l] = false;
-                        if (field[k][l]) --new_count;
+                        new_configuration[k][l] = false;
+                        if (configuration[k][l]) --new_count;
                       }
                   }
                   // adjust max_x, max_y if necessary
@@ -280,7 +349,7 @@ public class Game_Evaluation {
                     while (new_max_y > 0 && checking_y) {
                       boolean found_position = false;
                       for (int k = 0; !found_position && k < max_x; ++k)
-                        found_position |= new_field[k][new_max_y - 1];
+                        found_position |= new_configuration[k][new_max_y - 1];
                       if (found_position) checking_y = false;
                       else --new_max_y;
                     }
@@ -288,12 +357,12 @@ public class Game_Evaluation {
                     while (new_max_x > 0 && checking_x) {
                       boolean found_position = false;
                       for (int l = 0; !found_position && l < max_y; ++l)
-                        found_position |= new_field[new_max_x - 1][l];
+                        found_position |= new_configuration[new_max_x - 1][l];
                       if (found_position) checking_x = false;
                       else --new_max_x;
                     }
                   }
-                  int value = compute_scores(new_field, new_count, new_max_x, new_max_y, level + 1);
+                  int value = compute_scores(new_configuration, new_count, new_max_x, new_max_y, level + 1);
                   options.add(value);
                   if (value == 0) {
                     winning_position = new Position(i, j);
@@ -308,7 +377,7 @@ public class Game_Evaluation {
             int mex = 0;
             while (options.contains(mex)) ++mex;
             result = mex;
-            cache_line.add(new Pair<>(field, result));
+            cache_line.add(new Pair<>(configuration, result));
             position_line.add(winning_position);
             if (result == 0 && level == 0)
               zero_position = ORIGIN;
@@ -327,24 +396,24 @@ public class Game_Evaluation {
 
   }
 
-  public void print_field(boolean[][] field, int max_x, int max_y) {
+  public void print_configuration(boolean[][] config, int max_x, int max_y) {
     Log.d(tag, "----");
     for (int i = max_y - 1; i > -1; --i) {
       String output = "";
       for (int j = 0; j < max_x; ++j)
-        output += (field[j][i]) ? "X" : ".";
+        output += (config[j][i]) ? "X" : ".";
       Log.d(tag, output);
     }
     Log.d(tag, "----");
   }
 
-  protected Position find_min_pos(boolean[][] field, int max_x, int max_y) {
+  protected Position find_min_pos(boolean[][] config, int max_x, int max_y) {
     boolean searching = true;
     int i = 0, j = 0;
     while (searching && i < max_x) {
       j = 0;
       while (searching && j < max_y) {
-        searching = !field[i][j];
+        searching = !config[i][j];
         if (searching) ++j;
       }
       if (searching) ++i;
@@ -352,16 +421,18 @@ public class Game_Evaluation {
     return new Position(i, j);
   }
 
-  Position hint_position() { return zero_position; }
-
+  protected boolean[][] base_configuration;
   protected int base_count, base_max_x, base_max_y;
   protected Vector<Vector<Vector<LinkedList<Pair<boolean[][], Integer>>>>> cache;
   protected Vector<Vector<Vector<LinkedList<Position>>>> zero_positions;
 
   protected static final Position ORIGIN = new Position(0,0);
   protected Position zero_position = ORIGIN;
+  protected int configuration_value;
 
-  protected Context overall_context;
+  protected Activity overall_context;
+
+  protected boolean computer_move;
 
   final private static String tag = "Game_Evaluation";
 

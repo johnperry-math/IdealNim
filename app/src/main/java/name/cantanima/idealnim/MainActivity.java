@@ -1,9 +1,16 @@
 package name.cantanima.idealnim;
 
 import android.app.AlertDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -20,29 +27,15 @@ public class MainActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     Button new_game_button = (Button) findViewById(R.id.new_game_button);
-    Button evaluate_game_button = (Button) findViewById(R.id.evaluate_game_button);
     TextView value_textview = (TextView) findViewById(R.id.value_view);
     Button hint_button = (Button) findViewById(R.id.hint_button);
     Playfield playfield = (Playfield) findViewById(R.id.playfield);
     playfield.set_buttons_to_listen(
-        new_game_button, evaluate_game_button, value_textview, hint_button
+        new_game_button, value_textview, hint_button
     );
     //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     //setSupportActionBar(toolbar);
 
-  }
-
-  public void showAlertDialog() {
-    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    builder.setTitle(getString(R.string.thinking));
-    builder.setMessage(getString(R.string.please_wait));
-    builder.setCancelable(false);
-    waiter = builder.create();
-    waiter.show();
-  }
-
-  public void dismissAlertDialog() {
-    waiter.dismiss();
   }
 
   @Override
@@ -61,6 +54,10 @@ public class MainActivity extends AppCompatActivity {
 
     //noinspection SimplifiableIfStatement
     if (id == R.id.action_settings) {
+      Intent i = new Intent(this, SettingsActivity.class);
+      startActivity(i);
+      return true;
+    } else if (id == R.id.action_information) {
       return true;
     }
 

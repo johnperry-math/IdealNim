@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:sample="http://schemas.android.com/apk/res-auto">
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/stupid_pref_key"
+        android:summary="@string/stupid_pref_summary"
+        android:title="@string/stupid_pref_title"
+        sample:key="@string/stupid_pref_key"
+        sample:summary="@string/stupid_pref_summary"
+        sample:title="@string/stupid_pref_title"/>
+
+    <com.pavelsikun.seekbarpreference.SeekBarPreference
+        android:key="@string/level_pref"
+        android:title="@string/level_title"
+        android:summary="@string/level_summary"
+        android:defaultValue="1"
+        sample:msbp_minValue="1"
+        sample:msbp_maxValue="10"
+        sample:msbp_interval="1"
+        sample:msbp_measurementUnit=" "
+        sample:msbp_dialogEnabled="false"/>
+
+    <com.pavelsikun.seekbarpreference.SeekBarPreference
+        android:key="@string/max_pref_key"
+        android:title="@string/max_pref_title"
+        android:summary="@string/max_pref_summary"
+        android:defaultValue="7"
+        sample:msbp_view_defaultValue="1"
+        sample:msbp_minValue="7"
+        sample:msbp_maxValue="15"
+        sample:msbp_interval="1"
+        sample:msbp_measurementUnit=" "
+        sample:msbp_dialogEnabled="false"
+        />
+
+</PreferenceScreen>

@@ -1,13 +1,67 @@
 <resources>
+
     <string name="app_name">Ideal Nim</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_bar_settings">Settings</string>
+    <string name="action_bar_info">Information</string>
 
     <string name="new_game">New Game</string>
     <string name="evaluate_game">Evaluate</string>
     <string name="hint">Hint</string>
 
+    <string name="who_first">Who shall go first?</string>
+    <string name="human">Human</string>
+    <string name="computer">Computer</string>
+
+    <string name="game_over">Game over!</string>
+    <string name="computer_won">I won!&#160;</string>
+    <string-array name="lose_insults">
+        <item>I was playing with &#8220;One arm behind my back&#8221; and I still won!</item>
+        <item>But of course: my brain is much smaller than yours. Bigger ain&#8217;t always better!</item>
+        <item>I can think several billion thoughts a second. Whereas you, well&#8230;</item>
+        <item>You should try that Hint button now and again. Maybe start first, too. (Bet I still beat you!)</item>
+        <item>You should spend more time with books than with Android. I recommend &#8220;Winning Ways for Your Mathematical Plays&#8221;.</item>
+    </string-array>
+    <string name="player_won">You won!&#160;</string>
+    <string-array name="win_insults">
+        <item>But I wouldn&#8217;t brag too loud, were I you. I mean, come on, I was playing with &#8220;One arm behind my back&#8221;.</item>
+        <item>Surely it were a fluke! Betcha can&#8217;t do it again!</item>
+        <item>Have you been disassembling my bytecode?</item>
+        <item>Made heavy use of that Hint button, dincha?</item>
+        <item>Peeked into &#8220;Winning Ways for Your Mathematical Plays&#8221; lately?</item>
+    </string-array>
+    <string name="play_again">&#160;Start a new game, with the same settings?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+
     <string name="thinking">Thinking</string>
     <string name="please_wait">Please wait...</string>
     <string name="unknown_game_value">\?</string>
+
+    <!-- Strings related to Settings -->
+
+    <string name="title_activity_settings">Settings</string>
+
+    <string name="stupid_pref_key">stupid_pref</string>
+    <string name="stupid_pref_title">One arm behind my back</string>
+    <string name="stupid_pref_summary">
+        The computer will always figure out the best move, if it&#8217;s available.
+        Check this box, however, the computer will sometimes make a mistake.
+        <b>Sometimes.</b>
+    </string>
+
+    <string name="level_pref">level_pref</string>
+    <string name="level_title">Level</string>
+    <string name="level_summary">
+        Level 1 is easiest. Higher levels increase the number of base points.
+        Even-numbered levels are identical to odd-numbered levels, but forbid hints.
+    </string>
+
+    <string name="max_pref_title">Board size</string>
+    <string name="max_pref_key">max_pref_key</string>
+    <string name="max_pref_summary" formatted="false">
+        Defines how large you want the playing board to be.
+        Larger values require more time for the computer&#8217;s first move,
+        or for your first hint.
+    </string>
 
 </resources>

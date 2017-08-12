@@ -1,13 +1,16 @@
 package name.cantanima.idealnim;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Shader;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -29,12 +32,18 @@ import static android.graphics.Paint.Style.STROKE;
 import static android.view.MotionEvent.ACTION_DOWN;
 import static android.view.MotionEvent.ACTION_MOVE;
 import static android.view.MotionEvent.ACTION_UP;
+import static name.cantanima.idealnim.Game_Control.Player_Kind.COMPUTER;
+import static name.cantanima.idealnim.Game_Control.Player_Kind.HUMAN;
+import static name.cantanima.idealnim.Game_Evaluation.ORIGIN;
 
 /**
  * Created by cantanima on 8/8/17.
  */
 
-public class Playfield extends View implements OnTouchListener, OnClickListener {
+public class Playfield
+    extends View
+    implements OnTouchListener, OnClickListener, SharedPreferences.OnSharedPreferenceChangeListener
+{
 
   public Playfield(Context context, AttributeSet attrs) {
 
@@ -50,10 +59,18 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
       playable.add_generator_fast(3, 2);
       playable.add_generator_fast(5, 1);
       playable.sort_ideal();
+    } else {
+      SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+      pref.registerOnSharedPreferenceChangeListener(this);
+      if (pref.contains(context.getString(R.string.level_pref)))
+        game_level = pref.getInt(context.getString(R.string.level_pref), 1);
+      if (pref.contains(context.getString(R.string.max_pref_key)))
+        view_xmax = view_ymax = pref.getInt(context.getString(R.string.max_pref_key), 7);
+      if (pref.contains(context.getString(R.string.stupid_pref_key)))
+        computer_sometimes_dumb = pref.getBoolean(context.getString(R.string.stupid_pref_key), false);
+      game_control = new Game_Control();
+      game_control.new_game(this, view_xmax, view_ymax, game_level);
     }
-
-    game_control = new Game_Control();
-    game_control.new_game(this);
     setOnTouchListener(this);
 
   }
@@ -78,6 +95,9 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
         w + getPaddingLeft() + getPaddingRight(), h + getPaddingTop() + getPaddingBottom()
     );
 
+    ideal_paint.setShader(new LinearGradient(0, h, w, 0, ideal_color, disappear_color, Shader.TileMode.CLAMP));
+    coideal_paint.setShader(new LinearGradient(0, h, w, 0, coideal_color, disappear_color, Shader.TileMode.CLAMP));
+
   }
 
   /**
@@ -93,22 +113,7 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
     if (value_text != null)
       value_text.setText(getContext().getString(R.string.unknown_game_value));
 
-    evaluator = null;
-    playfield = new boolean[view_xmax][view_ymax];
-    playfield_count = 0;
-    for (int i = 0; i < view_xmax; ++i)
-      for (int j = 0; j < view_ymax; ++j)
-        playfield[i][j] = false;
-    for (Position t: playable.T) {
-      for (int i = t.get_x(); i < view_xmax; ++i)
-        for (int j = t.get_y(); j < view_ymax; ++j)
-          if (!playfield[i][j]) {
-            playfield[i][j] = true;
-            ++playfield_count;
-          }
-    }
-    playfield_max_x = view_xmax;
-    playfield_max_y = view_ymax;
+    evaluator = new Game_Evaluation(getContext(), playable, null, view_xmax, view_ymax);
 
   }
 
@@ -239,6 +244,32 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
       canvas.drawLine(0, h - i * step_y, w, h - i * step_y, line_paint);
   }
 
+  public void get_computer_move() {
+
+      boolean stupid_turn = computer_sometimes_dumb && game_control.random.nextBoolean();
+
+    if (hint_position == null)
+      evaluator.choose_computer_move();
+    else{
+      int i, j;
+      if (hint_position == ORIGIN || stupid_turn) {
+        do {
+          i = game_control.random.nextInt(view_xmax);
+          j = game_control.random.nextInt(view_ymax);
+        } while (!playable.contains(i, j) || gone.contains(i, j));
+      } else {
+        i = hint_position.get_x();
+        j = hint_position.get_y();
+      }
+      evaluator.play_point(i, j);
+      gone.add_generator(i, j, true);
+    }
+
+    game_control.set_player_kind(HUMAN);
+    evaluator.computer_move = false;
+
+  }
+
   /**
    * Called when a touch event is dispatched to a view. This allows listeners to
    * get a chance to respond before the target view.
@@ -250,68 +281,43 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
    */
   @Override
   public boolean onTouch(View v, MotionEvent event) {
-    float x = event.getX(), y = event.getY();
-    float w = getWidth(), h = getHeight();
-    if (x >= 0 && y >= 0 && x <= w && y <= h) {
-      int i = (int) (x / step_x);
-      int j = (int) ((h - y) / step_y);
-      switch (event.getAction()) {
-        case ACTION_UP:
-          highlighting = hinting = false;
-          // check for valid position
-          if (playable.contains(i, j) && !gone.contains(i, j)) {
-            // add generator
-            gone.add_generator(i, j, true);
-            // update playfield
-            for (int k = i; k < playfield_max_x; ++k)
-              for (int l = j; l < playfield_max_y; ++l)
-                if (playfield[k][l]) {
-                  playfield[k][l] = false;
-                  --playfield_count;
-                }
-            // adjust playfield_max_y
-            boolean checking_y = true;
-            int old_playfield_max_y = playfield_max_y;
-            while (playfield_max_y > 0 && checking_y) {
-              boolean found_position = false;
-              for (int k = 0; !found_position && k < playfield_max_x; ++k)
-                found_position |= playfield[k][playfield_max_y - 1];
-              if (found_position) checking_y = false;
-              else --playfield_max_y;
+    if (game_control.get_player_kind() == HUMAN) {
+      float x = event.getX(), y = event.getY();
+      float w = getWidth(), h = getHeight();
+      if (x >= 0 && y >= 0 && x <= w && y <= h) {
+        int i = (int) (x / step_x);
+        int j = (int) ((h - y) / step_y);
+        switch (event.getAction()) {
+          case ACTION_UP:
+            highlighting = hinting = false;
+            // check for valid position
+            if (playable.contains(i, j) && !gone.contains(i, j)) {
+              // add generator
+              gone.add_generator(i, j, true);
+              evaluator.play_point(i, j);
             }
-            // adjust playfield_max_x
-            if (j == 0) playfield_max_x = i;
-            boolean checking_x = true;
-            while (playfield_max_x > 0 && checking_x) {
-              boolean found_position = false;
-              for (int l = 0; !found_position && l < old_playfield_max_y; ++l)
-                found_position |= playfield[playfield_max_x - 1][l];
-              if (found_position) checking_x = false;
-              else --playfield_max_x;
+            if (evaluator.base_count != 0) {
+              game_control.set_player_kind(COMPUTER);
+              evaluator.choose_computer_move();
             }
-          }
-          Log.d(tag,
-              "count: " + String.valueOf(playfield_count) +
-                  " max_x: " + String.valueOf(playfield_max_x) +
-                  " max_y: " + String.valueOf(playfield_max_y)
-          );
-          break;
-        case ACTION_DOWN:
-          highlighting = true;
-          highlight_x = i;
-          highlight_y = j;
-          if (playable.contains(i, j) && !gone.contains(i, j)) highlight_color = YELLOW;
-          else highlight_color = BLACK;
-          break;
-        case ACTION_MOVE:
-          if (highlighting) {
+            break;
+          case ACTION_DOWN:
+            highlighting = true;
             highlight_x = i;
             highlight_y = j;
             if (playable.contains(i, j) && !gone.contains(i, j)) highlight_color = YELLOW;
             else highlight_color = BLACK;
-          }
+            break;
+          case ACTION_MOVE:
+            if (highlighting) {
+              highlight_x = i;
+              highlight_y = j;
+              if (playable.contains(i, j) && !gone.contains(i, j)) highlight_color = YELLOW;
+              else highlight_color = BLACK;
+            }
+        }
+        invalidate();
       }
-      invalidate();
     }
     return true;
   }
@@ -325,29 +331,9 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
   public void onClick(View v) {
 
     if (v == new_game_button) {
-      game_control.new_game(this);
-    } else if (v == evaluate_game_button) {
-      waiter = null;
-      if (evaluator == null) {
-        /*waiter = new ProgressDialog(getContext());
-        waiter.setTitle(getContext().getString(R.string.thinking));
-        waiter.setMessage(getContext().getString(R.string.please_wait));
-        waiter.setMax(playfield_count);
-        waiter.setCancelable(false);
-        waiter.show();*/
-        evaluator
-            = new Game_Evaluation(getContext(), playfield_count, playfield_max_x, playfield_max_y);
-      }
-      value_text.setText(String.valueOf(
-          evaluator.game_value(playfield, playfield_count, playfield_max_x, playfield_max_y)
-      ));
-      if (waiter != null) waiter.dismiss();
-
+      game_control.new_game(this, view_xmax, view_ymax, game_level);
     } else if (v == hint_button) {
-      if (evaluator == null)
-        evaluator
-            = new Game_Evaluation(getContext(), playfield_count, playfield_max_x, playfield_max_y);
-      evaluator.game_value(playfield, playfield_count, playfield_max_x, playfield_max_y);
+      value_text.setText(String.valueOf(evaluator.game_value()));
       hint_position = evaluator.hint_position();
       hinting = true;
       invalidate();
@@ -356,24 +342,56 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
   }
 
   public void set_buttons_to_listen(
-      Button ng_button, Button eg_button, TextView vt_view, Button h_button
+      Button ng_button, TextView vt_view, Button h_button
   ) {
 
     new_game_button = ng_button;
     new_game_button.setOnClickListener(this);
-    evaluate_game_button = eg_button;
-    evaluate_game_button.setOnClickListener(this);
     value_text = vt_view;
     hint_button = h_button;
     hint_button.setOnClickListener(this);
+    if (game_level % 2 == 0) hint_button.setEnabled(false);
+    else hint_button.setEnabled(true);
 
   }
 
-  protected int view_xmax = 10, view_ymax = 10;
+  /**
+   * Called when a shared preference is changed, added, or removed. This
+   * may be called even if a preference is set to its existing value.
+   * <p>
+   * <p>This callback will be run on your main thread.
+   *
+   * @param pref The {@link SharedPreferences} that received
+   *                          the change.
+   * @param key               The key of the preference that was changed, added, or
+   */
+  @Override
+  public void onSharedPreferenceChanged(SharedPreferences pref, String key) {
+    if (key.equals(getContext().getString(R.string.level_pref))) {
+      game_level = pref.getInt(getContext().getString(R.string.level_pref), 1);
+      game_level = (game_level < 1) ? 1 : game_level;
+      if (game_level % 2 == 0) hint_button.setEnabled(false);
+      else hint_button.setEnabled(true);
+    } else if (key.equals(getContext().getString(R.string.max_pref_key))) {
+      int max = pref.getInt(getContext().getString(R.string.max_pref_key), 7);
+      max = (max < 7) ? 7 : max;
+      if (max != view_xmax) {
+        view_xmax = view_ymax = max;
+        step_x = getWidth() / view_xmax;
+        step_y = getHeight() / view_ymax;
+        evaluator = new Game_Evaluation(getContext(), playable, gone, view_xmax, view_ymax);
+        invalidate();
+      }
+    } else if (key.equals(getContext().getString(R.string.stupid_pref_key))) {
+      computer_sometimes_dumb = pref.getBoolean(getContext().getString(R.string.stupid_pref_key), false);
+    }
+  }
+
+  protected int view_xmax = 7, view_ymax = 7;
   protected float step_x, step_y;
   protected int highlight_x, highlight_y;
   protected boolean highlighting = false, hinting = false;
-  protected int background_color = GREEN, ideal_color = GRAY,
+  protected int background_color = GREEN, ideal_color = RED, disappear_color = GRAY,
       coideal_color = RED, highlight_color = YELLOW, hint_color = Color.rgb(0xff, 0x80, 0x00);
   protected Paint highlight_paint = new Paint(), hint_paint = new Paint(),
       ideal_paint = new Paint(), coideal_paint = new Paint(),
@@ -381,17 +399,16 @@ public class Playfield extends View implements OnTouchListener, OnClickListener 
   protected Path ideal_path = new Path(), coideal_path = new Path();
 
   protected Ideal playable, gone;
-  protected boolean[][] playfield;
-  protected int playfield_count, playfield_max_x, playfield_max_y;
 
   protected Position hint_position;
 
+  protected int game_level = 4;
   protected Game_Control game_control;
+  protected boolean computer_sometimes_dumb = false;
 
   protected Game_Evaluation evaluator;
-  protected ProgressDialog waiter;
 
-  protected Button new_game_button, evaluate_game_button, hint_button;
+  protected Button new_game_button, hint_button;
   protected TextView value_text;
 
   final protected static String tag = "Playfield";

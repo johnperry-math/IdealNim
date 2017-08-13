@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ideal Nim</title>
+</head>
+<body>
+<a name="top"/><h1>Ideal Nim</h1>
+<ul>
+    <li><a href="#idea">The idea</a></li>
+    <li><a href="#gameplay">Gameplay</a></li>
+    <li><a href="#options">Options</a></li>
+    <li><a href="#mathematics">Mathematical ideas behind the game</a></li>
+    <li><a href="#credits">Credits</a></li>
+</ul>
+
+<h2><a name="idea">The idea</a> </h2>
+
+Ideal Nim is a very simple example of an
+&ldquo;impartial, two-player, perfect-information, combinatorial game&rdquo;
+that challenges the mind while illustrating some advanced mathematical ideas.
+It is difficult to defeat the computer even when you know what you&rsquo;re doing,
+so when you manage it you should be proud of yourself.
+<p/>
+If you are familiar with Nim then you are familiar with the basic principles behind Ideal Nim.
+More information on this appears in the section on
+<a href="#mathematics">Mathematical ideas behind the game</a>.
+
+<p/>
+<a href="#top">Back to the top</a>
+
+<h2><a name="gameplay"/>Gameplay</h2>
+
+<h3>Basic gameplay</h3>
+Gameplay consists in selecting valid squares.
+Once a player selects a valid square,
+all squares &ldquo;northeast&rdquo; of it become invalid.
+To help identify valid and invalid squares,
+You can drag your finger across the board, and the square underneath your finger
+will highlight over a valid square, or black out over an invalid square.
+<p/>
+<center><b><i>The player who takes the last valid square wins.</i></b></center>
+<p/>
+(Initially, valid positions are colored <span style="color:blue;">blue</span>,
+while invalid positions are colored <span style="color:red;">red</span>.
+This can be changed in the preferences.)
+
+<h3>Hints</h3>
+On odd-numbered levels you can ask for a hint, and
+the computer will mark the square it would choose.
+If the position is playable, then it is a winning move; that is,
+<i>if you play according to the computer&rsquo;s hints, you will win.</i>
+<p/>
+Oftentimes, the computer will mark the lower left square, which is not playable!
+In these cases, <i>no move will guarantee a win</i>, and the computer would choose a random square.
+You might as well do the same&hellip;
+or use one of at least two ways to cheat.
+
+<h3>&ldquo;Thinking&rdquo;</h3>
+Before the computer can move or give you a hint (assuming you ask for one)
+it has to analyze the game board. This is both good news and bad news.
+<p/>
+<b>The bad news:</b>
+Depending on the number of playable pieces,
+<b>this analysis can take anywhere from a split second to several minutes.</b>
+A message will pop up, indicating the computer&rsquo;s progress in analyzing the board,
+indicating both a percentage and a ratio of positions analyzed.
+<p/>
+<b>The good news:</b>
+Most of the thinking gets done between the 20% and the 60% markers,
+and <b>the anlysis is complete</b>.
+If you can wait that out at the beginning of the game,
+it will be near-instantaneous from then on&hellip; unless you change the board size mid-game!
+<p/>
+
+<a href="#top">Back to the top</a>
+
+<h2><a name="options"/>Options</h2>
+
+If you select the &ldquo;Settings&rdquo; (wrench) icon in the toolbar, several options will appear,
+along with some fairly detailed explanations. Here&rsquo;s a little more detail on how they work.
+
+<ul>
+    <li> <b>One arm behind my back</b> &mdash;
+        If a winning move is available, the computer will find it.
+        Now, a computer can think a lot faster than you,
+        and is much better at keeping track of all possible locations.
+        If you check this box, however, the computer will sometimes &mdash; <i>sometimes</i> &mdash;
+        &ldquo;make a mistake&rdquo; and choose a random square
+        even when it knows a different square would guarantee a win!
+        (This does not affect the hints: the machine will be honest in those cases.)
+        <p/>
+    </li>
+    <li>
+        <b>Level</b> &mdash; Each level offers a number of random configurations.
+        The level&rsquo;s number is related to the number of &ldquo;southwest corners&rdquo;
+        the region of playable squares will have.
+        Levels 1-2 have only one corner; levels 2-3 have two corners; levels 3-4 have three corners,
+        and so forth.
+        <p/>
+        <b>Even-numbered levels disable hints.</b>
+        Each even-numbered level offer the exact same configurations as the level below,
+        but the lack of a hint makes it harder to play.
+        So, while ten levels are listed,
+        there are really only five levels of different configurations.
+        <p/>
+    </li>
+    <li>
+        <b>Board size</b> &mdash; In theory, the board could extend indefinitely to the northeast;
+        that is, an &ldquo;ideal&rdquo; game of Ideal Nim has an infinite game board.
+        In practice, this is impossible to implement,
+        especially if the computer is going to find the best move!
+        As a result, this app limits the board size.
+        The smallest board you can play on is 7&times;7,
+        but you can extend it to 15&times;15.
+        Keep in mind that <i>larger boards require much more time for the computer to analyze!</i>
+        <p/>
+        But, lookit: This gives you an opportunity to outwit the computer!
+        On a finite board, the winning position can change
+        by adding or removing rows to the north and east!
+        Just keep in mind that the computer will have to re-analyze the board
+        when you change the size, and this will require time.
+    </li>
+</ul>
+
+<p/>
+<a href="#top">Back to the top</a>
+
+<h2><a name="mathematics"/>Mathematical ideas behind the game</h2>
+
+Ideal Nim is based on several major ideas in the mathematical fields of
+<b>commutative algebra</b> and <b>combinatorial game theory</b>.
+
+<ul>
+    <li>
+        The game board involves two <b>diagrams of monomial ideals</b>.
+        Playable points correspond to an ideal <i>P</i>,
+        while played points correspond to an ideal <i>G</i>.
+        During gameplay, <i>G</i> expands until it meets <i>P</i>.
+        The game is inspired by what happens to monomial ideals
+        during the computation of a Gr&ouml;bner basis.
+        (You can read about
+        <a href="http://en.wikipedia.org/wiki/Monomial_ideal">monomial ideals</a> and
+        <a href="http://en.wikipedia.org/wiki/Gröbner_basis">Gr&ouml;bner bases</a> here.)
+    </li>
+    <li>
+        The fact that this game cannot go on indefinitely,
+        regardless of the gameboard&rsquo;s dimension,
+        is called either <b>the Hilbert basis theorem</b> or <i>Dickson&rsquo;s Lemma</i>,
+        depending on how you look at it, and is possible because &ldquo;polynomial rings&rdquo;
+        possess what is called the <b>Noetherian property</b>.
+        (You can read more about <a href="http://en.wikipedia.org/wiki/David_Hilbert">David Hilbert</a>,
+        <a href="http://en.wikipedia.org/wiki/Leonard_Dickson">Leonard Dickson</a>, and
+        <a href="http://en.wikipedia.org/wiki/Emmy_Noether">Emmy Noether</a> if you like.)
+    </li>
+    <li>
+        Ideal Nim illustrates these ideas in the framework of an impartial, two-player,
+        perfect-information, combinatorial game. What does this mean?<p/>
+        <ul>
+            <li>
+                <b>Impartial</b> means that any move available to one player
+                is also available to the other.
+                The only difference between the players is whose turn it currently is.
+                Any player the computer makes, you could also make if it were your turn instead.
+                <p/>
+                Chess is an example of a &ldquo;non-impartial game&rdquo;,
+                properly called &ldquo;partizan&rdquo;,
+                because you can&rsquo;s move your opponent&rsquo;s pieces.
+            </li>
+            <li> <b>Two-player</b> is probably obvious.<p/></li>
+            <li>
+                <b>Perfect-information</b> means that all information about the game
+                is equally available to all players.
+                In theory, the computer knows nothing more than you about Ideal Nim.
+                The computer&rsquo;s only advantage
+                is that it can &ldquo;think&rdquo; faster and more carefully than you.
+                <p/>
+            </li>
+            <li>
+                <b>Combinatorial</b> means that the game&rsquo;s structure is <i>discrete</i>
+                and <i>countable</i>; that is, you could in theory analyze the game using integers.
+                <p/>
+            </li>
+        </ul>
+        (You can read more about
+        <a href="https://en.wikipedia.org/wiki/Combinatorial_game_theory">combinatorial games</a>
+        if you like.)
+    </li>
+</ul>
+
+(You can read more about the mathematics of
+<a href="http://dx.doi.org/10.4169/math.mag.89.4.235">Ideal Nim</a> if you like,
+especially if you can find a university that carries <i>Mathematics Magazine</i>.)
+<p/>
+<a href="#top">Back to the top</a>
+
+<h2><a name="credits"/>Credits</h2>
+Ideal Nim, Version 1.0 & &#169; 2017
+<br/>App by <a href="http://www.math.usm.edu/perry/">John Perry</a>.
+<p/>
+Please report any bugs to the author.
+<p/>
+The source code is available at
+<a href="https://github.com/johnperry-math/IdealNim">GitHub</a>
+under the GPL license.
+<p/>
+The Preference used to pick colors is
+<a href="https://github.com/yukuku/ambilwarna">AmbilWarnaPreference</a>,
+used under the conditions of the Apache License 2.0.
+<p/>
+The Preference used to select levels is
+<a href="https://github.com/MrBIMC/MaterialSeekBarPreference/">MaterialSeekBarPreference</a>,
+used under the conditions of the Apache License 2.0.
+<p/>
+<a href="#top">Back to the top</a>
+</body>
+</html>

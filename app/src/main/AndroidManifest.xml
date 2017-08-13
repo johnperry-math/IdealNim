@@ -27,6 +27,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="name.cantanima.idealnim.MainActivity"/>
         </activity>
+        <activity android:name=".Information_Activity">
+        </activity>
     </application>
 
 </manifest>

@@ -23,6 +23,7 @@ import android.widget.TextView;
 import java.util.Iterator;
 
 import static android.graphics.Color.BLACK;
+import static android.graphics.Color.BLUE;
 import static android.graphics.Color.GRAY;
 import static android.graphics.Color.GREEN;
 import static android.graphics.Color.RED;
@@ -67,7 +68,7 @@ public class Playfield
       if (pref.contains(context.getString(R.string.max_pref_key)))
         view_xmax = view_ymax = pref.getInt(context.getString(R.string.max_pref_key), 7);
       if (pref.contains(context.getString(R.string.stupid_pref_key)))
-        computer_sometimes_dumb = pref.getBoolean(context.getString(R.string.stupid_pref_key), false);
+        computer_sometimes_dumb = pref.getBoolean(context.getString(R.string.stupid_pref_key), true);
       game_control = new Game_Control();
       game_control.new_game(this, view_xmax, view_ymax, game_level);
     }
@@ -246,7 +247,7 @@ public class Playfield
 
   public void get_computer_move() {
 
-      boolean stupid_turn = computer_sometimes_dumb && game_control.random.nextBoolean();
+    boolean stupid_turn = computer_sometimes_dumb && game_control.random.nextBoolean();
 
     if (hint_position == null)
       evaluator.choose_computer_move();
@@ -350,8 +351,13 @@ public class Playfield
     value_text = vt_view;
     hint_button = h_button;
     hint_button.setOnClickListener(this);
-    if (game_level % 2 == 0) hint_button.setEnabled(false);
-    else hint_button.setEnabled(true);
+    if (game_level % 2 == 0) {
+      hint_button.setVisibility(INVISIBLE);
+      value_text.setVisibility(INVISIBLE);
+    } else {
+      hint_button.setVisibility(VISIBLE);
+      value_text.setVisibility(VISIBLE);
+    }
 
   }
 
@@ -370,8 +376,13 @@ public class Playfield
     if (key.equals(getContext().getString(R.string.level_pref))) {
       game_level = pref.getInt(getContext().getString(R.string.level_pref), 1);
       game_level = (game_level < 1) ? 1 : game_level;
-      if (game_level % 2 == 0) hint_button.setEnabled(false);
-      else hint_button.setEnabled(true);
+      if (game_level % 2 == 0) {
+        hint_button.setVisibility(INVISIBLE);
+        value_text.setVisibility(INVISIBLE);
+      } else {
+        hint_button.setVisibility(VISIBLE);
+        value_text.setVisibility(VISIBLE);
+      }
     } else if (key.equals(getContext().getString(R.string.max_pref_key))) {
       int max = pref.getInt(getContext().getString(R.string.max_pref_key), 7);
       max = (max < 7) ? 7 : max;
@@ -383,7 +394,7 @@ public class Playfield
         invalidate();
       }
     } else if (key.equals(getContext().getString(R.string.stupid_pref_key))) {
-      computer_sometimes_dumb = pref.getBoolean(getContext().getString(R.string.stupid_pref_key), false);
+      computer_sometimes_dumb = pref.getBoolean(getContext().getString(R.string.stupid_pref_key), true);
     }
   }
 
@@ -391,7 +402,7 @@ public class Playfield
   protected float step_x, step_y;
   protected int highlight_x, highlight_y;
   protected boolean highlighting = false, hinting = false;
-  protected int background_color = GREEN, ideal_color = RED, disappear_color = GRAY,
+  protected int background_color = BLUE, ideal_color = RED, disappear_color = GRAY,
       coideal_color = RED, highlight_color = YELLOW, hint_color = Color.rgb(0xff, 0x80, 0x00);
   protected Paint highlight_paint = new Paint(), hint_paint = new Paint(),
       ideal_paint = new Paint(), coideal_paint = new Paint(),

@@ -58,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
       startActivity(i);
       return true;
     } else if (id == R.id.action_information) {
+      Intent i = new Intent(this, Information_Activity.class);
+      startActivity(i);
       return true;
     }
 

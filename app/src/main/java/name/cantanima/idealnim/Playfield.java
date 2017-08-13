@@ -402,7 +402,7 @@ public class Playfield
   protected float step_x, step_y;
   protected int highlight_x, highlight_y;
   protected boolean highlighting = false, hinting = false;
-  protected int background_color = BLUE, ideal_color = RED, disappear_color = GRAY,
+  protected int background_color = BLUE, ideal_color = Color.rgb(0xff, 0x80, 0x00), disappear_color = GRAY,
       coideal_color = RED, highlight_color = YELLOW, hint_color = Color.rgb(0xff, 0x80, 0x00);
   protected Paint highlight_paint = new Paint(), hint_paint = new Paint(),
       ideal_paint = new Paint(), coideal_paint = new Paint(),

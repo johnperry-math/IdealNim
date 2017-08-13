@@ -3,6 +3,7 @@ package name.cantanima.idealnim;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.Pair;
@@ -315,7 +316,7 @@ public class Game_Evaluation {
           }
           if (!searching) {
             result = p.second;
-            zero_position = winning_position;
+            if (level == 0) zero_position = winning_position;
             //Log.d(tag, "found with value " + String.valueOf(result));
             //print_configuration(p.first, max_x, max_y);
             //Log.d(tag, "----");
@@ -405,6 +406,19 @@ public class Game_Evaluation {
       Log.d(tag, output);
     }
     Log.d(tag, "----");
+  }
+
+  public void print_cache(int line) {
+    if (line < 0 || line > cache.size())
+      return;
+    Vector<Vector<LinkedList<Pair<boolean[][], Integer>>>> cache_line = cache.get(line);
+    for (int i = 0; i < cache_line.size(); ++i)
+      for (int j = 0; j < cache_line.get(i).size(); ++i)
+        for (Pair<boolean[][], Integer> p : cache_line.get(i).get(j)) {
+          Log.d(tag, "==== " + String.valueOf(i) + ", " + String.valueOf(j) + " ====");
+          print_configuration(p.first, i, j);
+          Log.d(tag, "==============");
+        }
   }
 
   protected Position find_min_pos(boolean[][] config, int max_x, int max_y) {

@@ -17,21 +17,24 @@
     <string-array name="lose_insults">
         <item>I was playing with &#8220;One arm behind my back&#8221; and I still won!</item>
         <item>But of course: my brain is much smaller than yours. Bigger ain&#8217;t always better!</item>
-        <item>I can think several billion thoughts a second. Whereas you, well&#8230;</item>
-        <item>You should try that Hint button now and again. Maybe start first, too. (Bet I still beat you!)</item>
+        <item>That&#8217;s understandable: I can think several billion thoughts a second. Whereas you, well&#8230; keep the day job.</item>
+        <item>It&#8217;s alright to cry uncle, and ask for a hint. Then again, sometimes there&#8217;s no useful hint to be had. Or maybe Uncle just doesn&#8217;t care.</item>
+        <item>Changing levels might give you an advantage. <b>Might.</b> (Snicker.)</item>
         <item>You should spend more time with books than with Android. I recommend &#8220;Winning Ways for Your Mathematical Plays&#8221;.</item>
     </string-array>
     <string name="player_won">You won!&#160;</string>
     <string-array name="win_insults">
-        <item>But I wouldn&#8217;t brag too loud, were I you. I mean, come on, I was playing with &#8220;One arm behind my back&#8221;.</item>
-        <item>Surely it were a fluke! Betcha can&#8217;t do it again!</item>
-        <item>Have you been disassembling my bytecode?</item>
+        <item>I wouldn&#8217;t brag too loud, were I you. I mean, come on, I was playing with &#8220;One arm behind my back&#8221;.</item>
+        <item>Yeah, well, even a blind squirrel finds an acorn sometimes.</item>
+        <item>Did you disassemble my bytecode?</item>
         <item>Made heavy use of that Hint button, dincha?</item>
-        <item>Peeked into &#8220;Winning Ways for Your Mathematical Plays&#8221; lately?</item>
+        <item>Changed the level to cheat your way to victory, dincha?</item>
+        <item>You spent so much time with &#8220;Winning Ways for Your Mathematical Plays&#8221; that you killed your social life, didn&#8217;t you?</item>
     </string-array>
     <string name="play_again">&#160;Start a new game, with the same settings?</string>
-    <string name="yes">Yes</string>
-    <string name="no">No</string>
+    <string name="another_game">New game!</string>
+    <string name="dont_play_again_win">Contemplate victory.</string>
+    <string name="dont_play_again_lose">Gaze upon the ruins.</string>
 
     <string name="thinking">Thinking</string>
     <string name="please_wait">Please wait...</string>

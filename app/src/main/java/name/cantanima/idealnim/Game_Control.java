@@ -77,23 +77,25 @@ public class Game_Control implements DialogInterface.OnClickListener {
   public void notify_game_over() {
     AlertDialog.Builder last_builder = new AlertDialog.Builder(main_activity);
     last_builder.setTitle(main_activity.getString(R.string.game_over));
-    String message = main_activity.getString(R.string.play_again);
+    //String message = main_activity.getString(R.string.play_again);
+    String message;
     if (last_player == COMPUTER) {
       String[] insults = main_activity.getResources().getStringArray(R.array.lose_insults);
       String insult;
       if (playfield.computer_sometimes_dumb && random.nextBoolean()) insult = insults[0];
       else insult = insults[random.nextInt(insults.length - 1) + 1];
-      message = main_activity.getString(R.string.computer_won) + insult + message;
+      message = main_activity.getString(R.string.computer_won) + insult;
+      last_builder.setNegativeButton(main_activity.getString(R.string.dont_play_again_lose), this);
     } else {
       String[] insults = main_activity.getResources().getStringArray(R.array.win_insults);
       String insult;
       if (playfield.computer_sometimes_dumb && random.nextBoolean()) insult = insults[0];
       else insult = insults[random.nextInt(insults.length - 1) + 1];
-      message = main_activity.getString(R.string.player_won) + insult + message;
+      message = main_activity.getString(R.string.player_won) + insult;
+      last_builder.setNegativeButton(main_activity.getString(R.string.dont_play_again_win), this);
     }
     last_builder.setMessage(message);
-    last_builder.setPositiveButton(main_activity.getString(R.string.yes), this);
-    last_builder.setNegativeButton(main_activity.getString(R.string.no), this);
+    last_builder.setPositiveButton(main_activity.getString(R.string.another_game), this);
     last_builder.show();
     last_dialog = PLAY_AGAIN;
   }

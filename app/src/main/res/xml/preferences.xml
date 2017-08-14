@@ -1,38 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-                  xmlns:sample="http://schemas.android.com/apk/res-auto">
+                  xmlns:sample="http://schemas.android.com/apk/res-auto"
+                  xmlns:tools="http://schemas.android.com/tools">
 
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="@string/stupid_pref_key"
-        android:summary="@string/stupid_pref_summary"
-        android:title="@string/stupid_pref_title"
-        sample:key="@string/stupid_pref_key"
-        sample:summary="@string/stupid_pref_summary"
-        sample:title="@string/stupid_pref_title"/>
+    <PreferenceCategory
+        android:title="@string/pref_category_gameplay"
+        tools:summary="@string/gameplay_category_summary">
 
-    <com.pavelsikun.seekbarpreference.SeekBarPreference
-        android:key="@string/level_pref"
-        android:title="@string/level_title"
-        android:summary="@string/level_summary"
-        android:defaultValue="1"
-        sample:msbp_minValue="1"
-        sample:msbp_maxValue="10"
-        sample:msbp_interval="1"
-        sample:msbp_measurementUnit=" "
-        sample:msbp_dialogEnabled="false"/>
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="@string/stupid_pref_key"
+            android:summary="@string/stupid_pref_summary"
+            android:title="@string/stupid_pref_title"
+            sample:key="@string/stupid_pref_key"
+            sample:summary="@string/stupid_pref_summary"
+            sample:title="@string/stupid_pref_title"/>
 
-    <com.pavelsikun.seekbarpreference.SeekBarPreference
-        android:key="@string/max_pref_key"
-        android:title="@string/max_pref_title"
-        android:summary="@string/max_pref_summary"
-        android:defaultValue="7"
-        sample:msbp_view_defaultValue="1"
-        sample:msbp_minValue="7"
-        sample:msbp_maxValue="15"
-        sample:msbp_interval="1"
-        sample:msbp_measurementUnit=" "
-        sample:msbp_dialogEnabled="false"
-        />
+        <com.pavelsikun.seekbarpreference.SeekBarPreference
+            android:key="@string/level_pref"
+            android:title="@string/level_title"
+            android:summary="@string/level_summary"
+            android:defaultValue="1"
+            sample:msbp_minValue="1"
+            sample:msbp_maxValue="10"
+            sample:msbp_interval="1"
+            sample:msbp_measurementUnit=" "
+            sample:msbp_dialogEnabled="false"/>
+
+        <com.pavelsikun.seekbarpreference.SeekBarPreference
+            android:key="@string/max_pref_key"
+            android:title="@string/max_pref_title"
+            android:summary="@string/max_pref_summary"
+            android:defaultValue="7"
+            sample:msbp_view_defaultValue="1"
+            sample:msbp_minValue="7"
+            sample:msbp_maxValue="15"
+            sample:msbp_interval="1"
+            sample:msbp_measurementUnit=" "
+            sample:msbp_dialogEnabled="false"
+            />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_category_color"
+        tools:summary="@string/colors_category_summary">
+        <yuku.ambilwarna.widget.AmbilWarnaPreference
+            android:key="@string/bg_color"
+            android:defaultValue="0xffff0000"
+            android:title="@string/bg_color_text"
+            android:summary="@string/bg_color_text"/>
+        <yuku.ambilwarna.widget.AmbilWarnaPreference
+            android:key="@string/playable_color_key"
+            android:defaultValue="0xff0000ff"
+            android:title="@string/playable_color"
+            android:summary="@string/playable_color_text"/>
+        <yuku.ambilwarna.widget.AmbilWarnaPreference
+            android:key="@string/played_color_key"
+            android:defaultValue="0xffa00000"
+            android:title="@string/played_color"
+            android:summary="@string/played_color_text"/>
+        <yuku.ambilwarna.widget.AmbilWarnaPreference
+            android:key="@string/highlight_color_key"
+            android:defaultValue="0xffff8000"
+            android:title="@string/highlight_color"
+            android:summary="@string/highlight_color_text"/>
+        <yuku.ambilwarna.widget.AmbilWarnaPreference
+            android:key="@string/hint_color_key"
+            android:defaultValue="0xffff9000"
+            android:title="@string/hint_color"
+            android:summary="@string/hint_color_text"/>
+        <yuku.ambilwarna.widget.AmbilWarnaPreference
+            android:key="@string/invalid_color_key"
+            android:defaultValue="0xff000000"
+            android:title="@string/invalid_color"
+            android:summary="@string/invalid_color_text"/>
+    </PreferenceCategory>
 
 </PreferenceScreen>

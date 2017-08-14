@@ -19,10 +19,10 @@
 Ideal Nim is a very simple example of an
 &ldquo;impartial, two-player, perfect-information, combinatorial game&rdquo;
 that challenges the mind while illustrating some advanced mathematical ideas.
-It is difficult to defeat the computer even when you know what you&rsquo;re doing,
+It can be difficult to defeat the computer even when you know what you&rsquo;re doing,
 so when you manage it you should be proud of yourself.
 <p/>
-If you are familiar with Nim then you are familiar with the basic principles behind Ideal Nim.
+If you are familiar with Nim, then you are familiar with the basic principles behind Ideal Nim.
 More information on this appears in the section on
 <a href="#mathematics">Mathematical ideas behind the game</a>.
 
@@ -37,7 +37,7 @@ Once a player selects a valid square,
 all squares &ldquo;northeast&rdquo; of it become invalid.
 To help identify valid and invalid squares,
 You can drag your finger across the board, and the square underneath your finger
-will highlight over a valid square, or black out over an invalid square.
+will change color according to whether the square is valid.
 <p/>
 <center><b><i>The player who takes the last valid square wins.</i></b></center>
 <p/>
@@ -53,8 +53,8 @@ If the position is playable, then it is a winning move; that is,
 <p/>
 Oftentimes, the computer will mark the lower left square, which is not playable!
 In these cases, <i>no move will guarantee a win</i>, and the computer would choose a random square.
-You might as well do the same&hellip;
-or use one of at least two ways to cheat.
+You might as well do the same&hellip; or employ one of at least two methods to cheat.
+(We drop hints on these methods here and there.)
 
 <h3>&ldquo;Thinking&rdquo;</h3>
 Before the computer can move or give you a hint (assuming you ask for one)
@@ -68,10 +68,16 @@ indicating both a percentage and a ratio of positions analyzed.
 <p/>
 <b>The good news:</b>
 Most of the thinking occurs before the 60% mark, and once it&rsquo;'s done,
-and <b>the anlysis is complete</b>.
+<b>the analysis is complete</b>.
 If you can wait that out at the beginning of the game,
 it will be near-instantaneous from then on&hellip; unless you change the board size mid-game!
 Even then, it shouldn&rsquo;t take as long after you&rsquo;ve played a few turns.
+<p/>
+There is a remote possibility that in larger boards, your device will lack memory sufficient
+to store the analysis, but for that matter'
+your device will probably take far too long in the analysis, anyway!
+The precise limit is device-dependent, so advance &ldquo;up the ladder,&rdquo; so to speak,
+with caution.
 <p/>
 
 <a href="#top">Back to the top</a>
@@ -79,7 +85,7 @@ Even then, it shouldn&rsquo;t take as long after you&rsquo;ve played a few turns
 <h2><a name="options"/>Options</h2>
 
 If you select the &ldquo;Settings&rdquo; (wrench) icon in the toolbar, several options will appear,
-along with some fairly detailed explanations. Here&rsquo;s a little more detail on how they work.
+along with some explanations. Here&rsquo;s a little more detail on how they work.
 
 <ul>
     <li> <b>One arm behind my back</b> &mdash;
@@ -89,7 +95,10 @@ along with some fairly detailed explanations. Here&rsquo;s a little more detail 
         If you check this box, however, the computer will sometimes &mdash; <i>sometimes</i> &mdash;
         &ldquo;make a mistake&rdquo; and choose a random square
         even when it knows a different square would guarantee a win!
-        (This does not affect the hints: the machine will be honest in those cases.)
+        <p/>
+        (This does not affect the hints: the machine will be honest in those cases.
+        &mdash; Unless there&rsquo;s a bug in the program, of course,
+        but we&rsquo;ve spent a lot of time on debugging, honest!)
         <p/>
     </li>
     <li>
@@ -121,6 +130,8 @@ along with some fairly detailed explanations. Here&rsquo;s a little more detail 
         by adding or removing rows to the north and east!
         Just keep in mind that the computer will have to re-analyze the board
         when you change the size, and this will require time.
+        <p/>
+        (The computer is not allowed to change the board size on its turn.)
     </li>
 </ul>
 
@@ -137,22 +148,27 @@ Ideal Nim is based on several major ideas in the mathematical fields of
         The game board involves two <b>diagrams of monomial ideals</b>.
         Playable points correspond to an ideal <i>P</i>,
         while played points correspond to an ideal <i>G</i>.
-        During gameplay, <i>G</i> expands until it meets <i>P</i>.
-        The game is inspired by what happens to monomial ideals
+        During gameplay, <i>G</i> expands until it agrees with <i>P</i>.
+        This resembles what happens to a &ldquo;leading monomial ideal&rdquo;
         during the computation of a Gr&ouml;bner basis.
         (You can read about
         <a href="http://en.wikipedia.org/wiki/Monomial_ideal">monomial ideals</a> and
-        <a href="http://en.wikipedia.org/wiki/Gröbner_basis">Gr&ouml;bner bases</a> here.)
+        <a href="http://en.wikipedia.org/wiki/Gröbner_basis">Gr&ouml;bner bases</a> if you like.)
+        <p/>
     </li>
     <li>
         The fact that this game cannot go on indefinitely,
         regardless of the gameboard&rsquo;s dimension,
         is called either <b>the Hilbert basis theorem</b> or <i>Dickson&rsquo;s Lemma</i>,
         depending on how you look at it, and is possible because &ldquo;polynomial rings&rdquo;
-        possess what is called the <b>Noetherian property</b>.
-        (You can read more about <a href="http://en.wikipedia.org/wiki/David_Hilbert">David Hilbert</a>,
+        are <b>Noetherian</b>.
+        (You can read more about
+        <a href="http://en.wikipedia.org/wiki/David_Hilbert">David Hilbert</a>,
         <a href="http://en.wikipedia.org/wiki/Leonard_Dickson">Leonard Dickson</a>, and
-        <a href="http://en.wikipedia.org/wiki/Emmy_Noether">Emmy Noether</a> if you like.)
+        <a href="http://en.wikipedia.org/wiki/Emmy_Noether">Emmy Noether</a>, and
+        the <a href="http://en.wikipedia.org/wiki/Noetherian_ring">Noetherian rings</a>
+        if you like.)
+        <p/>
     </li>
     <li>
         Ideal Nim illustrates these ideas in the framework of an impartial, two-player,
@@ -161,20 +177,29 @@ Ideal Nim is based on several major ideas in the mathematical fields of
             <li>
                 <b>Impartial</b> means that any move available to one player
                 is also available to the other.
-                The only difference between the players is whose turn it currently is.
-                Any player the computer makes, you could also make if it were your turn instead.
+                The only difference between the players is in whose turn it is.
+                Any play the computer makes on its turn, you could also make if it were your turn.
                 <p/>
                 Chess is an example of a &ldquo;non-impartial game&rdquo;,
                 properly called &ldquo;partizan&rdquo;,
-                because you can&rsquo;s move your opponent&rsquo;s pieces.
+                because you can&rsquo;t move your opponent&rsquo;s pieces.
+                <p/>
+                (Technically, this particular implementation of Ideal Nim is not purely impartial.
+                We&rsquo;ll leave the reason unspoken, but here&rsquo;s a hint:
+                there&rsquo;s something you can do in the app that the computer can&rsquo;t do,
+                and that you would not be allowed to do in a real game.)
             </li>
-            <li> <b>Two-player</b> is probably obvious.<p/></li>
+            <li>
+                <b>Two-player</b> is probably obvious.
+                (If it isn&rsquo;t, this might not be the right game for you.)
+                <p/>
+            </li>
             <li>
                 <b>Perfect-information</b> means that all information about the game
                 is equally available to all players.
-                In theory, the computer knows nothing more than you about Ideal Nim.
+                In theory, the computer knows nothing more about the game than you do.
                 The computer&rsquo;s only advantage
-                is that it can &ldquo;think&rdquo; faster and more carefully than you.
+                is that it can analyze the game much faster and more carefully.
                 <p/>
             </li>
             <li>
@@ -196,7 +221,7 @@ especially if you can find a university that carries <i>Mathematics Magazine</i>
 <a href="#top">Back to the top</a>
 
 <h2><a name="credits"/>Credits</h2>
-Ideal Nim, Version 1.0 & &#169; 2017
+Ideal Nim, Version 1.0 &#169; 2017
 <br/>App by <a href="http://www.math.usm.edu/perry/">John Perry</a>.
 <p/>
 Please report any bugs to the author.

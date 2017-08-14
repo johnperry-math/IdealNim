@@ -50,12 +50,12 @@ public class Playfield
 
     super(context, attrs);
     playable = new Ideal();
-    gone = new Ideal();
+    played = new Ideal();
     if (isInEditMode()) {
-      gone.add_generator_fast(3, 8);
-      gone.add_generator_fast(8, 2);
-      gone.add_generator_fast(2, 9);
-      gone.sort_ideal();
+      played.add_generator_fast(3, 8);
+      played.add_generator_fast(8, 2);
+      played.add_generator_fast(2, 9);
+      played.sort_ideal();
       playable.add_generator_fast(0, 5);
       playable.add_generator_fast(3, 2);
       playable.add_generator_fast(5, 1);
@@ -69,8 +69,31 @@ public class Playfield
         view_xmax = view_ymax = pref.getInt(context.getString(R.string.max_pref_key), 7);
       if (pref.contains(context.getString(R.string.stupid_pref_key)))
         computer_sometimes_dumb = pref.getBoolean(context.getString(R.string.stupid_pref_key), true);
+      if (pref.contains(context.getString(R.string.bg_color_key)))
+        background_color = pref.getInt(context.getString(R.string.bg_color_key), background_color);
+      if (pref.contains(context.getString(R.string.playable_color_key)))
+        playable_color = pref.getInt(context.getString(R.string.playable_color_key), playable_color);
+      if (pref.contains(context.getString(R.string.played_color_key)))
+        played_color = pref.getInt(context.getString(R.string.played_color_key), played_color);
+      if (pref.contains(context.getString(R.string.highlight_color_key)))
+        highlight_color = pref.getInt(context.getString(R.string.highlight_color_key), highlight_color);
+      if (pref.contains(context.getString(R.string.hint_color_key)))
+        hint_color = pref.getInt(context.getString(R.string.hint_color_key), hint_color);
+      if (pref.contains(context.getString(R.string.invalid_color_key)))
+        invalid_color = pref.getInt(context.getString(R.string.invalid_color_key), invalid_color);
       game_control = new Game_Control();
       game_control.new_game(this, view_xmax, view_ymax, game_level);
+      SharedPreferences.Editor editor = pref.edit();
+      editor.putBoolean(context.getString(R.string.stupid_pref_key), computer_sometimes_dumb);
+      editor.putInt(context.getString(R.string.level_pref), game_level);
+      editor.putInt(context.getString(R.string.max_pref_key), view_xmax);
+      editor.putInt(context.getString(R.string.bg_color_key), background_color);
+      editor.putInt(context.getString(R.string.playable_color_key), playable_color);
+      editor.putInt(context.getString(R.string.played_color_key), played_color);
+      editor.putInt(context.getString(R.string.highlight_color_key), highlight_color);
+      editor.putInt(context.getString(R.string.hint_color_key), hint_color);
+      editor.putInt(context.getString(R.string.invalid_color_key), invalid_color);
+      editor.apply();
     }
     setOnTouchListener(this);
 
@@ -96,8 +119,12 @@ public class Playfield
         w + getPaddingLeft() + getPaddingRight(), h + getPaddingTop() + getPaddingBottom()
     );
 
-    ideal_paint.setShader(new LinearGradient(0, h, w, 0, ideal_color, disappear_color, Shader.TileMode.CLAMP));
-    coideal_paint.setShader(new LinearGradient(0, h, w, 0, coideal_color, disappear_color, Shader.TileMode.CLAMP));
+    bg_paint.setShader(
+        new LinearGradient(0, h, w, 0, background_color, disappear_color, Shader.TileMode.CLAMP)
+    );
+    played_paint.setShader(
+        new LinearGradient(0, h, w, 0, played_color, disappear_color, Shader.TileMode.CLAMP)
+    );
 
   }
 
@@ -109,12 +136,12 @@ public class Playfield
   public void set_to(Ideal F) {
 
     playable = new Ideal(F);
-    gone = new Ideal();
+    played = new Ideal();
     hinting = false;
     if (value_text != null)
       value_text.setText(getContext().getString(R.string.unknown_game_value));
 
-    evaluator = new Game_Evaluation(getContext(), playable, null, view_xmax, view_ymax);
+    evaluator = new Game_Evaluation(getContext(), playable, null, view_xmax, view_ymax, game_level);
 
   }
 
@@ -124,9 +151,9 @@ public class Playfield
 
   public void set_background_color(int color) { background_color = color; }
 
-  public void set_ideal_color(int color) { ideal_color = color; }
+  public void set_playable_color(int color) { playable_color = color; }
 
-  public void set_coidealColor(int color) { coideal_color = color; }
+  public void set_played_color(int color) { played_color = color; }
 
   /**
    * This is called during layout when the size of this view has changed. If
@@ -162,67 +189,73 @@ public class Playfield
     line_paint.setColor(BLACK);
     line_paint.setStrokeWidth(1);
     line_paint.setStyle(STROKE);
-    ideal_paint.setColor(ideal_color);
-    ideal_paint.setStyle(FILL);
-    coideal_paint.setColor(coideal_color);
-    coideal_paint.setStyle(FILL);
+    playable_paint.setColor(playable_color);
+    playable_paint.setStyle(FILL);
+    played_paint.setColor(played_color);
+    played_paint.setStyle(FILL);
+    invalid_paint.setColor(invalid_color);
+    invalid_paint.setStyle(FILL);
+    highlight_paint.setColor(highlight_color);
+    highlight_paint.setStyle(FILL);
+    hint_paint.setColor(hint_color);
+    hint_paint.setStyle(FILL);
 
     float h = getHeight(), w = getWidth();
     canvas.drawRect(0, 0, w, h, bg_paint);
 
     if (playable.T.size() != 0) {
-      coideal_path.rewind();
-      coideal_path.moveTo(0, h);
+      playable_path.rewind();
+      playable_path.moveTo(w, 0);
       Iterator<Position> Ti = playable.iterator();
       Position P = Ti.next();
-      if (P.get_x() == 0)
-        coideal_path.lineTo(0, h - P.get_y() * step_y);
-      else {
-        coideal_path.lineTo(0, 0);
-        coideal_path.lineTo(P.get_x() * step_x, 0);
-        coideal_path.lineTo(P.get_x() * step_x, h - P.get_y() * step_y);
-      }
-      while (Ti.hasNext()) {
-        Position Q = Ti.next();
-        coideal_path.lineTo(Q.get_x() * step_x, h - P.get_y() * step_y);
-        coideal_path.lineTo(Q.get_x() * step_x, h - Q.get_y() * step_y);
-        P = Q;
-      }
-      if (P.get_y() != 0) {
-        coideal_path.lineTo(w, h - P.get_y() * step_y);
-        coideal_path.lineTo(w, h);
-      }
-      coideal_path.close();
-      canvas.drawPath(coideal_path, coideal_paint);
-    }
-
-    if (gone.T.size() != 0) {
-      ideal_path.rewind();
-      ideal_path.moveTo(w, 0);
-      Iterator<Position> Ti = gone.iterator();
-      Position P = Ti.next();
-      ideal_path.lineTo(P.get_x() * step_x, 0);
+      playable_path.lineTo(P.get_x() * step_x, 0);
       if (P.get_y() < view_ymax)
-        ideal_path.lineTo(P.get_x() * step_x, h - P.get_y() * step_y);
+        playable_path.lineTo(P.get_x() * step_x, h - P.get_y() * step_y);
       while (Ti.hasNext()) {
         Position Q = Ti.next();
         if (Q.get_y() < view_ymax) {
-          ideal_path.lineTo(Q.get_x() * step_x, h - P.get_y() * step_y);
-          ideal_path.lineTo(Q.get_x() * step_x, h - Q.get_y() * step_y);
+          playable_path.lineTo(Q.get_x() * step_x, h - P.get_y() * step_y);
+          playable_path.lineTo(Q.get_x() * step_x, h - Q.get_y() * step_y);
         }
         P = Q;
       }
       if (P.get_x() < view_xmax)
-        ideal_path.lineTo(w, h - P.get_y() * step_y);
-      ideal_path.close();
-      canvas.drawPath(ideal_path, ideal_paint);
+        playable_path.lineTo(w, h - P.get_y() * step_y);
+      playable_path.close();
+      canvas.drawPath(playable_path, playable_paint);
+    }
+
+    if (played.T.size() != 0) {
+      played_path.rewind();
+      played_path.moveTo(w, 0);
+      Iterator<Position> Ti = played.iterator();
+      Position P = Ti.next();
+      if (P.get_x() == 0) {
+        played_path.lineTo(0, 0);
+        played_path.lineTo(0, h - P.get_y() * step_y);
+      } else {
+        played_path.lineTo(P.get_x() * step_x, 0);
+        played_path.lineTo(P.get_x() * step_x, h - P.get_y() * step_y);
+      }
+      while (Ti.hasNext()) {
+        Position Q = Ti.next();
+        played_path.lineTo(Q.get_x() * step_x, h - P.get_y() * step_y);
+        played_path.lineTo(Q.get_x() * step_x, h - Q.get_y() * step_y);
+        P = Q;
+      }
+      if (P.get_x() != w) {
+        played_path.lineTo(w, h - P.get_y() * step_y);
+        played_path.lineTo(w, 0);
+      }
+      played_path.close();
+      canvas.drawPath(played_path, played_paint);
     }
 
     if (highlighting) {
       highlight_paint.setColor(highlight_color);
       highlight_paint.setStyle(FILL);
       canvas.drawRect(
-          highlight_x * step_x, h - (highlight_y + 1)* step_y,
+          highlight_x * step_x, h - (highlight_y + 1) * step_y,
           (highlight_x + 1) * step_x, h - highlight_y * step_y,
           highlight_paint
       );
@@ -233,7 +266,7 @@ public class Playfield
       hint_paint.setStyle(FILL);
       int x = hint_position.get_x(), y = hint_position.get_y();
       canvas.drawRect(
-          x * step_x, h - (y + 1)* step_y,
+          x * step_x, h - (y + 1) * step_y,
           (x + 1) * step_x, h - y * step_y,
           hint_paint
       );
@@ -257,17 +290,18 @@ public class Playfield
         do {
           i = game_control.random.nextInt(view_xmax);
           j = game_control.random.nextInt(view_ymax);
-        } while (!playable.contains(i, j) || gone.contains(i, j));
+        } while (!playable.contains(i, j) || played.contains(i, j));
       } else {
         i = hint_position.get_x();
         j = hint_position.get_y();
       }
       evaluator.play_point(i, j);
-      gone.add_generator(i, j, true);
+      played.add_generator(i, j, true);
     }
 
     game_control.set_player_kind(HUMAN);
     evaluator.computer_move = false;
+    invalidate();
 
   }
 
@@ -285,16 +319,18 @@ public class Playfield
     if (game_control.get_player_kind() == HUMAN) {
       float x = event.getX(), y = event.getY();
       float w = getWidth(), h = getHeight();
-      if (x >= 0 && y >= 0 && x <= w && y <= h) {
+      if (x < 0 || y < 0 || x > w || y > h)
+        highlighting = false;
+      else {
         int i = (int) (x / step_x);
         int j = (int) ((h - y) / step_y);
         switch (event.getAction()) {
           case ACTION_UP:
             highlighting = hinting = false;
             // check for valid position
-            if (playable.contains(i, j) && !gone.contains(i, j)) {
+            if (playable.contains(i, j) && !played.contains(i, j)) {
               // add generator
-              gone.add_generator(i, j, true);
+              played.add_generator(i, j, true);
               evaluator.play_point(i, j);
             }
             if (evaluator.base_count != 0) {
@@ -306,16 +342,14 @@ public class Playfield
             highlighting = true;
             highlight_x = i;
             highlight_y = j;
-            if (playable.contains(i, j) && !gone.contains(i, j)) highlight_color = YELLOW;
+            if (playable.contains(i, j) && !played.contains(i, j)) highlight_color = YELLOW;
             else highlight_color = BLACK;
             break;
           case ACTION_MOVE:
-            if (highlighting) {
-              highlight_x = i;
-              highlight_y = j;
-              if (playable.contains(i, j) && !gone.contains(i, j)) highlight_color = YELLOW;
-              else highlight_color = BLACK;
-            }
+            highlight_x = i;
+            highlight_y = j;
+            if (playable.contains(i, j) && !played.contains(i, j)) highlight_color = YELLOW;
+            else highlight_color = BLACK;
         }
         invalidate();
       }
@@ -373,8 +407,11 @@ public class Playfield
    */
   @Override
   public void onSharedPreferenceChanged(SharedPreferences pref, String key) {
-    if (key.equals(getContext().getString(R.string.level_pref))) {
-      game_level = pref.getInt(getContext().getString(R.string.level_pref), 1);
+    
+    Context context = getContext();
+    
+    if (key.equals(context.getString(R.string.level_pref))) {
+      game_level = pref.getInt(context.getString(R.string.level_pref), 1);
       game_level = (game_level < 1) ? 1 : game_level;
       if (game_level % 2 == 0) {
         hint_button.setVisibility(INVISIBLE);
@@ -383,33 +420,67 @@ public class Playfield
         hint_button.setVisibility(VISIBLE);
         value_text.setVisibility(VISIBLE);
       }
-    } else if (key.equals(getContext().getString(R.string.max_pref_key))) {
-      int max = pref.getInt(getContext().getString(R.string.max_pref_key), 7);
+      game_control.new_game(this, view_xmax, view_ymax, game_level);
+    } else if (key.equals(context.getString(R.string.max_pref_key))) {
+      int max = pref.getInt(context.getString(R.string.max_pref_key), 7);
       max = (max < 7) ? 7 : max;
       if (max != view_xmax) {
         view_xmax = view_ymax = max;
         step_x = getWidth() / view_xmax;
         step_y = getHeight() / view_ymax;
-        evaluator = new Game_Evaluation(getContext(), playable, gone, view_xmax, view_ymax);
+        evaluator = new Game_Evaluation(context, playable, played, view_xmax, view_ymax, game_level);
         invalidate();
       }
-    } else if (key.equals(getContext().getString(R.string.stupid_pref_key))) {
-      computer_sometimes_dumb = pref.getBoolean(getContext().getString(R.string.stupid_pref_key), true);
-    }
+    } else if (key.equals(context.getString(R.string.stupid_pref_key)))
+      computer_sometimes_dumb = pref.getBoolean(context.getString(R.string.stupid_pref_key), true);
+    else if (key.equals(context.getString(R.string.bg_color_key)))
+      background_color = pref.getInt(context.getString(R.string.bg_color_key), background_color);
+    else if (key.equals(context.getString(R.string.playable_color_key)))
+      playable_color = pref.getInt(context.getString(R.string.playable_color_key), playable_color);
+    else if (key.equals(context.getString(R.string.played_color_key)))
+      played_color = pref.getInt(context.getString(R.string.played_color_key), played_color);
+    else if (key.equals(context.getString(R.string.highlight_color_key)))
+      highlight_color = pref.getInt(context.getString(R.string.highlight_color_key), highlight_color);
+    else if (key.equals(context.getString(R.string.hint_color_key)))
+      hint_color = pref.getInt(context.getString(R.string.hint_color_key), hint_color);
+    else if (key.equals(context.getString(R.string.invalid_color_key)))
+      invalid_color = pref.getInt(context.getString(R.string.invalid_color_key), invalid_color);
+    bg_paint.setShader(
+        new LinearGradient(
+            0, getHeight(), getWidth(), 0, background_color, disappear_color, Shader.TileMode.CLAMP
+        )
+    );
+    played_paint.setShader(
+        new LinearGradient(
+            0, getHeight(), getWidth(), 0, played_color, disappear_color, Shader.TileMode.CLAMP
+        )
+    );
+    SharedPreferences.Editor editor = pref.edit();
+    editor.putBoolean(context.getString(R.string.stupid_pref_key), computer_sometimes_dumb);
+    editor.putInt(context.getString(R.string.level_pref), game_level);
+    editor.putInt(context.getString(R.string.max_pref_key), view_xmax);
+    editor.putInt(context.getString(R.string.bg_color_key), background_color);
+    editor.putInt(context.getString(R.string.playable_color_key), playable_color);
+    editor.putInt(context.getString(R.string.played_color_key), played_color);
+    editor.putInt(context.getString(R.string.highlight_color_key), highlight_color);
+    editor.putInt(context.getString(R.string.hint_color_key), hint_color);
+    editor.putInt(context.getString(R.string.invalid_color_key), invalid_color);
+    editor.apply();
   }
 
   protected int view_xmax = 7, view_ymax = 7;
   protected float step_x, step_y;
   protected int highlight_x, highlight_y;
   protected boolean highlighting = false, hinting = false;
-  protected int background_color = BLUE, ideal_color = Color.rgb(0xff, 0x80, 0x00), disappear_color = GRAY,
-      coideal_color = RED, highlight_color = YELLOW, hint_color = Color.rgb(0xff, 0x80, 0x00);
+  protected int playable_color = BLUE, played_color = Color.rgb(0xff, 0x80, 0x00),
+      disappear_color = GRAY, invalid_color = BLACK,
+      background_color = RED, highlight_color = YELLOW, hint_color = Color.rgb(0xff, 0x80, 0x00);
   protected Paint highlight_paint = new Paint(), hint_paint = new Paint(),
-      ideal_paint = new Paint(), coideal_paint = new Paint(),
-      bg_paint = new Paint(), line_paint = new Paint();
-  protected Path ideal_path = new Path(), coideal_path = new Path();
+      played_paint = new Paint(), playable_paint = new Paint(),
+      bg_paint = new Paint(), line_paint = new Paint(), invalid_paint = new Paint();
+  protected Path playable_path = new Path(), played_path = new Path();
 
-  protected Ideal playable, gone;
+  protected Ideal playable, played;
 
   protected Position hint_position;
 

@@ -3,6 +3,7 @@
     <string name="app_name">Ideal Nim</string>
     <string name="action_bar_settings">Settings</string>
     <string name="action_bar_info">Information</string>
+    <string name="action_bar_achievements">Achievements</string>
 
     <string name="new_game">New Game</string>
     <string name="evaluate_game">Evaluate</string>
@@ -17,7 +18,7 @@
     <string-array name="lose_insults">
         <item>I was playing with &#8220;One arm behind my back&#8221; and I still won!</item>
         <item>But of course: my brain is much smaller than yours. Bigger ain&#8217;t always better!</item>
-        <item>That&#8217;s understandable: I can think several billion thoughts a second. Whereas you, well&#8230; keep the day job.</item>
+        <item>That&#8217;s understandable: I can think several billion thoughts a second. Whereas you&#8230; well, keep the day job.</item>
         <item>It&#8217;s alright to cry uncle, and ask for a hint. Then again, sometimes there&#8217;s no useful hint to be had. Or maybe Uncle just doesn&#8217;t care.</item>
         <item>Changing levels might give you an advantage. <b>Might.</b> (Snicker.)</item>
         <item>You should spend more time with books than with Android. I recommend &#8220;Winning Ways for Your Mathematical Plays&#8221;.</item>
@@ -44,6 +45,11 @@
 
     <string name="title_activity_settings">Settings</string>
 
+    <string name="pref_category_gameplay">Gameplay</string>
+    <string name="gameplay_category_summary">How the game should proceed</string>
+    <string name="pref_category_color">Colors</string>
+    <string name="colors_category_summary">How to colors squares of different type</string>
+
     <string name="stupid_pref_key">stupid_pref</string>
     <string name="stupid_pref_title">One arm behind my back</string>
     <string name="stupid_pref_summary">
@@ -66,5 +72,40 @@
         Larger values require more time for the computer&#8217;s first move,
         or for your first hint.
     </string>
+
+    <string name="bg_color">Background</string>
+    <string name="bg_color_key">bg_color_key</string>
+    <string name="bg_color_text">Squares that are never valid</string>
+    <string name="playable_color">Playable</string>
+    <string name="playable_color_key">playable_color_key</string>
+    <string name="playable_color_text">Squares that can be played, but haven&#8217;t yet</string>
+    <string name="played_color">Played</string>
+    <string name="played_color_key">played_color_key</string>
+    <string name="played_color_text">Squares that have been played</string>
+    <string name="highlight_color">Current choice</string>
+    <string name="highlight_color_key">highlight_color_key</string>
+    <string name="highlight_color_text">When you drag your finger over a valid square</string>
+    <string name="invalid_color">Invalid square</string>
+    <string name="invalid_color_key">invalid_color_key</string>
+    <string name="invalid_color_text">When you drag your finger over an invalid square</string>
+    <string name="hint_color">Hinted square</string>
+    <string name="hint_color_key">hint_color_key</string>
+    <string name="hint_color_text">When you ask for a hint</string>
+
+    <!-- Connection failure -->
+
+    <string name="conn_fail_title">Connection failure</string>
+    <string name="conn_fail_summ">
+        Failed to connect to the Google Play API.
+        You need not log in unless you want access to achievements.
+    </string>
+    <string name="conn_fail_pos">Understood</string>
+    <string name="unknown_signin_error">Unknown sign-in error</string>
+
+    <!-- Sign-in -->
+    <string name="sign_in">Sign in</string>
+    <string name="sign_in_why">Sign in to enable achievements!</string>
+    <string name="sign_out">Sign out</string>
+    <string name="understood">Understood</string>
 
 </resources>

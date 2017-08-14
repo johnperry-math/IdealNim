@@ -46,19 +46,40 @@ public class Game_Control implements DialogInterface.OnClickListener {
     Ideal I;
     this.level = level;
     level = (level < 1) ? 1 : (level + 1) / 2;
-    do {
-      I = new Ideal();
-      //Log.d(tag, "----");
-      for (int n = 0; n < level; ++n) {
-        int i = random.nextInt(3 * max_x / 4);
-        int j = random.nextInt(3 * max_y / 4);
-        //Log.d(tag, String.valueOf(i) + ", " + String.valueOf(j));
-        I.add_generator_fast(i, j);
-      }
-      //Log.d(tag, String.valueOf(I.T.size()) + " = " + String.valueOf(level));
+    if (level != 5) {
+      do {
+        I = new Ideal();
+        //Log.d(tag, "----");
+        for (int n = 0; n < level; ++n) {
+          int i = random.nextInt(3 * max_x / 4);
+          int j = random.nextInt(3 * max_y / 4);
+          //Log.d(tag, String.valueOf(i) + ", " + String.valueOf(j));
+          I.add_generator_fast(i, j);
+        }
+        //Log.d(tag, String.valueOf(I.T.size()) + " = " + String.valueOf(level));
 
-      //Log.d(tag, "----");
-    } while (I.T.size() < level);
+        //Log.d(tag, "----");
+      } while (I.T.size() < level);
+    } else {
+      int last_i, last_j;
+      do {
+        last_i = 0;
+        last_j = max_y;
+        I = new Ideal();
+        Log.d(tag, "----");
+        for (int n = 0; n < 5; ++n) {
+          int i = last_i + (random.nextInt(2) + 1);
+          int j = last_j - (random.nextInt(2) + 1);
+          if (j < 0) break;
+          last_i = i;
+          last_j = j;
+          I.add_generator_fast(i, j);
+          Log.d(tag, String.valueOf(i) + ", " + String.valueOf(j));
+        }
+        Log.d(tag, "----");
+      } while (last_i >= max_x - 1 || I.T.size() < 5);
+      Log.d(tag, "pause");
+    }
     I.sort_ideal();
     playfield.set_to(I);
     playfield.invalidate();

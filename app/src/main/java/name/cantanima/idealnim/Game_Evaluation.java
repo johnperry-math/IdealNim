@@ -20,9 +20,12 @@ import java.util.Vector;
 
 public class Game_Evaluation {
 
-  public Game_Evaluation(Context context, Ideal I, Ideal J, int view_xmax, int view_ymax) {
+  public Game_Evaluation(
+      Context context, Ideal I, Ideal J, int view_xmax, int view_ymax, int level
+  ) {
 
     overall_context = (Activity) context;
+    game_level = level;
 
     base_configuration = new boolean[view_xmax][view_ymax];
     base_count = 0;
@@ -139,36 +142,49 @@ public class Game_Evaluation {
 
     if (base_count != 0) {
 
-      LinkedList<Pair<boolean[][], Integer>> cache_line
-          = cache.get(base_count - 1).get(base_max_x - 1).get(base_max_y - 1);
-      LinkedList<Position> position_line
-          = zero_positions.get(base_count - 1).get(base_max_x - 1).get(base_max_y - 1);
-      Iterator<Pair<boolean[][], Integer>> iter = cache_line.iterator();
-      Iterator<Position> piter = position_line.iterator();
+      if (game_level == 1 || game_level == 2) {
 
-      boolean searching = true;
-      Pair<boolean[][], Integer> p = null;
-      while (searching && iter.hasNext()) {
-        p = iter.next();
-        Position temp_position = piter.next();
-        if (same_configuration(base_configuration, p.first, base_count, base_max_x, base_max_y)) {
-          searching = false;
-          winning_position = temp_position;
-        }
-      }
-
-      if (searching) {
-        Compute_Task my_task = new Compute_Task(overall_context, base_count);
-        my_task.execute(base_configuration, base_count, base_max_x, base_max_y);
-      } else {
-        zero_position = winning_position;
-        result = configuration_value = p.second;
-        result = p.second;
+        zero_position = find_min_pos(base_configuration, base_max_x, base_max_y);
         if (computer_move) {
           Playfield playfield = (Playfield) overall_context.findViewById(R.id.playfield);
           playfield.hint_position = zero_position;
           playfield.get_computer_move();
         }
+
+      } else {
+
+        LinkedList<Pair<boolean[][], Integer>> cache_line
+            = cache.get(base_count - 1).get(base_max_x - 1).get(base_max_y - 1);
+        LinkedList<Position> position_line
+            = zero_positions.get(base_count - 1).get(base_max_x - 1).get(base_max_y - 1);
+        Iterator<Pair<boolean[][], Integer>> iter = cache_line.iterator();
+        Iterator<Position> piter = position_line.iterator();
+
+        boolean searching = true;
+        Pair<boolean[][], Integer> p = null;
+        while (searching && iter.hasNext()) {
+          p = iter.next();
+          Position temp_position = piter.next();
+          if (same_configuration(base_configuration, p.first, base_count, base_max_x, base_max_y)) {
+            searching = false;
+            winning_position = temp_position;
+          }
+        }
+
+        if (searching) {
+          Compute_Task my_task = new Compute_Task(overall_context, base_count);
+          my_task.execute(base_configuration, base_count, base_max_x, base_max_y);
+        } else {
+          zero_position = winning_position;
+          result = configuration_value = p.second;
+          result = p.second;
+          if (computer_move) {
+            Playfield playfield = (Playfield) overall_context.findViewById(R.id.playfield);
+            playfield.hint_position = zero_position;
+            playfield.get_computer_move();
+          }
+        }
+
       }
 
     }
@@ -445,6 +461,7 @@ public class Game_Evaluation {
   protected int configuration_value;
 
   protected Activity overall_context;
+  protected int game_level;
 
   protected boolean computer_move;
 

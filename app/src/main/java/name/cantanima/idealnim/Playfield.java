@@ -280,6 +280,9 @@ public class Playfield
 
   public void get_computer_move() {
 
+    if (computer_sometimes_dumb) game_control.notify_computer_sometimes_dumb();
+    if (view_xmax >= 10) game_control.notify_large_board();
+
     boolean stupid_turn = computer_sometimes_dumb && game_control.random.nextBoolean();
 
     if (hint_position == null)
@@ -369,8 +372,10 @@ public class Playfield
       game_control.new_game(this, view_xmax, view_ymax, game_level);
     } else if (v == hint_button) {
       value_text.setText(String.valueOf(evaluator.game_value()));
+      if (view_xmax >= 10) game_control.notify_large_board();
       hint_position = evaluator.hint_position();
       hinting = true;
+      game_control.notify_requested_a_hint();
       invalidate();
     }
 
@@ -413,13 +418,6 @@ public class Playfield
     if (key.equals(context.getString(R.string.level_pref))) {
       game_level = pref.getInt(context.getString(R.string.level_pref), 1);
       game_level = (game_level < 1) ? 1 : game_level;
-      if (game_level % 2 == 0) {
-        hint_button.setVisibility(INVISIBLE);
-        value_text.setVisibility(INVISIBLE);
-      } else {
-        hint_button.setVisibility(VISIBLE);
-        value_text.setVisibility(VISIBLE);
-      }
       game_control.new_game(this, view_xmax, view_ymax, game_level);
     } else if (key.equals(context.getString(R.string.max_pref_key))) {
       int max = pref.getInt(context.getString(R.string.max_pref_key), 7);
@@ -429,6 +427,7 @@ public class Playfield
         step_x = getWidth() / view_xmax;
         step_y = getHeight() / view_ymax;
         evaluator = new Game_Evaluation(context, playable, played, view_xmax, view_ymax, game_level);
+        game_control.notify_changed_board_size();
         invalidate();
       }
     } else if (key.equals(context.getString(R.string.stupid_pref_key)))
@@ -487,6 +486,7 @@ public class Playfield
   protected int game_level = 4;
   protected Game_Control game_control;
   protected boolean computer_sometimes_dumb = false;
+  protected int consecutive_wins = 0;
 
   protected Game_Evaluation evaluator;
 

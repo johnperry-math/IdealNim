@@ -6,15 +6,17 @@ Save this file as res/values/games-ids.xml in your project.
 <resources>
     <string name="app_id">950897793124</string>
     <string name="package_name">name.cantanima.idealnim</string>
-    <string name="achievement_won_a_game">CgkI5LCzr9YbEAIQAQ</string>
-    <string name="achievement_beat_me_with_one_hand_behind_my_back">CgkI5LCzr9YbEAIQAg</string>
+    <string name="achievement_everyone_gets_a_trophy">CgkI5LCzr9YbEAIQDg</string>
+    <string name="achievement_honorable_mention">CgkI5LCzr9YbEAIQAQ</string>
+    <string name="achievement_0ne_hand_behind_my_back">CgkI5LCzr9YbEAIQAg</string>
     <string name="achievement_won_a_level_3_game">CgkI5LCzr9YbEAIQAw</string>
     <string name="achievement_won_a_game_at_level_4">CgkI5LCzr9YbEAIQBA</string>
     <string name="achievement_won_a_game_at_level_5">CgkI5LCzr9YbEAIQBQ</string>
     <string name="achievement_fair_play_award">CgkI5LCzr9YbEAIQBg</string>
+    <string name="achievement_patience_is_a_virtue">CgkI5LCzr9YbEAIQDQ</string>
     <string name="achievement_apprentice">CgkI5LCzr9YbEAIQCA</string>
     <string name="achievement_journeyman">CgkI5LCzr9YbEAIQBw</string>
     <string name="achievement_craftsman">CgkI5LCzr9YbEAIQCQ</string>
     <string name="achievement_master_craftsman">CgkI5LCzr9YbEAIQCg</string>
-    <string name="achievement_i.n.d._doctor_of_ideal_nim">CgkI5LCzr9YbEAIQCw</string>
+    <string name="achievement_doctor_of_ideal_nim">CgkI5LCzr9YbEAIQCw</string>
 </resources>

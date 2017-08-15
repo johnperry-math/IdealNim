@@ -3,6 +3,8 @@ package name.cantanima.idealnim;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 
@@ -23,6 +25,21 @@ import static name.cantanima.idealnim.Game_Control.Dialog_Id.NEW_GAME;
 import static name.cantanima.idealnim.Game_Control.Dialog_Id.PLAY_AGAIN;
 import static name.cantanima.idealnim.Game_Control.Player_Kind.COMPUTER;
 import static name.cantanima.idealnim.Game_Control.Player_Kind.HUMAN;
+import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.APPRENTICE;
+import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.CRAFTSMAN;
+import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.DOCTOR_OF_IDEAL_NIM;
+import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.EVERYONE_GETS_A_TROPHY;
+import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.FAIR_PLAY;
+import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.HONORABLE_MENTION;
+import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.JOURNEYMAN;
+import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.MASTER_CRAFTSMAN;
+import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.ONE_HAND_BEHIND_MY_BACK;
+import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.PATIENCE_A_VIRTUE;
+import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.WON_LEVEL_3;
+import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.WON_LEVEL_4;
+import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.WON_LEVEL_5;
+
+import name.cantanima.idealnim.MainActivity.Achievements_to_unlock;
 
 /**
  * Created by cantanima on 8/8/17.
@@ -41,7 +58,7 @@ public class Game_Control implements DialogInterface.OnClickListener {
 
   public void new_game(Playfield p, int max_x, int max_y, int level) {
     playfield = p;
-    main_activity = p.getContext();
+    main_activity = (MainActivity) p.getContext();
 
     Ideal I;
     this.level = level;
@@ -96,9 +113,11 @@ public class Game_Control implements DialogInterface.OnClickListener {
   }
 
   public void notify_game_over() {
+
+    handle_achievements();
+
     AlertDialog.Builder last_builder = new AlertDialog.Builder(main_activity);
     last_builder.setTitle(main_activity.getString(R.string.game_over));
-    //String message = main_activity.getString(R.string.play_again);
     String message;
     if (last_player == COMPUTER) {
       String[] insults = main_activity.getResources().getStringArray(R.array.lose_insults);
@@ -119,6 +138,136 @@ public class Game_Control implements DialogInterface.OnClickListener {
     last_builder.setPositiveButton(main_activity.getString(R.string.another_game), this);
     last_builder.show();
     last_dialog = PLAY_AGAIN;
+  }
+
+  public void handle_achievements() {
+
+    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(main_activity);
+    SharedPreferences.Editor edit = pref.edit();
+
+    // everyone gets this achievements, even losers
+
+    if (!pref.contains(main_activity.getString(R.string.everyone_get_a_trophy))) {
+      main_activity.unlock_achievement(EVERYONE_GETS_A_TROPHY);
+      edit.putBoolean(main_activity.getString(R.string.everyone_get_a_trophy), true);
+    }
+
+    // the following achievements require an actual human victory
+
+    if (last_player == HUMAN) {
+
+      if (!pref.contains(main_activity.getString(R.string.honorable_mention))) {
+        main_activity.unlock_achievement(HONORABLE_MENTION);
+        edit.putBoolean(main_activity.getString(R.string.honorable_mention), true);
+      }
+
+      if (
+          !pref.contains(main_activity.getString(R.string.one_hand_behind_my_back)) &&
+          used_one_hand_behind_back
+      ) {
+        main_activity.unlock_achievement(ONE_HAND_BEHIND_MY_BACK);
+        edit.putBoolean(main_activity.getString(R.string.one_hand_behind_my_back), true);
+      }
+
+      if (
+          !pref.contains(main_activity.getString(R.string.won_level_3)) &&
+          playfield.game_level == 5
+      ) {
+        main_activity.unlock_achievement(WON_LEVEL_3);
+        edit.putBoolean(main_activity.getString(R.string.won_level_3), true);
+      }
+
+      if (
+          !pref.contains(main_activity.getString(R.string.won_level_4)) &&
+              playfield.game_level == 7
+          ) {
+        main_activity.unlock_achievement(WON_LEVEL_4);
+        edit.putBoolean(main_activity.getString(R.string.won_level_4), true);
+      }
+
+      if (
+          !pref.contains(main_activity.getString(R.string.won_level_5)) &&
+              playfield.game_level == 9
+          ) {
+        main_activity.unlock_achievement(WON_LEVEL_5);
+        edit.putBoolean(main_activity.getString(R.string.won_level_5), true);
+      }
+
+      boolean cheated = used_hint || used_one_hand_behind_back;
+
+      if (!pref.contains(main_activity.getString(R.string.apprentice)) && !cheated) {
+        main_activity.unlock_achievement(FAIR_PLAY);
+        edit.putBoolean(main_activity.getString(R.string.fair_play), true);
+      }
+
+      if (
+          !pref.contains(main_activity.getString(R.string.patience_a_virtue)) &&
+          computed_large_board
+      ) {
+        main_activity.unlock_achievement(PATIENCE_A_VIRTUE);
+        edit.putBoolean(main_activity.getString(R.string.patience_a_virtue), true);
+      }
+
+      // the final achievements all require fair play
+      
+      if (!cheated) {
+
+        int level = playfield.game_level;
+
+        if (
+            level == 2 &&
+                (!pref.contains(main_activity.getString(R.string.apprentice)) ||
+                pref.getInt(main_activity.getString(R.string.apprentice), 0) < 1)
+            ) {
+          main_activity.increment_achievement(APPRENTICE);
+          edit.putInt(main_activity.getString(R.string.apprentice), 1);
+        }
+        if (
+            level == 4 &&
+                (!pref.contains(main_activity.getString(R.string.journeyman)) ||
+                pref.getInt(main_activity.getString(R.string.journeyman), 0) < 2)
+            ) {
+          main_activity.increment_achievement(JOURNEYMAN);
+          int wins = pref.getInt(main_activity.getString(R.string.journeyman), 0);
+          edit.putInt(main_activity.getString(R.string.journeyman), ++wins);
+        }
+        if (
+            level == 6 &&
+                (!pref.contains(main_activity.getString(R.string.craftsman)) ||
+                pref.getInt(main_activity.getString(R.string.craftsman), 0) < 3)
+            ) {
+          main_activity.increment_achievement(CRAFTSMAN);
+          int wins = pref.getInt(main_activity.getString(R.string.craftsman), 0);
+          edit.putInt(main_activity.getString(R.string.craftsman), ++wins);
+        }
+        if (
+            level == 8 &&
+                (!pref.contains(main_activity.getString(R.string.master_craftsman)) ||
+                pref.getInt(main_activity.getString(R.string.master_craftsman), 0) < 4)
+            ) {
+          main_activity.increment_achievement(MASTER_CRAFTSMAN);
+          int wins = pref.getInt(main_activity.getString(R.string.master_craftsman), 0);
+          edit.putInt(main_activity.getString(R.string.master_craftsman), ++wins);
+        }
+        if (level < 6)
+          playfield.consecutive_wins = 0;
+        else if (level % 2 == 0){
+          ++playfield.consecutive_wins;
+          if (
+              playfield.consecutive_wins >= 5 &&
+                  !pref.contains(main_activity.getString(R.string.doctor_ideal_nim))
+              ) {
+            main_activity.unlock_achievement(DOCTOR_OF_IDEAL_NIM);
+            edit.putBoolean(main_activity.getString(R.string.doctor_ideal_nim), true);
+          }
+        }
+
+      }
+
+    }
+
+    edit.commit();
+
   }
 
   public void set_player_kind(Player_Kind kind) { last_player = kind; }
@@ -149,10 +298,18 @@ public class Game_Control implements DialogInterface.OnClickListener {
 
   }
 
+  public void notify_requested_a_hint() { used_hint = true; }
+
+  public void notify_changed_board_size() { changed_size = true;}
+
+  public void notify_computer_sometimes_dumb() { used_one_hand_behind_back = true; }
+
+  public void notify_large_board() { computed_large_board = true; }
+
   protected int level = 1;
   protected long current_seed;
   protected Playfield playfield;
-  protected Context main_activity;
+  protected MainActivity main_activity;
   protected Random random = new Random();
 
   protected enum Player_Kind { COMPUTER, HUMAN };
@@ -160,6 +317,12 @@ public class Game_Control implements DialogInterface.OnClickListener {
 
   protected enum Dialog_Id { NEW_GAME, PLAY_AGAIN };
   protected Dialog_Id last_dialog;
+
+  // for achievements
+  protected boolean
+      changed_size = false, used_hint = false, used_one_hand_behind_back = false,
+      computed_large_board = false
+  ;
 
   final private static String tag = "Game_Control";
 

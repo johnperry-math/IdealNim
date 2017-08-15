@@ -16,7 +16,7 @@
     <string name="game_over">Game over!</string>
     <string name="computer_won">I won!&#160;</string>
     <string-array name="lose_insults">
-        <item>I was playing with &#8220;One arm behind my back&#8221; and I still won!</item>
+        <item>You lost to an Android playing with &#8220;One arm behind my back&#8221;! Embarrassing, isn&#8217;t it?</item>
         <item>But of course: my brain is much smaller than yours. Bigger ain&#8217;t always better!</item>
         <item>That&#8217;s understandable: I can think several billion thoughts a second. Whereas you&#8230; well, keep the day job.</item>
         <item>It&#8217;s alright to cry uncle, and ask for a hint. Then again, sometimes there&#8217;s no useful hint to be had. Or maybe Uncle just doesn&#8217;t care.</item>
@@ -96,8 +96,8 @@
 
     <string name="conn_fail_title">Connection failure</string>
     <string name="conn_fail_summ">
-        Failed to connect to the Google Play API.
-        You need not log in unless you want access to achievements.
+        Failed to connect to Google Play services, and all attempts to resolve the problem failed.
+        Achievements will not be available, sorry.
     </string>
     <string name="conn_fail_pos">Understood</string>
     <string name="unknown_signin_error">Unknown sign-in error</string>
@@ -107,5 +107,20 @@
     <string name="sign_in_why">Sign in to enable achievements!</string>
     <string name="sign_out">Sign out</string>
     <string name="understood">Understood</string>
+
+    <!-- Achievements -->
+    <string name="everyone_get_a_trophy">everyone_gets_a_trophy</string>
+    <string name="honorable_mention">honorable_mention</string>
+    <string name="one_hand_behind_my_back">one_hand_behind_my_back</string>
+    <string name="won_level_3">won_level_3</string>
+    <string name="won_level_4">won_level_4</string>
+    <string name="won_level_5">won_level_5</string>
+    <string name="fair_play">fair_play</string>
+    <string name="patience_a_virtue">patience_a_virtue</string>
+    <string name="apprentice">apprentice</string>
+    <string name="journeyman">journeyman</string>
+    <string name="craftsman">craftsman</string>
+    <string name="master_craftsman">master_craftsman</string>
+    <string name="doctor_ideal_nim">doctor_ideal_nim</string>
 
 </resources>

@@ -3,6 +3,7 @@ package name.cantanima.idealnim;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.os.Bundle;
@@ -12,6 +13,8 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -19,6 +22,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.images.ImageManager;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.Player;
 
@@ -27,9 +31,13 @@ import static android.view.View.VISIBLE;
 import static com.google.android.gms.common.ConnectionResult.SUCCESS;
 import static com.google.android.gms.common.GoogleApiAvailability.GOOGLE_PLAY_SERVICES_VERSION_CODE;
 import static com.google.android.gms.games.GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED;
+import static name.cantanima.idealnim.Game_Control.Player_Kind.HUMAN;
 
 import com.google.android.gms.games.achievement.Achievement;
 import com.google.example.games.basegameutils.BaseGameUtils;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class MainActivity
     extends AppCompatActivity
@@ -49,6 +57,7 @@ public class MainActivity
     playfield.set_buttons_to_listen(
         new_game_button, value_textview, hint_button
     );
+    playfield.start_game();
 
     sign_in_button = (SignInButton) findViewById(R.id.sign_in_button);
     sign_in_button.setOnClickListener(this);
@@ -56,6 +65,8 @@ public class MainActivity
     sign_out_button = (Button) findViewById(R.id.sign_out_button);
     sign_out_button.setVisibility(INVISIBLE);
     sign_out_button.setOnClickListener(this);
+    avatar_view = (ImageView) findViewById(R.id.avatar_view);
+    avatar_view.setVisibility(INVISIBLE);
 
 
     //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -102,7 +113,7 @@ public class MainActivity
       startActivity(i);
       return true;
     } else if (id == R.id.action_achievements) {
-      if (games_client != null && games_client.isConnected())
+      if (can_handle_achievements())
         startActivityForResult(
             Games.Achievements.getAchievementsIntent(games_client), REQUEST_ACHIEVEMENTS
         );
@@ -181,6 +192,7 @@ public class MainActivity
       Log.d(tag, "Logging into package" + getPackageName());
       sign_in_clicked = true;
       if (games_client != null) games_client.connect();
+      if (games_client.isConnected()) onConnected(null);
     } else if (v == findViewById(R.id.sign_out_button)) {
       Log.d(tag, "Logging out of package");
       sign_in_clicked = false;
@@ -188,6 +200,7 @@ public class MainActivity
       sign_out_button.setVisibility(INVISIBLE);
       sign_in_button.setVisibility(VISIBLE);
       sign_in_message_view.setText(getString(R.string.sign_in_why));
+      avatar_view.setVisibility(INVISIBLE);
     }
   }
 
@@ -221,8 +234,13 @@ public class MainActivity
     Log.d(tag, "connected!");
     sign_out_button.setVisibility(VISIBLE);
     sign_in_button.setVisibility(INVISIBLE);
+    avatar_view.setVisibility(VISIBLE);
     Player p = Games.Players.getCurrentPlayer(games_client);
     sign_in_message_view.setText(p.getDisplayName());
+    if (p.getIconImageUri() != null) {
+      ImageManager im = ImageManager.create(this);
+      im.loadImage(avatar_view, p.getIconImageUri());
+    }
   }
 
   @Override
@@ -231,9 +249,17 @@ public class MainActivity
     if (games_client != null) games_client.connect();
   }
 
+  public boolean can_handle_achievements() {
+    return games_client != null && games_client.isConnected() &&
+        Games.Players.getCurrentPlayer(games_client) != null;
+  }
+
   public void unlock_achievement(Achievements_to_unlock achievement) {
 
-    if (games_client != null) {
+    if (
+        games_client != null && games_client.isConnected() &&
+        Games.Players.getCurrentPlayer(games_client) != null
+    ) {
 
       switch (achievement) {
         case EVERYONE_GETS_A_TROPHY:
@@ -275,7 +301,11 @@ public class MainActivity
 
   public void increment_achievement(Achievements_to_unlock achievement) {
 
-    if (games_client != null) {
+    if (
+        games_client != null &&
+            games_client.isConnected() &&
+            Games.Players.getCurrentPlayer(games_client) != null
+    ) {
 
       switch (achievement) {
         case JOURNEYMAN:
@@ -297,6 +327,7 @@ public class MainActivity
   private boolean resolving_failure = false, auto_start_signin = false, sign_in_clicked = false;
   private SignInButton sign_in_button;
   private TextView sign_in_message_view;
+  private ImageView avatar_view;
   private Button sign_out_button;
   private int PLAY_SERVICES_RESOLUTION_REQUEST = 9200, REQUEST_ACHIEVEMENTS = 9300,
       GAME_SIGN_IN_CODE = 9400;

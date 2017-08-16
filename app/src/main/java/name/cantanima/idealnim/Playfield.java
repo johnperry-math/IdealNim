@@ -3,6 +3,7 @@ package name.cantanima.idealnim;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -20,6 +21,7 @@ import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import static android.graphics.Color.BLACK;
@@ -35,7 +37,7 @@ import static android.view.MotionEvent.ACTION_MOVE;
 import static android.view.MotionEvent.ACTION_UP;
 import static name.cantanima.idealnim.Game_Control.Player_Kind.COMPUTER;
 import static name.cantanima.idealnim.Game_Control.Player_Kind.HUMAN;
-import static name.cantanima.idealnim.Game_Evaluation.ORIGIN;
+import static name.cantanima.idealnim.Game_Evaluation_Hashmap.ORIGIN;
 
 /**
  * Created by cantanima on 8/8/17.
@@ -62,7 +64,6 @@ public class Playfield
       playable.sort_ideal();
     } else {
       SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
-      pref.registerOnSharedPreferenceChangeListener(this);
       if (pref.contains(context.getString(R.string.level_pref)))
         game_level = pref.getInt(context.getString(R.string.level_pref), 1);
       if (pref.contains(context.getString(R.string.max_pref_key)))
@@ -81,8 +82,6 @@ public class Playfield
         hint_color = pref.getInt(context.getString(R.string.hint_color_key), hint_color);
       if (pref.contains(context.getString(R.string.invalid_color_key)))
         invalid_color = pref.getInt(context.getString(R.string.invalid_color_key), invalid_color);
-      game_control = new Game_Control();
-      game_control.new_game(this, view_xmax, view_ymax, game_level);
       SharedPreferences.Editor editor = pref.edit();
       editor.putBoolean(context.getString(R.string.stupid_pref_key), computer_sometimes_dumb);
       editor.putInt(context.getString(R.string.level_pref), game_level);
@@ -94,8 +93,16 @@ public class Playfield
       editor.putInt(context.getString(R.string.hint_color_key), hint_color);
       editor.putInt(context.getString(R.string.invalid_color_key), invalid_color);
       editor.apply();
+      pref.registerOnSharedPreferenceChangeListener(this);
     }
     setOnTouchListener(this);
+
+  }
+
+  public void start_game() {
+
+    game_control = new Game_Control();
+    game_control.new_game(this, view_xmax, view_ymax, game_level, true);
 
   }
 
@@ -141,7 +148,23 @@ public class Playfield
     if (value_text != null)
       value_text.setText(getContext().getString(R.string.unknown_game_value));
 
-    evaluator = new Game_Evaluation(getContext(), playable, null, view_xmax, view_ymax, game_level);
+    evaluator = new Game_Evaluation_Hashmap(getContext(), playable, null, view_xmax, view_ymax, game_level);
+
+  }
+
+  // this is buggy, so managing configuration has been disabled
+  public void restore_to(
+      ArrayList<Integer> old_playable, ArrayList<Integer> old_played, int level
+  ) {
+
+    playable = new Ideal(old_playable);
+    played = new Ideal(old_played);
+    game_level = level;
+    evaluator = new Game_Evaluation_Hashmap(getContext(), playable, played, view_xmax, view_ymax, game_level);
+    evaluator.game_value();
+    game_control = new Game_Control();
+    game_control.new_game(this, view_xmax, view_ymax, game_level, false);
+    invalidate();
 
   }
 
@@ -281,7 +304,6 @@ public class Playfield
   public void get_computer_move() {
 
     if (computer_sometimes_dumb) game_control.notify_computer_sometimes_dumb();
-    if (view_xmax >= 10) game_control.notify_large_board();
 
     boolean stupid_turn = computer_sometimes_dumb && game_control.random.nextBoolean();
 
@@ -336,7 +358,7 @@ public class Playfield
               played.add_generator(i, j, true);
               evaluator.play_point(i, j);
             }
-            if (evaluator.base_count != 0) {
+            if (!playable.equals(played)) {
               game_control.set_player_kind(COMPUTER);
               evaluator.choose_computer_move();
             }
@@ -369,10 +391,9 @@ public class Playfield
   public void onClick(View v) {
 
     if (v == new_game_button) {
-      game_control.new_game(this, view_xmax, view_ymax, game_level);
+      game_control.new_game(this, view_xmax, view_ymax, game_level, true);
     } else if (v == hint_button) {
       value_text.setText(String.valueOf(evaluator.game_value()));
-      if (view_xmax >= 10) game_control.notify_large_board();
       hint_position = evaluator.hint_position();
       hinting = true;
       game_control.notify_requested_a_hint();
@@ -418,7 +439,9 @@ public class Playfield
     if (key.equals(context.getString(R.string.level_pref))) {
       game_level = pref.getInt(context.getString(R.string.level_pref), 1);
       game_level = (game_level < 1) ? 1 : game_level;
-      game_control.new_game(this, view_xmax, view_ymax, game_level);
+      if (game_control == null)
+        game_control = new Game_Control();
+      game_control.new_game(this, view_xmax, view_ymax, game_level, true);
     } else if (key.equals(context.getString(R.string.max_pref_key))) {
       int max = pref.getInt(context.getString(R.string.max_pref_key), 7);
       max = (max < 7) ? 7 : max;
@@ -426,7 +449,7 @@ public class Playfield
         view_xmax = view_ymax = max;
         step_x = getWidth() / view_xmax;
         step_y = getHeight() / view_ymax;
-        evaluator = new Game_Evaluation(context, playable, played, view_xmax, view_ymax, game_level);
+        evaluator = new Game_Evaluation_Hashmap(context, playable, played, view_xmax, view_ymax, game_level);
         game_control.notify_changed_board_size();
         invalidate();
       }
@@ -488,7 +511,7 @@ public class Playfield
   protected boolean computer_sometimes_dumb = false;
   protected int consecutive_wins = 0;
 
-  protected Game_Evaluation evaluator;
+  protected Game_Evaluation_Hashmap evaluator;
 
   protected Button new_game_button, hint_button;
   protected TextView value_text;

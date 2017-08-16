@@ -9,10 +9,18 @@ import android.util.Log;
 import android.util.Pair;
 import android.widget.TextView;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeSet;
 import java.util.Vector;
+
+import static java.lang.Math.abs;
+import static java.util.Calendar.DAY_OF_MONTH;
+import static java.util.Calendar.HOUR;
+import static java.util.Calendar.MINUTE;
+import static java.util.Calendar.SECOND;
 
 /**
  * Created by cantanima on 8/10/17.
@@ -243,6 +251,15 @@ public class Game_Evaluation {
       super.onPostExecute(integer);
       ((TextView) overall_context.findViewById(R.id.value_view)).setText(integer.toString());
       Playfield p = ((Playfield) overall_context.findViewById(R.id.playfield));
+      end_time = new GregorianCalendar();
+      if (
+          start_time.get(HOUR) != end_time.get(HOUR) ||
+              start_time.get(MINUTE) != end_time.get(MINUTE) ||
+              abs(start_time.get(SECOND) - end_time.get(SECOND)) >= 30 ||
+              start_time.get(DAY_OF_MONTH) != end_time.get(DAY_OF_MONTH) // gracious me, that's patient!
+          ) {
+        p.game_control.notify_large_board();
+      }
       p.hint_position = zero_position;
       p.invalidate();
       TextView tv = (TextView) overall_context.findViewById(R.id.value_view);
@@ -284,6 +301,7 @@ public class Game_Evaluation {
      */
     @Override
     protected Integer doInBackground(Object... params) {
+      start_time = new GregorianCalendar();
       Integer result = this.compute_scores(
           (boolean[][]) params[0], (Integer) params[1], (Integer) params[2], (Integer) params[3], 0
       );
@@ -410,6 +428,7 @@ public class Game_Evaluation {
 
     ProgressDialog update_dialog;
     int current_positions;
+    Calendar start_time, end_time;
 
   }
 

@@ -61,7 +61,8 @@
     <string name="level_pref">level_pref</string>
     <string name="level_title">Level</string>
     <string name="level_summary">
-        Level 1 is easiest. Higher levels increase the number of base points.
+        Level 1 is definitely easiest. Higher levels increase the number of southwest corners.
+        <b>Higher is not necessarily harder; a great deal depends on the configuration.</b>
         Even-numbered levels are identical to odd-numbered levels, but forbid hints.
     </string>
 

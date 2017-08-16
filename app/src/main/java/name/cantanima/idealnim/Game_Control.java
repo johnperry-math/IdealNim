@@ -56,59 +56,61 @@ public class Game_Control implements DialogInterface.OnClickListener {
 
   }
 
-  public void new_game(Playfield p, int max_x, int max_y, int level) {
+  public void new_game(Playfield p, int max_x, int max_y, int level, boolean generate_ideals) {
     playfield = p;
     main_activity = (MainActivity) p.getContext();
 
-    Ideal I;
-    this.level = level;
-    level = (level < 1) ? 1 : (level + 1) / 2;
-    if (level != 5) {
-      do {
-        I = new Ideal();
-        //Log.d(tag, "----");
-        for (int n = 0; n < level; ++n) {
-          int i = random.nextInt(3 * max_x / 4);
-          int j = random.nextInt(3 * max_y / 4);
-          //Log.d(tag, String.valueOf(i) + ", " + String.valueOf(j));
-          I.add_generator_fast(i, j);
-        }
-        //Log.d(tag, String.valueOf(I.T.size()) + " = " + String.valueOf(level));
+    if (generate_ideals) {
 
-        //Log.d(tag, "----");
-      } while (I.T.size() < level);
-    } else {
-      int last_i, last_j;
-      do {
-        last_i = 0;
-        last_j = max_y;
-        I = new Ideal();
-        Log.d(tag, "----");
-        for (int n = 0; n < 5; ++n) {
-          int i = last_i + (random.nextInt(2) + 1);
-          int j = last_j - (random.nextInt(2) + 1);
-          if (j < 0) break;
-          last_i = i;
-          last_j = j;
-          I.add_generator_fast(i, j);
-          Log.d(tag, String.valueOf(i) + ", " + String.valueOf(j));
-        }
-        Log.d(tag, "----");
-      } while (last_i >= max_x - 1 || I.T.size() < 5);
-      Log.d(tag, "pause");
+      Ideal I;
+      this.level = level;
+      level = (level < 1) ? 1 : (level + 1) / 2;
+      if (level != 5) {
+        do {
+          I = new Ideal();
+          //Log.d(tag, "----");
+          for (int n = 0; n < level; ++n) {
+            int i = random.nextInt(3 * max_x / 4);
+            int j = random.nextInt(3 * max_y / 4);
+            //Log.d(tag, String.valueOf(i) + ", " + String.valueOf(j));
+            I.add_generator_fast(i, j);
+          }
+          //Log.d(tag, String.valueOf(I.T.size()) + " = " + String.valueOf(level));
+
+          //Log.d(tag, "----");
+        } while (I.T.size() < level);
+      } else {
+        int last_i, last_j;
+        do {
+          last_i = 0;
+          last_j = max_y;
+          I = new Ideal();
+          Log.d(tag, "----");
+          for (int n = 0; n < 5; ++n) {
+            int i = last_i + (random.nextInt(2) + 1);
+            int j = last_j - (random.nextInt(2) + 1);
+            if (j < 0) break;
+            last_i = i;
+            last_j = j;
+            I.add_generator_fast(i, j);
+            Log.d(tag, String.valueOf(i) + ", " + String.valueOf(j));
+          }
+          Log.d(tag, "----");
+        } while (last_i >= max_x - 1 || I.T.size() < 5);
+      }
+      I.sort_ideal();
+      playfield.set_to(I);
+      playfield.invalidate();
+
+      AlertDialog.Builder first_builder = new AlertDialog.Builder(main_activity);
+      first_builder.setTitle(main_activity.getString(R.string.new_game));
+      first_builder.setMessage(main_activity.getString(R.string.who_first));
+      first_builder.setPositiveButton(main_activity.getString(R.string.human), this);
+      first_builder.setNegativeButton(main_activity.getString(R.string.computer), this);
+      first_builder.show();
+      last_dialog = NEW_GAME;
+
     }
-    I.sort_ideal();
-    playfield.set_to(I);
-    playfield.invalidate();
-
-    AlertDialog.Builder first_builder = new AlertDialog.Builder(main_activity);
-    first_builder.setTitle(main_activity.getString(R.string.new_game));
-    first_builder.setMessage(main_activity.getString(R.string.who_first));
-    first_builder.setPositiveButton(main_activity.getString(R.string.human), this);
-    first_builder.setNegativeButton(main_activity.getString(R.string.computer), this);
-    first_builder.show();
-    last_dialog = NEW_GAME;
-
 
   }
 
@@ -142,131 +144,135 @@ public class Game_Control implements DialogInterface.OnClickListener {
 
   public void handle_achievements() {
 
-    SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(main_activity);
-    SharedPreferences.Editor edit = pref.edit();
+    if (main_activity.can_handle_achievements()) {
 
-    // everyone gets this achievements, even losers
+      SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(main_activity);
+      SharedPreferences.Editor edit = pref.edit();
 
-    if (!pref.contains(main_activity.getString(R.string.everyone_get_a_trophy))) {
-      main_activity.unlock_achievement(EVERYONE_GETS_A_TROPHY);
-      edit.putBoolean(main_activity.getString(R.string.everyone_get_a_trophy), true);
-    }
+      // everyone gets this achievements, even losers
 
-    // the following achievements require an actual human victory
-
-    if (last_player == HUMAN) {
-
-      if (!pref.contains(main_activity.getString(R.string.honorable_mention))) {
-        main_activity.unlock_achievement(HONORABLE_MENTION);
-        edit.putBoolean(main_activity.getString(R.string.honorable_mention), true);
+      if (!pref.contains(main_activity.getString(R.string.everyone_get_a_trophy))) {
+        main_activity.unlock_achievement(EVERYONE_GETS_A_TROPHY);
+        edit.putBoolean(main_activity.getString(R.string.everyone_get_a_trophy), true);
       }
 
-      if (
-          !pref.contains(main_activity.getString(R.string.one_hand_behind_my_back)) &&
-          used_one_hand_behind_back
-      ) {
-        main_activity.unlock_achievement(ONE_HAND_BEHIND_MY_BACK);
-        edit.putBoolean(main_activity.getString(R.string.one_hand_behind_my_back), true);
-      }
+      // the following achievements require an actual human victory
 
-      if (
-          !pref.contains(main_activity.getString(R.string.won_level_3)) &&
-          playfield.game_level == 5
-      ) {
-        main_activity.unlock_achievement(WON_LEVEL_3);
-        edit.putBoolean(main_activity.getString(R.string.won_level_3), true);
-      }
+      if (last_player == HUMAN) {
 
-      if (
-          !pref.contains(main_activity.getString(R.string.won_level_4)) &&
-              playfield.game_level == 7
-          ) {
-        main_activity.unlock_achievement(WON_LEVEL_4);
-        edit.putBoolean(main_activity.getString(R.string.won_level_4), true);
-      }
-
-      if (
-          !pref.contains(main_activity.getString(R.string.won_level_5)) &&
-              playfield.game_level == 9
-          ) {
-        main_activity.unlock_achievement(WON_LEVEL_5);
-        edit.putBoolean(main_activity.getString(R.string.won_level_5), true);
-      }
-
-      boolean cheated = used_hint || used_one_hand_behind_back;
-
-      if (!pref.contains(main_activity.getString(R.string.apprentice)) && !cheated) {
-        main_activity.unlock_achievement(FAIR_PLAY);
-        edit.putBoolean(main_activity.getString(R.string.fair_play), true);
-      }
-
-      if (
-          !pref.contains(main_activity.getString(R.string.patience_a_virtue)) &&
-          computed_large_board
-      ) {
-        main_activity.unlock_achievement(PATIENCE_A_VIRTUE);
-        edit.putBoolean(main_activity.getString(R.string.patience_a_virtue), true);
-      }
-
-      // the final achievements all require fair play
-      
-      if (!cheated) {
-
-        int level = playfield.game_level;
+        if (!pref.contains(main_activity.getString(R.string.honorable_mention))) {
+          main_activity.unlock_achievement(HONORABLE_MENTION);
+          edit.putBoolean(main_activity.getString(R.string.honorable_mention), true);
+        }
 
         if (
-            level == 2 &&
-                (!pref.contains(main_activity.getString(R.string.apprentice)) ||
-                pref.getInt(main_activity.getString(R.string.apprentice), 0) < 1)
+            !pref.contains(main_activity.getString(R.string.one_hand_behind_my_back)) &&
+                used_one_hand_behind_back
             ) {
-          main_activity.increment_achievement(APPRENTICE);
-          edit.putInt(main_activity.getString(R.string.apprentice), 1);
+          main_activity.unlock_achievement(ONE_HAND_BEHIND_MY_BACK);
+          edit.putBoolean(main_activity.getString(R.string.one_hand_behind_my_back), true);
         }
+
         if (
-            level == 4 &&
-                (!pref.contains(main_activity.getString(R.string.journeyman)) ||
-                pref.getInt(main_activity.getString(R.string.journeyman), 0) < 2)
+            !pref.contains(main_activity.getString(R.string.won_level_3)) &&
+                playfield.game_level == 5
             ) {
-          main_activity.increment_achievement(JOURNEYMAN);
-          int wins = pref.getInt(main_activity.getString(R.string.journeyman), 0);
-          edit.putInt(main_activity.getString(R.string.journeyman), ++wins);
+          main_activity.unlock_achievement(WON_LEVEL_3);
+          edit.putBoolean(main_activity.getString(R.string.won_level_3), true);
         }
+
         if (
-            level == 6 &&
-                (!pref.contains(main_activity.getString(R.string.craftsman)) ||
-                pref.getInt(main_activity.getString(R.string.craftsman), 0) < 3)
+            !pref.contains(main_activity.getString(R.string.won_level_4)) &&
+                playfield.game_level == 7
             ) {
-          main_activity.increment_achievement(CRAFTSMAN);
-          int wins = pref.getInt(main_activity.getString(R.string.craftsman), 0);
-          edit.putInt(main_activity.getString(R.string.craftsman), ++wins);
+          main_activity.unlock_achievement(WON_LEVEL_4);
+          edit.putBoolean(main_activity.getString(R.string.won_level_4), true);
         }
+
         if (
-            level == 8 &&
-                (!pref.contains(main_activity.getString(R.string.master_craftsman)) ||
-                pref.getInt(main_activity.getString(R.string.master_craftsman), 0) < 4)
+            !pref.contains(main_activity.getString(R.string.won_level_5)) &&
+                playfield.game_level == 9
             ) {
-          main_activity.increment_achievement(MASTER_CRAFTSMAN);
-          int wins = pref.getInt(main_activity.getString(R.string.master_craftsman), 0);
-          edit.putInt(main_activity.getString(R.string.master_craftsman), ++wins);
+          main_activity.unlock_achievement(WON_LEVEL_5);
+          edit.putBoolean(main_activity.getString(R.string.won_level_5), true);
         }
-        if (level < 6)
-          playfield.consecutive_wins = 0;
-        else if (level % 2 == 0){
-          ++playfield.consecutive_wins;
+
+        boolean cheated = used_hint || used_one_hand_behind_back;
+
+        if (!pref.contains(main_activity.getString(R.string.apprentice)) && !cheated) {
+          main_activity.unlock_achievement(FAIR_PLAY);
+          edit.putBoolean(main_activity.getString(R.string.fair_play), true);
+        }
+
+        if (
+            !pref.contains(main_activity.getString(R.string.patience_a_virtue)) &&
+                computed_large_board
+            ) {
+          main_activity.unlock_achievement(PATIENCE_A_VIRTUE);
+          edit.putBoolean(main_activity.getString(R.string.patience_a_virtue), true);
+        }
+
+        // the final achievements all require fair play
+
+        if (!cheated) {
+
+          int level = playfield.game_level;
+
           if (
-              playfield.consecutive_wins >= 5 &&
-                  !pref.contains(main_activity.getString(R.string.doctor_ideal_nim))
+              level == 2 &&
+                  (!pref.contains(main_activity.getString(R.string.apprentice)) ||
+                      pref.getInt(main_activity.getString(R.string.apprentice), 0) < 1)
               ) {
-            main_activity.unlock_achievement(DOCTOR_OF_IDEAL_NIM);
-            edit.putBoolean(main_activity.getString(R.string.doctor_ideal_nim), true);
+            main_activity.increment_achievement(APPRENTICE);
+            edit.putInt(main_activity.getString(R.string.apprentice), 1);
           }
+          if (
+              level == 4 &&
+                  (!pref.contains(main_activity.getString(R.string.journeyman)) ||
+                      pref.getInt(main_activity.getString(R.string.journeyman), 0) < 2)
+              ) {
+            main_activity.increment_achievement(JOURNEYMAN);
+            int wins = pref.getInt(main_activity.getString(R.string.journeyman), 0);
+            edit.putInt(main_activity.getString(R.string.journeyman), ++wins);
+          }
+          if (
+              level == 6 &&
+                  (!pref.contains(main_activity.getString(R.string.craftsman)) ||
+                      pref.getInt(main_activity.getString(R.string.craftsman), 0) < 3)
+              ) {
+            main_activity.increment_achievement(CRAFTSMAN);
+            int wins = pref.getInt(main_activity.getString(R.string.craftsman), 0);
+            edit.putInt(main_activity.getString(R.string.craftsman), ++wins);
+          }
+          if (
+              level == 8 &&
+                  (!pref.contains(main_activity.getString(R.string.master_craftsman)) ||
+                      pref.getInt(main_activity.getString(R.string.master_craftsman), 0) < 4)
+              ) {
+            main_activity.increment_achievement(MASTER_CRAFTSMAN);
+            int wins = pref.getInt(main_activity.getString(R.string.master_craftsman), 0);
+            edit.putInt(main_activity.getString(R.string.master_craftsman), ++wins);
+          }
+          if (level < 6)
+            playfield.consecutive_wins = 0;
+          else if (level % 2 == 0) {
+            ++playfield.consecutive_wins;
+            if (
+                playfield.consecutive_wins >= 5 &&
+                    !pref.contains(main_activity.getString(R.string.doctor_ideal_nim))
+                ) {
+              main_activity.unlock_achievement(DOCTOR_OF_IDEAL_NIM);
+              edit.putBoolean(main_activity.getString(R.string.doctor_ideal_nim), true);
+            }
+          }
+
         }
 
       }
-
-    }
 
     edit.commit();
+
+    }
 
   }
 
@@ -293,7 +299,7 @@ public class Game_Control implements DialogInterface.OnClickListener {
       }
     } else if (last_dialog == PLAY_AGAIN) {
       if (which == BUTTON_POSITIVE)
-        new_game(playfield, playfield.view_xmax, playfield.view_ymax, level);
+        new_game(playfield, playfield.view_xmax, playfield.view_ymax, level, true);
     }
 
   }

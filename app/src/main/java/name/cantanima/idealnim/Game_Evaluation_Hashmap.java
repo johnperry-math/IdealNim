@@ -123,8 +123,17 @@ public class Game_Evaluation_Hashmap {
               ++count;
           }
         }
-        Compute_Task my_task = new Compute_Task(overall_context, count);
-        my_task.execute(ideal, count, base_max_x, base_max_y);
+        if (count != 1) { // we don't cache configurations of size 1, so we have to check
+          Compute_Task my_task = new Compute_Task(overall_context, count);
+          my_task.execute(ideal, count, base_max_x, base_max_y);
+        } else {
+          zero_position = base_playable.T.getFirst();
+          if (computer_move) {
+            Playfield playfield = (Playfield) overall_context.findViewById(R.id.playfield);
+            playfield.hint_position = zero_position;
+            playfield.get_computer_move();
+          }
+        }
       } else {
         Pair<Integer, Position> p = cache.get(ideal);
         zero_position = p.second;

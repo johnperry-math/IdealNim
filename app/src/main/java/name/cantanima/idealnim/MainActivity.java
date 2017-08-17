@@ -65,9 +65,6 @@ public class MainActivity
     sign_out_button = (Button) findViewById(R.id.sign_out_button);
     sign_out_button.setVisibility(INVISIBLE);
     sign_out_button.setOnClickListener(this);
-    avatar_view = (ImageView) findViewById(R.id.avatar_view);
-    avatar_view.setVisibility(INVISIBLE);
-
 
     //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     //setSupportActionBar(toolbar);
@@ -200,7 +197,6 @@ public class MainActivity
       sign_out_button.setVisibility(INVISIBLE);
       sign_in_button.setVisibility(VISIBLE);
       sign_in_message_view.setText(getString(R.string.sign_in_why));
-      avatar_view.setVisibility(INVISIBLE);
     }
   }
 
@@ -234,13 +230,8 @@ public class MainActivity
     Log.d(tag, "connected!");
     sign_out_button.setVisibility(VISIBLE);
     sign_in_button.setVisibility(INVISIBLE);
-    avatar_view.setVisibility(VISIBLE);
     Player p = Games.Players.getCurrentPlayer(games_client);
     sign_in_message_view.setText(p.getDisplayName());
-    if (p.getIconImageUri() != null) {
-      ImageManager im = ImageManager.create(this);
-      im.loadImage(avatar_view, p.getIconImageUri());
-    }
   }
 
   @Override
@@ -327,7 +318,6 @@ public class MainActivity
   private boolean resolving_failure = false, auto_start_signin = false, sign_in_clicked = false;
   private SignInButton sign_in_button;
   private TextView sign_in_message_view;
-  private ImageView avatar_view;
   private Button sign_out_button;
   private int PLAY_SERVICES_RESOLUTION_REQUEST = 9200, REQUEST_ACHIEVEMENTS = 9300,
       GAME_SIGN_IN_CODE = 9400;

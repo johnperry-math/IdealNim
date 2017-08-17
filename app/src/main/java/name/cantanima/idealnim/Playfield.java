@@ -442,6 +442,10 @@ public class Playfield
       if (game_control == null)
         game_control = new Game_Control();
       game_control.new_game(this, view_xmax, view_ymax, game_level, true);
+      if (game_level % 2 == 0)
+        hint_button.setVisibility(INVISIBLE);
+      else
+        hint_button.setVisibility(VISIBLE);
     } else if (key.equals(context.getString(R.string.max_pref_key))) {
       int max = pref.getInt(context.getString(R.string.max_pref_key), 7);
       max = (max < 7) ? 7 : max;

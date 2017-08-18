@@ -51,7 +51,7 @@ public class Game_Evaluation_Hashmap {
     }
     base_max_x = view_xmax;
     base_max_y = view_ymax;
-    int initial_map_size = 10000000; // view_xmax*view_xmax*view_xmax*view_xmax*view_xmax;
+    int initial_map_size = 3000; // based on experimental observation (examination of cache.size())
     cache = null;
     try {
       cache = new HashMap<>(initial_map_size);
@@ -221,6 +221,7 @@ public class Game_Evaluation_Hashmap {
       ((TextView) overall_context.findViewById(R.id.value_view)).setText(integer.toString());
       Playfield p = ((Playfield) overall_context.findViewById(R.id.playfield));
       Log.d(tag, "times: " + String.valueOf(end_time.getTime()) + ", " + start_time.getTime());
+      Log.d(tag, "entries: " + String.valueOf(cache.size()));
       if (end_time.getTime() - start_time.getTime() > 60000) {
         p.game_control.notify_large_board();
       }

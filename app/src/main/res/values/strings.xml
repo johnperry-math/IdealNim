@@ -1,6 +1,8 @@
 <resources>
 
     <string name="app_name">Ideal Nim</string>
+    <string name="app_version">0.3</string>
+
     <string name="action_bar_settings">Settings</string>
     <string name="action_bar_info">Information</string>
     <string name="action_bar_achievements">Achievements</string>
@@ -42,6 +44,8 @@
     <string name="unknown_game_value">\?</string>
 
     <!-- Strings related to Settings -->
+
+    <string name="version_pref">version</string>
 
     <string name="title_activity_settings">Settings</string>
 
@@ -118,10 +122,20 @@
     <string name="won_level_5">won_level_5</string>
     <string name="fair_play">fair_play</string>
     <string name="patience_a_virtue">patience_a_virtue</string>
+    <string name="changed_board_size">changed_board_size</string>
     <string name="apprentice">apprentice</string>
     <string name="journeyman">journeyman</string>
     <string name="craftsman">craftsman</string>
     <string name="master_craftsman">master_craftsman</string>
     <string name="doctor_ideal_nim">doctor_ideal_nim</string>
+
+    <!-- Could run out of memory -->
+
+    <string name="out_of_memory_title">Out of memory</string>
+    <string name="out_of_memory_message">
+        The device lacks sufficient memory to analyze this particular game.
+        The program will have to terminate.
+        If you asked the computer to go first, next time try letting the human go first.
+    </string>
 
 </resources>

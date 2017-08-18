@@ -330,6 +330,7 @@ public class MainActivity
     WON_LEVEL_5,
     FAIR_PLAY,
     PATIENCE_A_VIRTUE,
+    CHANGED_BOARD_SIZE,
     APPRENTICE,
     JOURNEYMAN,
     CRAFTSMAN,

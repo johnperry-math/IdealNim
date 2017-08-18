@@ -2,6 +2,7 @@ package name.cantanima.idealnim;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -51,7 +52,15 @@ public class Game_Evaluation_Hashmap {
     base_max_x = view_xmax;
     base_max_y = view_ymax;
     int initial_map_size = 10000000; // view_xmax*view_xmax*view_xmax*view_xmax*view_xmax;
-    cache = new HashMap<>(initial_map_size);
+    cache = null;
+    try {
+      cache = new HashMap<>(initial_map_size);
+    } catch (OutOfMemoryError e) {
+      AlertDialog.Builder builder = new AlertDialog.Builder(overall_context)
+          .setTitle(R.string.out_of_memory_title)
+          .setMessage(R.string.out_of_memory_message)
+          .setPositiveButton(R.string.understood, null);
+    }
 
   }
 
@@ -127,7 +136,15 @@ public class Game_Evaluation_Hashmap {
           Compute_Task my_task = new Compute_Task(overall_context, count);
           my_task.execute(ideal, count, base_max_x, base_max_y);
         } else {
-          zero_position = base_playable.T.getFirst();
+          // last position is a generator of playable that is not also a generator of played
+          Iterator<Position> Ti = base_playable.T.iterator();
+          Iterator<Position> Ui = base_played.T.iterator();
+          Position position, invalid_position;
+          do {
+            position = Ti.next();
+            invalid_position = Ui.next();
+          } while (position.equals(invalid_position));
+          zero_position = position;
           if (computer_move) {
             Playfield playfield = (Playfield) overall_context.findViewById(R.id.playfield);
             playfield.hint_position = zero_position;

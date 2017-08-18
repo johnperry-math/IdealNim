@@ -1,21 +1,16 @@
 package name.cantanima.idealnim;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.View;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Random;
 
-import static android.R.id.message;
-import static android.content.DialogInterface.BUTTON_NEGATIVE;
 import static android.content.DialogInterface.BUTTON_POSITIVE;
-import static java.lang.Math.max;
 import static java.util.Calendar.DAY_OF_YEAR;
 import static java.util.Calendar.HOUR_OF_DAY;
 import static java.util.Calendar.MINUTE;
@@ -26,6 +21,7 @@ import static name.cantanima.idealnim.Game_Control.Dialog_Id.PLAY_AGAIN;
 import static name.cantanima.idealnim.Game_Control.Player_Kind.COMPUTER;
 import static name.cantanima.idealnim.Game_Control.Player_Kind.HUMAN;
 import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.APPRENTICE;
+import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.CHANGED_BOARD_SIZE;
 import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.CRAFTSMAN;
 import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.DOCTOR_OF_IDEAL_NIM;
 import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.EVERYONE_GETS_A_TROPHY;
@@ -38,8 +34,6 @@ import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.PATIEN
 import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.WON_LEVEL_3;
 import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.WON_LEVEL_4;
 import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.WON_LEVEL_5;
-
-import name.cantanima.idealnim.MainActivity.Achievements_to_unlock;
 
 /**
  * Created by cantanima on 8/8/17.
@@ -149,16 +143,25 @@ public class Game_Control implements DialogInterface.OnClickListener {
       SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(main_activity);
       SharedPreferences.Editor edit = pref.edit();
 
-      // everyone gets this achievements, even losers
+      if (last_player != HUMAN) {
 
-      if (!pref.contains(main_activity.getString(R.string.everyone_get_a_trophy))) {
-        main_activity.unlock_achievement(EVERYONE_GETS_A_TROPHY);
-        edit.putBoolean(main_activity.getString(R.string.everyone_get_a_trophy), true);
-      }
+        playfield.consecutive_wins = 0;
 
-      // the following achievements require an actual human victory
+        // only losers receive this achievement
 
-      if (last_player == HUMAN) {
+        if (!pref.contains(main_activity.getString(R.string.everyone_get_a_trophy))) {
+          main_activity.unlock_achievement(EVERYONE_GETS_A_TROPHY);
+          edit.putBoolean(main_activity.getString(R.string.everyone_get_a_trophy), true);
+        }
+
+      } else {
+
+        // the following achievements require human victory (sometimes multiple victories)
+
+        if (!pref.contains(main_activity.getString(R.string.changed_board_size))) {
+          main_activity.unlock_achievement(CHANGED_BOARD_SIZE);
+          edit.putBoolean(main_activity.getString(R.string.changed_board_size), true);
+        }
 
         if (!pref.contains(main_activity.getString(R.string.honorable_mention))) {
           main_activity.unlock_achievement(HONORABLE_MENTION);
@@ -199,7 +202,7 @@ public class Game_Control implements DialogInterface.OnClickListener {
 
         boolean cheated = used_hint || used_one_hand_behind_back;
 
-        if (!pref.contains(main_activity.getString(R.string.apprentice)) && !cheated) {
+        if (!pref.contains(main_activity.getString(R.string.fair_play)) && !cheated) {
           main_activity.unlock_achievement(FAIR_PLAY);
           edit.putBoolean(main_activity.getString(R.string.fair_play), true);
         }
@@ -253,7 +256,7 @@ public class Game_Control implements DialogInterface.OnClickListener {
             int wins = pref.getInt(main_activity.getString(R.string.master_craftsman), 0);
             edit.putInt(main_activity.getString(R.string.master_craftsman), ++wins);
           }
-          if (level < 6)
+          if (level != 8 && level != 10)
             playfield.consecutive_wins = 0;
           else if (level % 2 == 0) {
             ++playfield.consecutive_wins;

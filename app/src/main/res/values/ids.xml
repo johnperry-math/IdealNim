@@ -19,4 +19,5 @@ Save this file as res/values/games-ids.xml in your project.
     <string name="achievement_craftsman">CgkI5LCzr9YbEAIQCQ</string>
     <string name="achievement_master_craftsman">CgkI5LCzr9YbEAIQCg</string>
     <string name="achievement_doctor_of_ideal_nim">CgkI5LCzr9YbEAIQCw</string>
+    <string name="achievement_toyed_with_infinity">CgkI5LCzr9YbEAIQDw</string>
 </resources>

@@ -32,6 +32,8 @@ More information on this appears in the section on
 <h2><a name="gameplay"/>Gameplay</h2>
 
 <h3>Basic gameplay</h3>
+A game of Ideal Nim takes place on a finite gameboard
+(but see a remark in the <a href="#options">discussion of options</a>).
 Gameplay consists in selecting valid squares.
 Once a player selects a valid square,
 all squares &ldquo;northeast&rdquo; of it become invalid.
@@ -67,10 +69,11 @@ A message will pop up, indicating the computer&rsquo;s progress in analyzing the
 indicating both a percentage and a ratio of positions analyzed.
 <p/>
 <b>The good news:</b>
-Most of the thinking occurs before the 60% mark, and once it&rsquo;'s done,
+Most of the thinking occurs before the 60% mark, and once it&rsquo;s done,
 <b>the analysis is complete</b>.
 If you can wait that out at the beginning of the game,
 it will be near-instantaneous from then on&hellip; unless you change the board size mid-game!
+(The computer has to re-analyze the game.)
 Even then, it shouldn&rsquo;t take as long after you&rsquo;ve played a few turns.
 <p/>
 There is a remote possibility that in larger boards, your device will lack memory sufficient
@@ -119,7 +122,7 @@ along with some explanations. Here&rsquo;s a little more detail on how they work
         <b>Board size</b> &mdash; In theory, the board could extend indefinitely to the northeast;
         that is, an &ldquo;ideal&rdquo; game of Ideal Nim has an infinite game board.
         In practice, this is impossible to implement,
-        especially if the computer is going to find the best move!
+        especially if the computer is to analyze the game board!
         As a result, this app limits the board size.
         The smallest board you can play on is 7&times;7,
         but you can extend it to 15&times;15.
@@ -130,8 +133,11 @@ along with some explanations. Here&rsquo;s a little more detail on how they work
         by adding or removing rows to the north and east!
         Just keep in mind that the computer will have to re-analyze the board
         when you change the size, and this will require time.
+        <b>This is not considered cheating,</b> because, as mentioned already,
+        in principle the game board extends indefinitely.
         <p/>
-        (The computer is not allowed to change the board size on its turn.)
+        (In the present version of the game,
+        the computer does not change the board size on its turn.)
     </li>
 </ul>
 

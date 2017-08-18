@@ -1,9 +1,6 @@
 package name.cantanima.idealnim;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -64,6 +61,29 @@ public class Playfield
       playable.sort_ideal();
     } else {
       SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+      if (
+          !pref.contains(context.getString(R.string.version_pref)) ||
+              !pref.getString(context.getString(R.string.version_pref), "none").equals(
+                  context.getString(R.string.app_version)
+              )
+      ) {
+        SharedPreferences.Editor editor = pref.edit();
+        editor.remove(context.getString(R.string.everyone_get_a_trophy));
+        editor.remove(context.getString(R.string.honorable_mention));
+        editor.remove(context.getString(R.string.one_hand_behind_my_back));
+        editor.remove(context.getString(R.string.won_level_3));
+        editor.remove(context.getString(R.string.won_level_4));
+        editor.remove(context.getString(R.string.won_level_5));
+        editor.remove(context.getString(R.string.fair_play));
+        editor.remove(context.getString(R.string.patience_a_virtue));
+        editor.remove(context.getString(R.string.apprentice));
+        editor.remove(context.getString(R.string.journeyman));
+        editor.remove(context.getString(R.string.craftsman));
+        editor.remove(context.getString(R.string.master_craftsman));
+        editor.remove(context.getString(R.string.doctor_ideal_nim));
+        editor.putString(context.getString(R.string.version_pref), context.getString(R.string.app_version));
+        editor.apply();
+      }
       if (pref.contains(context.getString(R.string.level_pref)))
         game_level = pref.getInt(context.getString(R.string.level_pref), 1);
       if (pref.contains(context.getString(R.string.max_pref_key)))

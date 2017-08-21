@@ -56,6 +56,9 @@ public class Game_Control implements DialogInterface.OnClickListener {
 
     if (generate_ideals) {
 
+      max_x = (max_x > 10) ? 10 : max_x;
+      max_y = (max_y > 10) ? 10 : max_y;
+
       Ideal I;
       this.level = level;
       level = (level < 1) ? 1 : (level + 1) / 2;

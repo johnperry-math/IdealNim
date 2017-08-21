@@ -27,19 +27,6 @@
             sample:msbp_measurementUnit=" "
             sample:msbp_dialogEnabled="false"/>
 
-        <com.pavelsikun.seekbarpreference.SeekBarPreference
-            android:key="@string/max_pref_key"
-            android:title="@string/max_pref_title"
-            android:summary="@string/max_pref_summary"
-            android:defaultValue="7"
-            sample:msbp_view_defaultValue="1"
-            sample:msbp_minValue="7"
-            sample:msbp_maxValue="15"
-            sample:msbp_interval="1"
-            sample:msbp_measurementUnit=" "
-            sample:msbp_dialogEnabled="false"
-            />
-
     </PreferenceCategory>
 
     <PreferenceCategory

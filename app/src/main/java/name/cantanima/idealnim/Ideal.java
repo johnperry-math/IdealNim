@@ -22,13 +22,13 @@ import static java.util.Collections.sort;
 public class Ideal implements Iterable<Position> {
 
   /**
-   * Creates a new ideal, and initializes a 10x10 monomial diagram.
+   * Creates a new ideal, and initializes a 20x20 monomial diagram.
    */
   public Ideal() {
     T = new LinkedList<>();
-    mon_diag = new boolean[10][10];
-    for (int i = 0; i < 10; ++i)
-      for (int j = 0; j < 10; ++j)
+    mon_diag = new boolean[max_x][max_y];
+    for (int i = 0; i < max_x; ++i)
+      for (int j = 0; j < max_y; ++j)
         mon_diag[i][j] = false;
   }
 
@@ -42,8 +42,6 @@ public class Ideal implements Iterable<Position> {
     T = new LinkedList<>();
     for (Position t : F.T)
       T.add(t);
-    max_x = F.max_x;
-    max_y = F.max_y;
     mon_diag = new boolean[max_x][max_y];
     for (int i = 0; i < max_x; ++i)
       for (int j = 0; j < max_y; ++j)
@@ -53,18 +51,15 @@ public class Ideal implements Iterable<Position> {
   
   public Ideal(ArrayList<Integer> positions) {
     T = new LinkedList<>();
-    max_x = max_y = 0;
-    for (int i = 0; i < positions.size(); i += 2) {
-      int x = positions.get(i), y = positions.get(i + 1);
-      T.add(new Position(x, y));
-      if (x > max_x) max_x = x;
-      if (y > max_y) max_y = y;
-    }
     mon_diag = new boolean[max_x][max_y];
     for (int i = 0; i < max_x; ++i)
       for (int j = 0; j < max_y; ++j)
         mon_diag[i][j] = false;
-    mark_diagram(max_x, max_y);
+    for (int i = 0; i < positions.size(); i += 2) {
+      int x = positions.get(i), y = positions.get(i + 1);
+      T.add(new Position(x, y));
+      mark_diagram(x, y);
+    }
   }
 
   /**
@@ -153,21 +148,11 @@ public class Ideal implements Iterable<Position> {
 
   /**
    * Marks the monomial diagram up to the indicated position.
-   * @param x x-value of position to mark
-   * @param y y-value of position to mark
+   * @param start_x where to start marking the diagram
+   * @param start_y where to start marking the diagram
    */
-  private void mark_diagram(int x, int y) {
+  protected void mark_diagram(int start_x, int start_y) {
 
-    int start_x = x, start_y = y;
-    if (x > max_x || y > max_y) {
-      max_x = (x > max_x) ? x + 5 : max_x;
-      max_y = (y > max_y) ? y + 5 : max_y;
-      mon_diag = new boolean[max_x][max_y];
-      for (int i = 0; i < max_x; ++i)
-        for (int j = 0; j < max_y; ++j)
-          mon_diag[i][j] = false;
-      start_x = start_y = 0;
-    }
     for (int i = start_x; i < max_x; ++i)
       for (int j = start_y; j < max_y; ++j)
         if (mon_diag[i][j]) break;
@@ -246,9 +231,21 @@ public class Ideal implements Iterable<Position> {
 
   }
 
+  public void log_diagram() {
+    Log.d(tag, "---- diagram start ----");
+    for (int i = 0; i < max_x; ++i) {
+      String outline = "";
+      for (int j = 0; j < max_y; ++j)
+        if (mon_diag[i][j]) outline += "X";
+        else outline += " ";
+      Log.d(tag, outline);
+    }
+    Log.d(tag, "---- diagram  stop ----");
+  }
+
   protected LinkedList<Position> T;
   protected boolean mon_diag[][];
-  protected int max_x = 10, max_y = 10;
+  final static protected int max_x = 20, max_y = 20;
 
   private String tag = "Ideal";
 

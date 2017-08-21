@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.Pair;
@@ -35,7 +36,7 @@ import static java.util.Calendar.SECOND;
 public class Game_Evaluation_Hashmap {
 
   public Game_Evaluation_Hashmap(
-      Context context, Ideal I, Ideal J, int view_xmax, int view_ymax, int level
+      Context context, Ideal I, Ideal J, int level
   ) {
 
     overall_context = (Activity) context;
@@ -43,14 +44,21 @@ public class Game_Evaluation_Hashmap {
 
     base_playable = new Ideal(I);
     base_playable.sort_ideal();
+
+    int view_xmax = base_playable.T.peekLast().get_x();
+    int view_ymax = base_playable.T.peekFirst().get_y();
     if (J != null)
       base_played = new Ideal(J);
     else {
       base_played = new Ideal();
-      base_played.add_generator_fast(view_xmax, view_ymax);
+      Resources Res = context.getResources();
+      base_played.add_generator_fast(
+          Res.getInteger(R.integer.view_min) + Res.getInteger(R.integer.view_seek_max),
+          Res.getInteger(R.integer.view_min) + Res.getInteger(R.integer.view_seek_max)
+      );
     }
-    base_max_x = view_xmax;
-    base_max_y = view_ymax;
+    base_max_x = view_xmax + 5;
+    base_max_y = view_ymax + 5;
     int initial_map_size = 3000; // based on experimental observation (examination of cache.size())
     cache = null;
     try {
@@ -63,8 +71,6 @@ public class Game_Evaluation_Hashmap {
     }
 
   }
-
-  public boolean same_configuration(Ideal I, Ideal J) { return I.T.equals(J.T);  }
 
   public void play_point(int i, int j) {
 

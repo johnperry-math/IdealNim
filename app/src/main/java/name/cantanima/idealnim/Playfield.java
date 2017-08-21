@@ -174,7 +174,7 @@ public class Playfield
     if (value_text != null)
       value_text.setText(getContext().getString(R.string.unknown_game_value));
 
-    evaluator = new Game_Evaluation_Hashmap(getContext(), playable, null, view_xmax, view_ymax, game_level);
+    evaluator = new Game_Evaluation_Hashmap(getContext(), playable, null, game_level);
 
   }
 
@@ -186,7 +186,7 @@ public class Playfield
     playable = new Ideal(old_playable);
     played = new Ideal(old_played);
     game_level = level;
-    evaluator = new Game_Evaluation_Hashmap(getContext(), playable, played, view_xmax, view_ymax, game_level);
+    evaluator = new Game_Evaluation_Hashmap(getContext(), playable, played, game_level);
     evaluator.game_value();
     game_control = new Game_Control();
     game_control.new_game(this, view_xmax, view_ymax, game_level, false);
@@ -348,6 +348,10 @@ public class Playfield
         i = hint_position.get_x();
         j = hint_position.get_y();
       }
+      if (i > view_xmax || j > view_ymax) {
+        view_xmax = view_ymax = (i > j) ? i + 1 : j + 1;
+        adjust_steps(getWidth(), getHeight());
+      }
       evaluator.play_point(i, j);
       played.add_generator(i, j, true);
     }
@@ -385,10 +389,10 @@ public class Playfield
               // add generator
               played.add_generator(i, j, true);
               evaluator.play_point(i, j);
-            }
-            if (!playable.equals(played)) {
-              game_control.set_player_kind(COMPUTER);
-              evaluator.choose_computer_move();
+              if (!playable.equals(played)) {
+                game_control.set_player_kind(COMPUTER);
+                evaluator.choose_computer_move();
+              }
             }
             break;
           case ACTION_DOWN:
@@ -449,7 +453,7 @@ public class Playfield
     scale_seekbar = sc_seekbar;
     scale_seekbar.setOnSeekBarChangeListener(this);
     scale_label = sc_label;
-    scale_label.setText(String.valueOf(getContext().getResources().getInteger(R.integer.view_min)));
+    scale_seekbar.setProgress(view_xmax - view_min_absolute);
 
   }
 
@@ -483,9 +487,8 @@ public class Playfield
       max = (max < 7) ? 7 : max;
       if (max != view_xmax) {
         view_xmax = view_ymax = max;
-        step_x = getWidth() / view_xmax;
-        step_y = getHeight() / view_ymax;
-        evaluator = new Game_Evaluation_Hashmap(context, playable, played, view_xmax, view_ymax, game_level);
+        adjust_steps(getWidth(), getHeight());
+        evaluator = new Game_Evaluation_Hashmap(context, playable, played, game_level);
         game_control.notify_changed_board_size();
         invalidate();
       }
@@ -564,6 +567,12 @@ public class Playfield
    */
   @Override
   public void onStopTrackingTouch(SeekBar seekBar) {
+
+    MainActivity context = (MainActivity) getContext();
+    SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(context)
+        .edit();
+    edit.putInt(context.getString(R.string.max_pref_key), view_xmax);
+    edit.apply();
 
   }
 

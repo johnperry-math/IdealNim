@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -36,6 +37,8 @@ import static name.cantanima.idealnim.Game_Control.Player_Kind.HUMAN;
 import com.google.android.gms.games.achievement.Achievement;
 import com.google.example.games.basegameutils.BaseGameUtils;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -51,11 +54,13 @@ public class MainActivity
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     Button new_game_button = (Button) findViewById(R.id.new_game_button);
+    SeekBar view_seekbar = (SeekBar) findViewById(R.id.view_scale);
+    TextView view_label = (TextView) findViewById(R.id.view_label);
     TextView value_textview = (TextView) findViewById(R.id.value_view);
     Button hint_button = (Button) findViewById(R.id.hint_button);
     Playfield playfield = (Playfield) findViewById(R.id.playfield);
     playfield.set_buttons_to_listen(
-        new_game_button, value_textview, hint_button
+        new_game_button, value_textview, hint_button, view_seekbar, view_label
     );
     playfield.start_game();
 

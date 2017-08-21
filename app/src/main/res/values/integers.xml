@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- view_max will be view_min + view_seek_max -->
+    <integer name="view_min">7</integer>
+    <string name="view_min_as_string">7</string>
+    <integer name="view_seek_max">13</integer>
+</resources>

@@ -3,7 +3,6 @@ package name.cantanima.idealnim;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.os.Bundle;
@@ -35,7 +34,6 @@ import static com.google.android.gms.games.GamesActivityResultCodes.RESULT_RECON
 import static name.cantanima.idealnim.Game_Control.Player_Kind.HUMAN;
 
 import com.google.android.gms.games.achievement.Achievement;
-import com.google.example.games.basegameutils.BaseGameUtils;
 
 import org.w3c.dom.Text;
 
@@ -141,10 +139,21 @@ public class MainActivity
     else if (sign_in_clicked || auto_start_signin) {
       auto_start_signin = sign_in_clicked = false;
       resolving_failure = true;
-      if (!BaseGameUtils.resolveConnectionFailure(
-          this, games_client, connectionResult, GAME_SIGN_IN_CODE, R.string.unknown_signin_error
-          )) {
-        resolving_failure = false;
+      if (connectionResult.hasResolution()) {
+        try {
+          connectionResult.startResolutionForResult(this, GAME_SIGN_IN_CODE);
+        } catch (Exception e) {
+          games_client.connect();
+          resolving_failure = false;
+        }
+      } else {
+        AlertDialog cancel_dialog = new AlertDialog.Builder(this)
+            .setTitle(getString(R.string.conn_fail_title))
+            .setMessage(getString(R.string.conn_fail_summ))
+            .setPositiveButton(getString(R.string.conn_fail_pos), this)
+            .show();
+        games_client.disconnect();
+
       }
     }
   }

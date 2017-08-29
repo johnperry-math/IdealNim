@@ -97,6 +97,9 @@
     <string name="hint_color">Hinted square</string>
     <string name="hint_color_key">hint_color_key</string>
     <string name="hint_color_text">When you ask for a hint</string>
+    <string name="last_played_color">Last played</string>
+    <string name="last_played_color_key">last_played_color_key</string>
+    <string name="last_played_color_text">Square that was played last</string>
 
     <!-- Connection failure -->
 

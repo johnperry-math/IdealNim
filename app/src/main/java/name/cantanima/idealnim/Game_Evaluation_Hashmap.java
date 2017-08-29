@@ -24,6 +24,8 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import static java.lang.Math.abs;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.util.Calendar.DAY_OF_MONTH;
 import static java.util.Calendar.HOUR;
 import static java.util.Calendar.MINUTE;
@@ -111,10 +113,14 @@ public class Game_Evaluation_Hashmap {
   public int game_value() {
 
     int result = 0;
+    boolean decided = false;
     Position winning_position = ORIGIN;
+
+    // on levels 1, 2 it is easy to decide the winning move
 
     if (game_level == 1 || game_level == 2) {
 
+      decided = true;
       zero_position = base_playable.T.getFirst();
       if (computer_move) {
         Playfield playfield = (Playfield) overall_context.findViewById(R.id.playfield);
@@ -122,7 +128,65 @@ public class Game_Evaluation_Hashmap {
         playfield.get_computer_move();
       }
 
-    } else {
+    } else if (game_level == 3 || game_level == 4) {
+
+      // easy to decide if we can create symmetry
+      Position P = base_playable.T.peekFirst(), Q = base_playable.T.peekLast();
+      int a = P.get_x(), b = P.get_y(), c = Q.get_x(), d = Q.get_y();
+      int delta_x = c - a, delta_y = b - d, i, j, comp_lx, comp_ly, comp_rx, comp_ry;
+      Position S;
+      if (delta_x <= delta_y) {
+        i = c;
+        j = d + delta_x;
+        comp_lx = c; comp_ly = b;
+        comp_rx = i; comp_ry = j;
+      } else {
+        i = a + delta_y;
+        j = b;
+        comp_lx = i; comp_ly = j;
+        comp_rx = c; comp_ry = b;
+      }
+      S = new Position(i, j);
+      decided = true;
+      if (base_played.contains(S.get_x(), S.get_y())) {
+        int num_asym = 0;
+        Iterator<Position> Ti = base_played.T.iterator();
+        Position T, U = ORIGIN;
+        while (Ti.hasNext() && num_asym < 2) {
+          T = Ti.next();
+          if (T.lies_left_of(S)) {
+            if (!base_played.contains(comp_rx + T.get_y() - comp_ly, comp_ry + T.get_x() - comp_lx)) {
+              ++num_asym;
+              U = new Position(comp_rx + T.get_y() - comp_ly, comp_ry + T.get_x() - comp_lx);
+            }
+          } else if (!T.equals(S)){
+            if (!base_played.contains(comp_lx + T.get_y() - comp_ry, comp_ly + T.get_x() - comp_rx)) {
+              ++num_asym;
+              U = new Position(comp_lx + T.get_y() - comp_ry, comp_ly + T.get_x() - comp_rx);
+            }
+          }
+        }
+        decided = num_asym < 2;
+        if (decided)
+          zero_position = U;
+      } else if (base_played.T.size() != 0) {
+        for (Position T : base_played.T) {
+          decided = S.generates(T);
+          if (!decided) break;
+        }
+        if (decided) zero_position = S;
+      }
+      if (decided) {
+        if (computer_move) {
+          Playfield playfield = (Playfield) overall_context.findViewById(R.id.playfield);
+          playfield.hint_position = zero_position;
+          playfield.get_computer_move();
+        }
+      }
+
+    }
+
+    if (!decided) {
 
       LinkedList<Position> L = base_played.T;
       ArrayList<Integer> ideal = new ArrayList<>(L.size() * 2);

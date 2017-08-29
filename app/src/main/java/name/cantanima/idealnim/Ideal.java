@@ -130,6 +130,13 @@ public class Ideal implements Iterable<Position> {
   }
 
   /**
+   * Determines whether the ideal generates the position P.
+   * @param P position to check
+   * @return {@literal true} if and only if the ideal generates P.
+   */
+  private boolean generates(Position P) { return generates(P.get_x(), P.get_y()); }
+
+  /**
    * Indicates whether the Ideal contains the position (x, y).
    * This is a fast check based on a cache.
    * @param x x-value of position to check
@@ -138,6 +145,16 @@ public class Ideal implements Iterable<Position> {
    */
   public boolean contains(int x, int y) {
     return mon_diag[x][y];
+  }
+
+  /**
+   * Indicates whether the Ideal contains the position P.
+   * This is a slower check based on divisibility.
+   * @param P position to check
+   * @return {@literal true} if and only P is contained in the Ideal
+   */
+  public boolean contains(Position P) {
+    return generates(P.get_x(), P.get_y());
   }
 
   /**

@@ -62,6 +62,11 @@
             android:defaultValue="0xff000000"
             android:title="@string/invalid_color"
             android:summary="@string/invalid_color_text"/>
+        <yuku.ambilwarna.widget.AmbilWarnaPreference
+            android:key="@string/last_played_color_key"
+            android:defaultValue="0xffffa080"
+            android:title="@string/last_played_color"
+            android:summary="@string/last_played_color_text"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

@@ -38,7 +38,7 @@ Gameplay consists in selecting valid squares.
 Once a player selects a valid square,
 all squares &ldquo;northeast&rdquo; of it become invalid.
 To help identify valid and invalid squares,
-You can drag your finger across the board, and the square underneath your finger
+you can drag your finger across the board, and the square underneath your finger
 will change color according to whether the square is valid.
 <p/>
 <center><b><i>The player who takes the last valid square wins.</i></b></center>
@@ -47,7 +47,7 @@ will change color according to whether the square is valid.
 while invalid positions are colored <span style="color:red;">red</span>.
 This can be changed in the preferences.)
 
-<h3>Hints</h3>
+<h3>Hints and game values</h3>
 On odd-numbered levels you can ask for a hint, and
 the computer will mark the square it would choose.
 If the position is playable, then it is a winning move; that is,
@@ -57,6 +57,15 @@ Oftentimes, the computer will mark the lower left square, which is not playable!
 In these cases, <i>no move will guarantee a win</i>, and the computer would choose a random square.
 You might as well do the same&hellip; or employ one of at least two methods to cheat.
 (We drop hints on these methods here and there.)
+<p/>
+The computer will also indicate the game&rsquo;s <b>value</b>,
+which is a &ldquo;nimber&rdquo; (not a &ldquo;number&rdquo;).
+Nimber arithmetic is consistent but unusual: you have
+4&nbsp;+&nbsp;2&nbsp;=&nbsp;6 and thus both
+6&nbsp;+&nbsp;2&nbsp;=&nbsp;4 and 4&nbsp;+&nbsp;6&nbsp;=&nbsp;2.
+While an understanding of nimber arithmetic will help you immensely,
+it is not strictly necessary.
+(You can read more about <a href="https://en.wikipedia.org/wiki/Nimber">nimbers</a> if you like.)
 
 <h3>&ldquo;Thinking&rdquo;</h3>
 Before the computer can move or give you a hint (assuming you ask for one)
@@ -65,16 +74,13 @@ it has to analyze the game board. This is both good news and bad news.
 <b>The bad news:</b>
 Depending on the number of playable pieces,
 <b>this analysis can take anywhere from a split second to several minutes.</b>
-A message will pop up, indicating the computer&rsquo;s progress in analyzing the board,
-indicating both a percentage and a ratio of positions analyzed.
+A message will pop up, indicating the computer&rsquo;s progress in analyzing the board
+through both a percentage and a ratio of positions analyzed.
 <p/>
 <b>The good news:</b>
-Most of the thinking occurs before the 60% mark, and once it&rsquo;s done,
-<b>the analysis is complete</b>.
+Once it&rsquo;s done, <b>the analysis is complete</b>.
 If you can wait that out at the beginning of the game,
-it will be near-instantaneous from then on&hellip; unless you change the board size mid-game!
-(The computer has to re-analyze the game.)
-Even then, it shouldn&rsquo;t take as long after you&rsquo;ve played a few turns.
+it will be near-instantaneous until you start a new game.
 <p/>
 There is a remote possibility that in larger boards, your device will lack memory sufficient
 to store the analysis, but for that matter'
@@ -112,7 +118,7 @@ along with some explanations. Here&rsquo;s a little more detail on how they work
         and so forth.
         <p/>
         <b>Even-numbered levels disable hints.</b>
-        Each even-numbered level offer the exact same configurations as the level below,
+        Each even-numbered level offers the same configurations as the previous odd-numbered level,
         but the lack of a hint makes it harder to play.
         So, while ten levels are listed,
         there are really only five levels of different configurations.
@@ -121,23 +127,10 @@ along with some explanations. Here&rsquo;s a little more detail on how they work
     <li>
         <b>Board size</b> &mdash; In theory, the board could extend indefinitely to the northeast;
         that is, an &ldquo;ideal&rdquo; game of Ideal Nim has an infinite game board.
-        In practice, this is impossible to implement,
-        especially if the computer is to analyze the game board!
-        As a result, this app limits the board size.
-        The smallest board you can play on is 7&times;7,
-        but you can extend it to 15&times;15.
-        Keep in mind that <i>larger boards require much more time for the computer to analyze!</i>
-        <p/>
-        But, lookit: This gives you an opportunity to outwit the computer!
-        On a finite board, the winning position can change
-        by adding or removing rows to the north and east!
-        Just keep in mind that the computer will have to re-analyze the board
-        when you change the size, and this will require time.
-        <b>This is not considered cheating,</b> because, as mentioned already,
-        in principle the game board extends indefinitely.
-        <p/>
-        (In the present version of the game,
-        the computer does not change the board size on its turn.)
+        In practice, this is impossible to implement, so the app limits the board size.
+        The smallest board you can play on is 7&times;7, but you can extend it to 15&times;15.
+        In some cases, this may allow you to snatch victory from the jaws of defeat,
+        as the computer&rsquo;s analysis is not always perfect.
     </li>
 </ul>
 
@@ -146,7 +139,7 @@ along with some explanations. Here&rsquo;s a little more detail on how they work
 
 <h2><a name="mathematics"/>Mathematical ideas behind the game</h2>
 
-Ideal Nim is based on several major ideas in the mathematical fields of
+Ideal Nim incorporates ideas from
 <b>commutative algebra</b> and <b>combinatorial game theory</b>.
 
 <ul>
@@ -165,8 +158,8 @@ Ideal Nim is based on several major ideas in the mathematical fields of
     <li>
         The fact that this game cannot go on indefinitely,
         regardless of the gameboard&rsquo;s dimension,
-        is called either <b>the Hilbert basis theorem</b> or <i>Dickson&rsquo;s Lemma</i>,
-        depending on how you look at it, and is possible because &ldquo;polynomial rings&rdquo;
+        is due to <b>the Hilbert basis theorem</b>, or <b>Dickson&rsquo;s Lemma</b>,
+        depending on how you look at it. These apply because &ldquo;polynomial rings&rdquo;
         are <b>Noetherian</b>.
         (You can read more about
         <a href="http://en.wikipedia.org/wiki/David_Hilbert">David Hilbert</a>,
@@ -189,11 +182,6 @@ Ideal Nim is based on several major ideas in the mathematical fields of
                 Chess is an example of a &ldquo;non-impartial game&rdquo;,
                 properly called &ldquo;partizan&rdquo;,
                 because you can&rsquo;t move your opponent&rsquo;s pieces.
-                <p/>
-                (Technically, this particular implementation of Ideal Nim is not purely impartial.
-                We&rsquo;ll leave the reason unspoken, but here&rsquo;s a hint:
-                there&rsquo;s something you can do in the app that the computer can&rsquo;t do,
-                and that you would not be allowed to do in a real game.)
             </li>
             <li>
                 <b>Two-player</b> is probably obvious.
@@ -207,6 +195,8 @@ Ideal Nim is based on several major ideas in the mathematical fields of
                 The computer&rsquo;s only advantage
                 is that it can analyze the game much faster and more carefully.
                 <p/>
+                Most card games are examples of &ldquo;non-perfect-information&rdquo; games,
+                because you don&rsquo;t know your opponents&rsquo; cards.
             </li>
             <li>
                 <b>Combinatorial</b> means that the game&rsquo;s structure is <i>discrete</i>

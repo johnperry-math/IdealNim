@@ -57,10 +57,11 @@ public class MainActivity
     SeekBar view_seekbar = (SeekBar) findViewById(R.id.view_scale);
     TextView view_label = (TextView) findViewById(R.id.view_label);
     TextView value_textview = (TextView) findViewById(R.id.value_view);
+    TextView value_label = (TextView) findViewById(R.id.value_label);
     Button hint_button = (Button) findViewById(R.id.hint_button);
     Playfield playfield = (Playfield) findViewById(R.id.playfield);
     playfield.set_buttons_to_listen(
-        new_game_button, value_textview, hint_button, view_seekbar, view_label
+        new_game_button, value_textview, value_label, hint_button, view_seekbar, view_label
     );
     playfield.start_game();
 

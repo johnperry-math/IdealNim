@@ -79,6 +79,20 @@ public class Position implements Comparable<Position> {
   }
 
   /**
+   * Returns {@literal true} if and only if this lies strictly leftwards of the given position.
+   * @param P position to test
+   * @return {@literal true} if and only if this lies leftwards of P
+   */
+  public boolean lies_left_of(Position P) { return a < P.a; }
+
+  /**
+   * Returns {@literal true} if and only if this lies strictly rightwards of the given position.
+   * @param P position to test
+   * @return {@literal true} if and only if this lies rightwards of P
+   */
+  public boolean lies_right_of(Position P) { return a > P.a; }
+
+  /**
    * Compares this object with the specified object for order.  Returns a
    * negative integer, zero, or a positive integer as this object is less
    * than, equal to, or greater than the specified object.

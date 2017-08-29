@@ -52,6 +52,7 @@ public class Game_Control implements DialogInterface.OnClickListener {
 
   public void new_game(Playfield p, int max_x, int max_y, int level, boolean generate_ideals) {
     playfield = p;
+    p.reset_last_played_position();
     main_activity = (MainActivity) p.getContext();
 
     if (generate_ideals) {

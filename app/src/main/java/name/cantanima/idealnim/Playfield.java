@@ -108,6 +108,10 @@ public class Playfield
         hint_color = pref.getInt(context.getString(R.string.hint_color_key), hint_color);
       if (pref.contains(context.getString(R.string.invalid_color_key)))
         invalid_color = pref.getInt(context.getString(R.string.invalid_color_key), invalid_color);
+      if (pref.contains(context.getString(R.string.last_played_color_key)))
+        last_played_color = pref.getInt(
+            context.getString(R.string.last_played_color_key), last_played_color
+        );
       SharedPreferences.Editor editor = pref.edit();
       editor.putBoolean(context.getString(R.string.stupid_pref_key), computer_sometimes_dumb);
       editor.putInt(context.getString(R.string.level_pref), game_level);
@@ -118,6 +122,7 @@ public class Playfield
       editor.putInt(context.getString(R.string.highlight_color_key), highlight_color);
       editor.putInt(context.getString(R.string.hint_color_key), hint_color);
       editor.putInt(context.getString(R.string.invalid_color_key), invalid_color);
+      editor.putInt(context.getString(R.string.last_played_color_key), last_played_color);
       editor.apply();
       pref.registerOnSharedPreferenceChangeListener(this);
     }
@@ -244,6 +249,8 @@ public class Playfield
     playable_paint.setStyle(FILL);
     played_paint.setColor(played_color);
     played_paint.setStyle(FILL);
+    last_played_paint.setColor(last_played_color);
+    last_played_paint.setStyle(FILL);
     invalid_paint.setColor(invalid_color);
     invalid_paint.setStyle(FILL);
     highlight_paint.setColor(highlight_color);
@@ -302,6 +309,17 @@ public class Playfield
       canvas.drawPath(played_path, played_paint);
     }
 
+    if (last_played_position != null) {
+      last_played_path.rewind();
+      Position P = last_played_position;
+      last_played_path.moveTo(P.get_x() * step_x, h - P.get_y() * step_y);
+      last_played_path.lineTo(P.get_x() * step_x, h - (P.get_y() + 1) * step_y);
+      last_played_path.lineTo((P.get_x() + 1) * step_x, h - (P.get_y() + 1) * step_y);
+      last_played_path.lineTo((P.get_x() + 1) * step_x, h - P.get_y() * step_y);
+      last_played_path.close();
+      canvas.drawPath(last_played_path, last_played_paint);
+    }
+
     if (highlighting) {
       highlight_paint.setColor(highlight_color);
       highlight_paint.setStyle(FILL);
@@ -337,9 +355,9 @@ public class Playfield
 
     if (hint_position == null)
       evaluator.choose_computer_move();
-    else{
+    else {
       int i, j;
-      if (hint_position == ORIGIN || stupid_turn) {
+      if (hint_position == ORIGIN || stupid_turn || played.contains(hint_position)) {
         do {
           i = game_control.random.nextInt(view_xmax);
           j = game_control.random.nextInt(view_ymax);
@@ -354,6 +372,7 @@ public class Playfield
       }
       evaluator.play_point(i, j);
       played.add_generator(i, j, true);
+      last_played_position = new Position(i, j);
     }
 
     game_control.set_player_kind(HUMAN);
@@ -387,6 +406,7 @@ public class Playfield
             // check for valid position
             if (playable.contains(i, j) && !played.contains(i, j)) {
               // add generator
+              last_played_position = new Position(i, j);
               played.add_generator(i, j, true);
               evaluator.play_point(i, j);
               if (!playable.equals(played)) {
@@ -435,20 +455,24 @@ public class Playfield
   }
 
   public void set_buttons_to_listen(
-      Button ng_button, TextView vt_view, Button h_button, SeekBar sc_seekbar, TextView sc_label
+      Button ng_button, TextView vt_view, TextView vt_label, Button h_button,
+      SeekBar sc_seekbar, TextView sc_label
   ) {
 
     new_game_button = ng_button;
     new_game_button.setOnClickListener(this);
     value_text = vt_view;
+    value_label = vt_label;
     hint_button = h_button;
     hint_button.setOnClickListener(this);
     if (game_level % 2 == 0) {
       hint_button.setVisibility(INVISIBLE);
       value_text.setVisibility(INVISIBLE);
+      value_label.setVisibility(INVISIBLE);
     } else {
       hint_button.setVisibility(VISIBLE);
       value_text.setVisibility(VISIBLE);
+      value_label.setVisibility(VISIBLE);
     }
     scale_seekbar = sc_seekbar;
     scale_seekbar.setOnSeekBarChangeListener(this);
@@ -478,10 +502,15 @@ public class Playfield
       if (game_control == null)
         game_control = new Game_Control();
       game_control.new_game(this, view_xmax, view_ymax, game_level, true);
-      if (game_level % 2 == 0)
+      if (game_level % 2 == 0) {
         hint_button.setVisibility(INVISIBLE);
-      else
+        value_text.setVisibility(INVISIBLE);
+        value_label.setVisibility(INVISIBLE);
+      } else {
         hint_button.setVisibility(VISIBLE);
+        value_text.setVisibility(VISIBLE);
+        value_label.setVisibility(VISIBLE);
+      }
     } else if (key.equals(context.getString(R.string.max_pref_key))) {
       int max = pref.getInt(context.getString(R.string.max_pref_key), 7);
       max = (max < 7) ? 7 : max;
@@ -506,6 +535,8 @@ public class Playfield
       hint_color = pref.getInt(context.getString(R.string.hint_color_key), hint_color);
     else if (key.equals(context.getString(R.string.invalid_color_key)))
       invalid_color = pref.getInt(context.getString(R.string.invalid_color_key), invalid_color);
+    else if (key.equals(context.getString(R.string.last_played_color_key)))
+      last_played_color = pref.getInt(context.getString(R.string.last_played_color_key), last_played_color);
     bg_paint.setShader(
         new LinearGradient(
             0, getHeight(), getWidth(), 0, background_color, disappear_color, Shader.TileMode.CLAMP
@@ -526,6 +557,7 @@ public class Playfield
     editor.putInt(context.getString(R.string.highlight_color_key), highlight_color);
     editor.putInt(context.getString(R.string.hint_color_key), hint_color);
     editor.putInt(context.getString(R.string.invalid_color_key), invalid_color);
+    editor.putInt(context.getString(R.string.last_played_color_key), last_played_color);
     editor.apply();
   }
 
@@ -576,22 +608,24 @@ public class Playfield
 
   }
 
+  public void reset_last_played_position() { last_played_position = null; }
+
   protected int view_xmax = 7, view_ymax = 7;
   protected int view_min_absolute, view_max_absolute;
   protected float step_x, step_y;
   protected int highlight_x, highlight_y;
   protected boolean highlighting = false, hinting = false;
   protected int playable_color = BLUE, played_color = Color.rgb(0xff, 0x80, 0x00),
-      disappear_color = GRAY, invalid_color = BLACK,
+      disappear_color = GRAY, invalid_color = BLACK, last_played_color = Color.rgb(0xff, 0xa0, 0x80),
       background_color = RED, highlight_color = YELLOW, hint_color = Color.rgb(0xff, 0x80, 0x00);
   protected Paint highlight_paint = new Paint(), hint_paint = new Paint(),
-      played_paint = new Paint(), playable_paint = new Paint(),
+      played_paint = new Paint(), playable_paint = new Paint(), last_played_paint = new Paint(),
       bg_paint = new Paint(), line_paint = new Paint(), invalid_paint = new Paint();
-  protected Path playable_path = new Path(), played_path = new Path();
+  protected Path playable_path = new Path(), played_path = new Path(), last_played_path = new Path();
 
   protected Ideal playable, played;
 
-  protected Position hint_position;
+  protected Position hint_position, last_played_position = null;
 
   protected int game_level = 4;
   protected Game_Control game_control;
@@ -601,7 +635,7 @@ public class Playfield
   protected Game_Evaluation_Hashmap evaluator;
 
   protected Button new_game_button, hint_button;
-  protected TextView value_text, scale_label;
+  protected TextView value_text, scale_label, value_label;
   protected SeekBar scale_seekbar;
 
   final protected static String tag = "Playfield";

@@ -54,10 +54,10 @@ public class Game_Evaluation_Hashmap {
     else {
       base_played = new Ideal();
       Resources Res = context.getResources();
-      base_played.add_generator_fast(
+      /*base_played.add_generator_fast(
           Res.getInteger(R.integer.view_min) + Res.getInteger(R.integer.view_seek_max),
           Res.getInteger(R.integer.view_min) + Res.getInteger(R.integer.view_seek_max)
-      );
+      );*/
     }
     base_max_x = view_xmax + 5;
     base_max_y = view_ymax + 5;
@@ -116,10 +116,9 @@ public class Game_Evaluation_Hashmap {
     boolean decided = false;
     Position winning_position = ORIGIN;
 
-    // on levels 1, 2 it is easy to decide the winning move
-
     if (game_level == 1 || game_level == 2) {
 
+      // on levels 1, 2 it is easy to decide the winning move
       decided = true;
       zero_position = base_playable.T.getFirst();
       if (computer_move) {
@@ -130,63 +129,19 @@ public class Game_Evaluation_Hashmap {
 
     } else if (game_level == 3 || game_level == 4) {
 
-      // easy to decide if we can create symmetry
-      Position P = base_playable.T.peekFirst(), Q = base_playable.T.peekLast();
-      int a = P.get_x(), b = P.get_y(), c = Q.get_x(), d = Q.get_y();
-      int delta_x = c - a, delta_y = b - d, i, j, comp_lx, comp_ly, comp_rx, comp_ry;
-      Position S;
-      if (delta_x <= delta_y) {
-        i = c;
-        j = d + delta_x;
-        comp_lx = c; comp_ly = b;
-        comp_rx = i; comp_ry = j;
-      } else {
-        i = a + delta_y;
-        j = b;
-        comp_lx = i; comp_ly = j;
-        comp_rx = c; comp_ry = b;
-      }
-      S = new Position(i, j);
-      decided = true;
-      if (base_played.contains(S.get_x(), S.get_y())) {
-        int num_asym = 0;
-        Iterator<Position> Ti = base_played.T.iterator();
-        Position T, U = ORIGIN;
-        while (Ti.hasNext() && num_asym < 2) {
-          T = Ti.next();
-          if (T.lies_left_of(S)) {
-            if (!base_played.contains(comp_rx + T.get_y() - comp_ly, comp_ry + T.get_x() - comp_lx)) {
-              ++num_asym;
-              U = new Position(comp_rx + T.get_y() - comp_ly, comp_ry + T.get_x() - comp_lx);
-            }
-          } else if (!T.equals(S)){
-            if (!base_played.contains(comp_lx + T.get_y() - comp_ry, comp_ly + T.get_x() - comp_rx)) {
-              ++num_asym;
-              U = new Position(comp_lx + T.get_y() - comp_ry, comp_ly + T.get_x() - comp_rx);
-            }
-          }
-        }
-        decided = num_asym < 2;
-        if (decided)
-          zero_position = U;
-      } else if (base_played.T.size() != 0) {
-        for (Position T : base_played.T) {
-          decided = S.generates(T);
-          if (!decided) break;
-        }
-        if (decided) zero_position = S;
-      }
-      if (decided) {
-        if (computer_move) {
-          Playfield playfield = (Playfield) overall_context.findViewById(R.id.playfield);
-          playfield.hint_position = zero_position;
-          playfield.get_computer_move();
-        }
+      // easy to decide if we can create symmetry, in which case the winning move is that one
+      decided = evaluate_two_corner_game();
+      if (decided && computer_move) {
+        Playfield playfield = (Playfield) overall_context.findViewById(R.id.playfield);
+        playfield.hint_position = zero_position;
+        playfield.get_computer_move();
       }
 
     }
 
     if (!decided) {
+
+      // harder cases
 
       LinkedList<Position> L = base_played.T;
       ArrayList<Integer> ideal = new ArrayList<>(L.size() * 2);
@@ -235,6 +190,69 @@ public class Game_Evaluation_Hashmap {
     }
 
     return result;
+
+  }
+
+  public boolean evaluate_two_corner_game() {
+
+    boolean decided = true;
+
+    // first find the optimal first position, which forces symmetric moves
+    Position P = base_playable.T.peekFirst(), Q = base_playable.T.peekLast();
+    int a = P.get_x(), b = P.get_y(), c = Q.get_x(), d = Q.get_y();
+    int delta_x = c - a, delta_y = b - d, i, j, comp_lx, comp_ly, comp_rx, comp_ry;
+    Position S;
+    if (delta_x <= delta_y) {
+      i = c;
+      j = d + delta_x;
+      comp_lx = c; comp_ly = b;
+      comp_rx = i; comp_ry = j;
+    } else {
+      i = a + delta_y;
+      j = b;
+      comp_lx = i; comp_ly = j;
+      comp_rx = c; comp_ry = b;
+    }
+    S = new Position(i, j);
+
+    if (base_played.contains(S.get_x(), S.get_y())) {
+
+      // if S has already been played, see if we can obtain symmetry
+
+      int num_asym = 0;
+      Iterator<Position> Ti = base_played.T.iterator();
+      Position T, U = ORIGIN;
+      while (Ti.hasNext() && num_asym < 2) {
+        T = Ti.next();
+        if (T.lies_left_of(S)) {
+          if (!base_played.contains(comp_rx + T.get_y() - comp_ly, comp_ry + T.get_x() - comp_lx)) {
+            ++num_asym;
+            U = new Position(comp_rx + T.get_y() - comp_ly, comp_ry + T.get_x() - comp_lx);
+          }
+        } else if (!T.equals(S)){
+          if (!base_played.contains(comp_lx + T.get_y() - comp_ry, comp_ly + T.get_x() - comp_rx)) {
+            ++num_asym;
+            U = new Position(comp_lx + T.get_y() - comp_ry, comp_ly + T.get_x() - comp_rx);
+          }
+        }
+      }
+      decided = num_asym < 2;
+      if (decided)
+        zero_position = U;
+
+    } else if (base_played.T.size() != 0) {
+
+      // if S has not been played, see if playing S would "swallow" the previous plays
+
+      for (Position T : base_played.T) {
+        decided = S.generates(T);
+        if (!decided) break;
+      }
+      if (decided) zero_position = S;
+
+    }
+
+    return decided;
 
   }
 
@@ -377,9 +395,9 @@ public class Game_Evaluation_Hashmap {
             Position winning_position = ORIGIN;
             //Log.d(tag, "not found, computing");
             TreeSet<Integer> options = new TreeSet<>();
-            // work our way up to largest x, y values
-            for (int i = 0; i <= max_x; ++i) {
-              for (int j = 0; j <= max_y; ++j) {
+            // work our way up to largest x, y values, short-circuiting when a winning move is found
+            for (int i = 0; i <= max_x && winning_position == ORIGIN; ++i) {
+              for (int j = 0; j <= max_y && winning_position == ORIGIN; ++j) {
                 // we will remove the point (i,j) and all those northeast of it
                 // to create a new configuration
                 // no point continuing if there are no points in this row

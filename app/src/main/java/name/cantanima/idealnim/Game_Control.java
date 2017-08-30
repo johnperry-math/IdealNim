@@ -52,7 +52,7 @@ public class Game_Control implements DialogInterface.OnClickListener {
 
   public void new_game(Playfield p, int max_x, int max_y, int level, boolean generate_ideals) {
     playfield = p;
-    p.reset_last_played_position();
+    p.reset_view();
     main_activity = (MainActivity) p.getContext();
 
     if (generate_ideals) {
@@ -83,7 +83,7 @@ public class Game_Control implements DialogInterface.OnClickListener {
           last_i = 0;
           last_j = max_y;
           I = new Ideal();
-          Log.d(tag, "----");
+          //Log.d(tag, "----");
           for (int n = 0; n < 5; ++n) {
             int i = last_i + (random.nextInt(2) + 1);
             int j = last_j - (random.nextInt(2) + 1);
@@ -91,9 +91,9 @@ public class Game_Control implements DialogInterface.OnClickListener {
             last_i = i;
             last_j = j;
             I.add_generator_fast(i, j);
-            Log.d(tag, String.valueOf(i) + ", " + String.valueOf(j));
+            //Log.d(tag, String.valueOf(i) + ", " + String.valueOf(j));
           }
-          Log.d(tag, "----");
+          //Log.d(tag, "----");
         } while (last_i >= max_x - 1 || I.T.size() < 5);
       }
       I.sort_ideal();

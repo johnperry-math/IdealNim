@@ -366,9 +366,9 @@ public class Playfield
         i = hint_position.get_x();
         j = hint_position.get_y();
       }
-      if (i > view_xmax || j > view_ymax) {
+      if (i >= view_xmax || j >= view_ymax) {
         view_xmax = view_ymax = (i > j) ? i + 1 : j + 1;
-        adjust_steps(getWidth(), getHeight());
+        scale_seekbar.setProgress(view_xmax - view_min_absolute);
       }
       evaluator.play_point(i, j);
       played.add_generator(i, j, true);
@@ -516,7 +516,7 @@ public class Playfield
       max = (max < 7) ? 7 : max;
       if (max != view_xmax) {
         view_xmax = view_ymax = max;
-        adjust_steps(getWidth(), getHeight());
+        scale_seekbar.setProgress(view_xmax - view_min_absolute);
         evaluator = new Game_Evaluation_Hashmap(context, playable, played, game_level);
         game_control.notify_changed_board_size();
         invalidate();
@@ -609,6 +609,12 @@ public class Playfield
   }
 
   public void reset_last_played_position() { last_played_position = null; }
+
+  public void reset_view() {
+    view_xmax = view_ymax = 7;
+    scale_seekbar.setProgress(0);
+    reset_last_played_position();
+  }
 
   protected int view_xmax = 7, view_ymax = 7;
   protected int view_min_absolute, view_max_absolute;

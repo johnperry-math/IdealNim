@@ -54,10 +54,6 @@ public class Game_Evaluation_Hashmap {
     else {
       base_played = new Ideal();
       Resources Res = context.getResources();
-      /*base_played.add_generator_fast(
-          Res.getInteger(R.integer.view_min) + Res.getInteger(R.integer.view_seek_max),
-          Res.getInteger(R.integer.view_min) + Res.getInteger(R.integer.view_seek_max)
-      );*/
     }
     base_max_x = view_xmax + 5;
     base_max_y = view_ymax + 5;
@@ -121,22 +117,24 @@ public class Game_Evaluation_Hashmap {
       // on levels 1, 2 it is easy to decide the winning move
       decided = true;
       zero_position = base_playable.T.getFirst();
-      if (computer_move) {
-        Playfield playfield = (Playfield) overall_context.findViewById(R.id.playfield);
-        playfield.hint_position = zero_position;
-        playfield.get_computer_move();
-      }
 
     } else if (game_level == 3 || game_level == 4) {
 
       // easy to decide if we can create symmetry, in which case the winning move is that one
-      decided = evaluate_two_corner_game();
-      if (decided && computer_move) {
-        Playfield playfield = (Playfield) overall_context.findViewById(R.id.playfield);
-        playfield.hint_position = zero_position;
-        playfield.get_computer_move();
-      }
+      decided = quickly_analyze_two_corner_game();
 
+    } else if (game_level == 5 || game_level == 6) {
+
+      // relatively easy to decide if we can create symmetry,
+      // in which case the winning move is that one
+      decided = quickly_analyze_three_corner_game();
+
+    }
+
+    if (decided && computer_move) {
+      Playfield playfield = (Playfield) overall_context.findViewById(R.id.playfield);
+      playfield.hint_position = zero_position;
+      playfield.get_computer_move();
     }
 
     if (!decided) {
@@ -193,9 +191,30 @@ public class Game_Evaluation_Hashmap {
 
   }
 
-  public boolean evaluate_two_corner_game() {
+  public boolean quickly_analyze_three_corner_game() {
 
-    boolean decided = true;
+    // first find the optimal first position, which forces symmetric moves -- IF IT EXISTS
+    Iterator<Position> Ti = base_playable.iterator();
+    Ti.next();
+    Position Q = Ti.next();
+    // for symmetry
+    boolean result = Q.get_x() == Q.get_y();
+    if (result && base_played.T.size() != 0) {
+      Iterator<Position> Ui = base_played.iterator();
+      while (result && Ui.hasNext())
+        result = Q.generates(Ui.next());
+    }
+    if (result) {
+      zero_position = Q;
+    }
+
+    return result;
+
+  }
+
+  public boolean quickly_analyze_two_corner_game() {
+
+    boolean result = true;
 
     // first find the optimal first position, which forces symmetric moves
     Position P = base_playable.T.peekFirst(), Q = base_playable.T.peekLast();
@@ -236,8 +255,8 @@ public class Game_Evaluation_Hashmap {
           }
         }
       }
-      decided = num_asym < 2;
-      if (decided)
+      result = num_asym < 2;
+      if (result)
         zero_position = U;
 
     } else if (base_played.T.size() != 0) {
@@ -245,14 +264,14 @@ public class Game_Evaluation_Hashmap {
       // if S has not been played, see if playing S would "swallow" the previous plays
 
       for (Position T : base_played.T) {
-        decided = S.generates(T);
-        if (!decided) break;
+        result = S.generates(T);
+        if (!result) break;
       }
-      if (decided) zero_position = S;
+      if (result) zero_position = S;
 
     }
 
-    return decided;
+    return result;
 
   }
 
@@ -379,6 +398,7 @@ public class Game_Evaluation_Hashmap {
             zero_position = just_played.T.getFirst();
           break;
         default:
+          if (cache.size() == 0) seed_cache_with_known_values();
           ArrayList<Integer> gens = new ArrayList<>(just_played.T.size() * 2);
           for (Position P : just_played.T) {
             gens.add(P.get_x());
@@ -452,6 +472,268 @@ public class Game_Evaluation_Hashmap {
 
   }
 
+  public void seed_cache_with_known_values() {
+
+    Ideal I = base_playable;
+    if (I.T.size() < 3) return;
+    Iterator<Position> Ti = I.T.iterator();
+    Position first = Ti.next();
+    Position second = Ti.next();
+    Position third = Ti.next();
+
+    // Haley Dozier's configurations: vertical version
+    if (second.get_x() == first.get_x() + 1) {
+      ArrayList<Integer> gens = new ArrayList<>(I.T.size() * 2 - 2);
+      Iterator<Position> Ui = I.T.iterator();
+      Ui.next(); Ui.next();
+      int iter_offset;
+      if (third.get_x() == second.get_x() + 1) {
+        gens.add(third.get_x());
+        gens.add(third.get_y());
+        Ui.next();
+        iter_offset = 3;
+      } else {
+        gens.add(second.get_x() + 1);
+        gens.add(second.get_y());
+        iter_offset = 2;
+      }
+      while (Ui.hasNext()) {
+        Position Q = Ui.next();
+        gens.add(Q.get_x());
+        gens.add(Q.get_y());
+      }
+      Log.d(tag, "---- caching configuration ----");
+      Log.d(tag, String.valueOf(0));
+      print_configuration(gens, base_max_x, base_max_y);
+      cache.put(gens, new Pair<>(0, ORIGIN));
+      // easy zeros
+      for (int i = 1; i < first.get_y() + base_max_y; ++i) {
+        ArrayList<Integer> future_gens = new ArrayList<>(I.T.size() * 2 + 2);
+        future_gens.add(first.get_x());
+        future_gens.add(first.get_y() + i);
+        future_gens.add(second.get_x());
+        future_gens.add(second.get_y() + i);
+        Ui = I.T.iterator();
+        Ui.next(); Ui.next();
+        if (third.get_x() != second.get_x() + 1) {
+          future_gens.add(second.get_x() + 1);
+          future_gens.add(second.get_y());
+        }
+        while (Ui.hasNext()) {
+          Position Q = Ui.next();
+          future_gens.add(Q.get_x());
+          future_gens.add(Q.get_y());
+        }
+        Log.d(tag, "---- caching configuration ----");
+        Log.d(tag, String.valueOf(0));
+        print_configuration(future_gens, base_max_x, base_max_y);
+        cache.put(future_gens, new Pair<>(0, ORIGIN));
+      }
+    } else {
+      ArrayList<Integer> gens = new ArrayList<>(I.T.size() * 2 - 2);
+      Iterator<Position> Ui = I.T.iterator();
+      Ui.next();
+      if (second.get_x() == first.get_x() + 2) {
+        gens.add(second.get_x());
+        gens.add(second.get_y());
+        Ui.next();
+      } else {
+        gens.add(first.get_x() + 2);
+        gens.add(first.get_y());
+      }
+      while (Ui.hasNext()) {
+        Position P = Ui.next();
+        gens.add(P.get_x());
+        gens.add(P.get_y());
+      }
+      Log.d(tag, "---- caching configuration ----");
+      Log.d(tag, String.valueOf(1));
+      print_configuration(gens, base_max_x, base_max_y);
+      cache.put(gens, new Pair<>(1, first));
+      // easy 1's
+      for (int i = 1; i < base_max_y; ++i) {
+        ArrayList<Integer> future_gens = new ArrayList<>(I.T.size() * 2 + 2);
+        future_gens.add(first.get_x());
+        future_gens.add(first.get_y() + i);
+        future_gens.add(first.get_x() + 1);
+        future_gens.add(first.get_y() + i - 1);
+        Ui = I.T.iterator();
+        Ui.next();
+        if (second.get_x() == first.get_x() + 2) {
+          future_gens.add(second.get_x());
+          future_gens.add(second.get_y());
+          Ui.next();
+        } else {
+          future_gens.add(first.get_x() + 2);
+          future_gens.add(first.get_y());
+        }
+        while (Ui.hasNext()) {
+          Position P = Ui.next();
+          future_gens.add(P.get_x());
+          future_gens.add(P.get_y());
+        }
+        Log.d(tag, "---- caching configuration ----");
+        Log.d(tag, String.valueOf(1));
+        print_configuration(future_gens, base_max_x, base_max_y);
+        cache.put(future_gens, new Pair<>(1, first));
+      }
+      // easy non-1's
+      for (int i = 1; i < base_max_y; ++i) {
+        ArrayList<Integer> future_gens = new ArrayList<>(I.T.size() * 2 + 2);
+        future_gens.add(first.get_x());
+        future_gens.add(first.get_y() + i);
+        Ui = I.T.iterator();
+        Ui.next();
+        if (second.get_x() == first.get_x() + 2) {
+          future_gens.add(second.get_x());
+          future_gens.add(second.get_y());
+          Ui.next();
+        } else {
+          future_gens.add(first.get_x() + 2);
+          future_gens.add(first.get_y());
+        }
+        while (Ui.hasNext()) {
+          Position P = Ui.next();
+          future_gens.add(P.get_x());
+          future_gens.add(P.get_y());
+        }
+        int value = i + ((i + 1) / 2);
+        Log.d(tag, "---- caching configuration ----");
+        Log.d(tag, String.valueOf(value));
+        print_configuration(future_gens, base_max_x, base_max_y);
+        cache.put(future_gens, new Pair<>(value, first));
+      }
+
+    }
+
+    while (Ti.hasNext()) {
+      first = second;
+      second = third;
+      third = Ti.next();
+    }
+
+    // Haley Dozier's configurations: horizontal version
+    if (second.get_y() == third.get_y() + 1) {
+      ArrayList<Integer> gens = new ArrayList<>(I.T.size() * 2 - 2);
+      Iterator<Position> Ui = I.T.iterator();
+      Position U = Ui.next();
+      do {
+        gens.add(U.get_x());
+        gens.add(U.get_y());
+        U = Ui.next();
+      } while (U != second);
+      if (first.get_y() != second.get_y() + 1) {
+        gens.add(second.get_x());
+        gens.add(second.get_y() + 1);
+      }
+      Log.d(tag, "---- caching configuration ----");
+      Log.d(tag, String.valueOf(0));
+      print_configuration(gens, base_max_x, base_max_y);
+      cache.put(gens, new Pair<>(0, ORIGIN));
+      // easy zeros
+      for (int i = 1; i < third.get_x() + base_max_x; ++i) {
+        ArrayList<Integer> future_gens = new ArrayList<>(I.T.size() * 2 + 2);
+        Ui = I.T.iterator();
+        U = Ui.next();
+        do {
+          future_gens.add(U.get_x());
+          future_gens.add(U.get_y());
+          U = Ui.next();
+        } while (U != second);
+        if (first.get_y() != second.get_y() + 1) {
+          future_gens.add(second.get_x());
+          future_gens.add(second.get_y() + 1);
+        }
+        future_gens.add(second.get_x() + i);
+        future_gens.add(second.get_y());
+        future_gens.add(third.get_x() + i);
+        future_gens.add(third.get_y());
+        Log.d(tag, "---- caching configuration ----");
+        Log.d(tag, String.valueOf(0));
+        print_configuration(future_gens, base_max_x, base_max_y);
+        cache.put(future_gens, new Pair<>(0, ORIGIN));
+      }
+    } else {
+      ArrayList<Integer> gens = new ArrayList<>(I.T.size() * 2 - 2);
+      Iterator<Position> Ui = I.T.iterator();
+      Position P = Ui.next();
+      while (P != third) {
+        gens.add(P.get_x());
+        gens.add(P.get_y());
+        P = Ui.next();
+      }
+      if (second.get_y() != third.get_y() + 2) {
+        gens.add(third.get_x());
+        gens.add(third.get_y() + 2);
+      }
+      Log.d(tag, "---- caching configuration ----");
+      Log.d(tag, String.valueOf(1));
+      print_configuration(gens, base_max_x, base_max_y);
+      cache.put(gens, new Pair<>(1, third));
+      // easy 1's
+      for (int i = 1; i < base_max_y; ++i) {
+        ArrayList<Integer> future_gens = new ArrayList<>(I.T.size() * 2 + 2);
+        Ui = I.T.iterator();
+        P = Ui.next();
+        while (P != third) {
+          future_gens.add(P.get_x());
+          future_gens.add(P.get_y());
+          P = Ui.next();
+        }
+        if (second.get_y() != third.get_y() + 2) {
+          future_gens.add(third.get_x());
+          future_gens.add(third.get_y() + 2);
+        }
+        future_gens.add(third.get_x() + i);
+        future_gens.add(third.get_y());
+        future_gens.add(third.get_x() + i - 1);
+        future_gens.add(third.get_y() + 1);
+        Log.d(tag, "---- caching configuration ----");
+        Log.d(tag, String.valueOf(1));
+        print_configuration(future_gens, base_max_x, base_max_y);
+        cache.put(future_gens, new Pair<>(1, first));
+      }
+      // easy non-1's
+      for (int i = 1; i < base_max_y; ++i) {
+        ArrayList<Integer> future_gens = new ArrayList<>(I.T.size() * 2 + 2);
+        Ui = I.T.iterator();
+        P = Ui.next();
+        while (P != third) {
+          future_gens.add(P.get_x());
+          future_gens.add(P.get_y());
+          P = Ui.next();
+        }
+        if (second.get_y() != third.get_y() + 2) {
+          future_gens.add(third.get_x());
+          future_gens.add(third.get_y() + 2);
+        }
+        future_gens.add(third.get_x() + i);
+        future_gens.add(third.get_y());
+        int value = i + ((i + 1) / 2);
+        Log.d(tag, "---- caching configuration ----");
+        Log.d(tag, String.valueOf(value));
+        print_configuration(future_gens, base_max_x, base_max_y);
+        cache.put(future_gens, new Pair<>(value, first));
+      }
+
+    }
+
+  }
+
+  public void print_configuration(ArrayList<Integer> config, int max_x, int max_y) {
+    boolean [][] bconfig = new boolean[max_x][max_y];
+    for (int i = 0; i < max_x; ++i)
+      for (int j = 0; j < max_y; ++j)
+        bconfig[i][j] = false || base_playable.contains(i, j);
+    for (int i = 0; i < config.size(); i += 2)
+      for (int k = config.get(i); k < max_x; ++k)
+        for (int l = config.get(i + 1); l < max_y; ++l) {
+          if (!bconfig[k][l]) break;
+          else bconfig[k][l] = false;
+        }
+    print_configuration(bconfig, max_x, max_y);
+  }
+
   public void print_configuration(boolean[][] config, int max_x, int max_y) {
     Log.d(tag, "----");
     for (int i = max_y - 1; i > -1; --i) {
@@ -483,7 +765,7 @@ public class Game_Evaluation_Hashmap {
 
   protected static final Position ORIGIN = new Position(0,0);
   protected Position zero_position = ORIGIN;
-  protected int configuration_value;
+  protected int configuration_value, omega = 32003;
 
   protected Activity overall_context;
   protected int game_level;

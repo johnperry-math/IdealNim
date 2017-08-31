@@ -97,7 +97,12 @@ public class Game_Control implements DialogInterface.OnClickListener {
         } while (last_i >= max_x - 1 || I.T.size() < 5);
       }
       I.sort_ideal();
-      playfield.set_to(I);
+      int x_offset = I.T.peekFirst().get_x();
+      int y_offset = I.T.peekLast().get_y();
+      Ideal J = new Ideal();
+      for (Position P : I.T)
+        J.add_generator_fast(P.get_x() - x_offset, P.get_y() - y_offset);
+      playfield.set_to(J);
       playfield.invalidate();
 
       AlertDialog.Builder first_builder = new AlertDialog.Builder(main_activity);

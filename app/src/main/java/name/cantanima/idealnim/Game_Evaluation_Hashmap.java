@@ -474,6 +474,13 @@ public class Game_Evaluation_Hashmap {
 
   public void seed_cache_with_known_values() {
 
+    seed_with_dozier_configurations();
+    seed_with_border_configurations();
+
+  }
+
+  private void seed_with_dozier_configurations() {
+
     Ideal I = base_playable;
     if (I.T.size() < 3) return;
     Iterator<Position> Ti = I.T.iterator();
@@ -502,9 +509,9 @@ public class Game_Evaluation_Hashmap {
         gens.add(Q.get_x());
         gens.add(Q.get_y());
       }
-      Log.d(tag, "---- caching configuration ----");
-      Log.d(tag, String.valueOf(0));
-      print_configuration(gens, base_max_x, base_max_y);
+      //Log.d(tag, "---- caching configuration ----");
+      //Log.d(tag, String.valueOf(0));
+      //print_configuration(gens, base_max_x, base_max_y);
       cache.put(gens, new Pair<>(0, ORIGIN));
       // easy zeros
       for (int i = 1; i < first.get_y() + base_max_y; ++i) {
@@ -524,9 +531,9 @@ public class Game_Evaluation_Hashmap {
           future_gens.add(Q.get_x());
           future_gens.add(Q.get_y());
         }
-        Log.d(tag, "---- caching configuration ----");
-        Log.d(tag, String.valueOf(0));
-        print_configuration(future_gens, base_max_x, base_max_y);
+        //Log.d(tag, "---- caching configuration ----");
+        //Log.d(tag, String.valueOf(0));
+        //print_configuration(future_gens, base_max_x, base_max_y);
         cache.put(future_gens, new Pair<>(0, ORIGIN));
       }
     } else {
@@ -546,9 +553,9 @@ public class Game_Evaluation_Hashmap {
         gens.add(P.get_x());
         gens.add(P.get_y());
       }
-      Log.d(tag, "---- caching configuration ----");
-      Log.d(tag, String.valueOf(1));
-      print_configuration(gens, base_max_x, base_max_y);
+      //Log.d(tag, "---- caching configuration ----");
+      //Log.d(tag, String.valueOf(1));
+      //print_configuration(gens, base_max_x, base_max_y);
       cache.put(gens, new Pair<>(1, first));
       // easy 1's
       for (int i = 1; i < base_max_y; ++i) {
@@ -572,9 +579,9 @@ public class Game_Evaluation_Hashmap {
           future_gens.add(P.get_x());
           future_gens.add(P.get_y());
         }
-        Log.d(tag, "---- caching configuration ----");
-        Log.d(tag, String.valueOf(1));
-        print_configuration(future_gens, base_max_x, base_max_y);
+        //Log.d(tag, "---- caching configuration ----");
+        //Log.d(tag, String.valueOf(1));
+        //print_configuration(future_gens, base_max_x, base_max_y);
         cache.put(future_gens, new Pair<>(1, first));
       }
       // easy non-1's
@@ -598,9 +605,9 @@ public class Game_Evaluation_Hashmap {
           future_gens.add(P.get_y());
         }
         int value = i + ((i + 1) / 2);
-        Log.d(tag, "---- caching configuration ----");
-        Log.d(tag, String.valueOf(value));
-        print_configuration(future_gens, base_max_x, base_max_y);
+        //Log.d(tag, "---- caching configuration ----");
+        //Log.d(tag, String.valueOf(value));
+        //print_configuration(future_gens, base_max_x, base_max_y);
         cache.put(future_gens, new Pair<>(value, first));
       }
 
@@ -626,9 +633,9 @@ public class Game_Evaluation_Hashmap {
         gens.add(second.get_x());
         gens.add(second.get_y() + 1);
       }
-      Log.d(tag, "---- caching configuration ----");
-      Log.d(tag, String.valueOf(0));
-      print_configuration(gens, base_max_x, base_max_y);
+      //Log.d(tag, "---- caching configuration ----");
+      //Log.d(tag, String.valueOf(0));
+      //print_configuration(gens, base_max_x, base_max_y);
       cache.put(gens, new Pair<>(0, ORIGIN));
       // easy zeros
       for (int i = 1; i < third.get_x() + base_max_x; ++i) {
@@ -648,9 +655,9 @@ public class Game_Evaluation_Hashmap {
         future_gens.add(second.get_y());
         future_gens.add(third.get_x() + i);
         future_gens.add(third.get_y());
-        Log.d(tag, "---- caching configuration ----");
-        Log.d(tag, String.valueOf(0));
-        print_configuration(future_gens, base_max_x, base_max_y);
+        //Log.d(tag, "---- caching configuration ----");
+        //Log.d(tag, String.valueOf(0));
+        //print_configuration(future_gens, base_max_x, base_max_y);
         cache.put(future_gens, new Pair<>(0, ORIGIN));
       }
     } else {
@@ -666,9 +673,9 @@ public class Game_Evaluation_Hashmap {
         gens.add(third.get_x());
         gens.add(third.get_y() + 2);
       }
-      Log.d(tag, "---- caching configuration ----");
-      Log.d(tag, String.valueOf(1));
-      print_configuration(gens, base_max_x, base_max_y);
+      //Log.d(tag, "---- caching configuration ----");
+      //Log.d(tag, String.valueOf(1));
+      //print_configuration(gens, base_max_x, base_max_y);
       cache.put(gens, new Pair<>(1, third));
       // easy 1's
       for (int i = 1; i < base_max_y; ++i) {
@@ -688,9 +695,9 @@ public class Game_Evaluation_Hashmap {
         future_gens.add(third.get_y());
         future_gens.add(third.get_x() + i - 1);
         future_gens.add(third.get_y() + 1);
-        Log.d(tag, "---- caching configuration ----");
-        Log.d(tag, String.valueOf(1));
-        print_configuration(future_gens, base_max_x, base_max_y);
+        //Log.d(tag, "---- caching configuration ----");
+        //Log.d(tag, String.valueOf(1));
+        //print_configuration(future_gens, base_max_x, base_max_y);
         cache.put(future_gens, new Pair<>(1, first));
       }
       // easy non-1's
@@ -710,9 +717,9 @@ public class Game_Evaluation_Hashmap {
         future_gens.add(third.get_x() + i);
         future_gens.add(third.get_y());
         int value = i + ((i + 1) / 2);
-        Log.d(tag, "---- caching configuration ----");
-        Log.d(tag, String.valueOf(value));
-        print_configuration(future_gens, base_max_x, base_max_y);
+        //Log.d(tag, "---- caching configuration ----");
+        //Log.d(tag, String.valueOf(value));
+        //print_configuration(future_gens, base_max_x, base_max_y);
         cache.put(future_gens, new Pair<>(value, first));
       }
 
@@ -720,11 +727,92 @@ public class Game_Evaluation_Hashmap {
 
   }
 
-  public void print_configuration(ArrayList<Integer> config, int max_x, int max_y) {
+  private void seed_with_border_configurations() {
+
+    if (base_playable.T.size() >= 2) {
+
+      Iterator<Position> Ti = base_playable.T.iterator();
+      Position P, Q = Ti.next();
+      do {
+        P = Q;
+        Q = Ti.next();
+        int a = Q.get_x() - P.get_x(), b = P.get_y() - Q.get_y();
+        int value = border_configuration_value(a, b);
+        Position winning_position;
+        if (a == b)
+          winning_position = new Position(Q.get_x(), P.get_y());
+        else if (a > b)
+          winning_position = new Position(P.get_x() + b, P.get_y());
+        else
+          winning_position = new Position(Q.get_x(), Q.get_y() + a);
+        Iterator<Position> Ui = base_playable.T.iterator();
+        ArrayList<Integer> gens = new ArrayList<>(base_playable.T.size() * 2);
+        while (Ui.hasNext()) {
+          Position R = Ui.next();
+          if (R == P) {
+            gens.add(R.get_x());
+            gens.add(R.get_y() + 1);
+          } else if (R == Q) {
+            gens.add(R.get_x() + 1);
+            gens.add(R.get_y());
+          } else {
+            gens.add(R.get_x());
+            gens.add(R.get_y());
+          }
+        }
+        //Log.d(tag, "---- caching configuration ----");
+        //Log.d(tag, String.valueOf(value));
+        //print_configuration(gens, base_max_x, base_max_y);
+        cache.put(gens, new Pair<>(value, winning_position));
+      } while (Ti.hasNext());
+
+    }
+
+  }
+
+  private int border_configuration_value(int m, int n) {
+
+    int result;
+
+    if (m < n) {
+      int temp = m;
+      m = n;
+      n = temp;
+    }
+
+    int i = 0, j = 0, k = 0;
+    while (m != 0 && ((m % 2 != 0) || (n % 2 != 0))) {
+      m /= 2;
+      n /= 2;
+      ++i;
+    }
+    j = k = i;
+    result = 1 << i;
+    while (n != 0) {
+      if ((m % 2) != (n % 2)) {
+        result += (2 << k);
+        if (m % 2 == 1)
+          j = k;
+      }
+      ++k;
+      m /= 2;
+      n /= 2;
+    }
+    if (j != i)
+      while (j != k) {
+        ++j;
+        result -= (1 << j);
+      }
+
+    return result;
+
+  }
+
+  protected void print_configuration(ArrayList<Integer> config, int max_x, int max_y) {
     boolean [][] bconfig = new boolean[max_x][max_y];
     for (int i = 0; i < max_x; ++i)
       for (int j = 0; j < max_y; ++j)
-        bconfig[i][j] = false || base_playable.contains(i, j);
+        bconfig[i][j] = base_playable.contains(i, j);
     for (int i = 0; i < config.size(); i += 2)
       for (int k = config.get(i); k < max_x; ++k)
         for (int l = config.get(i + 1); l < max_y; ++l) {
@@ -734,7 +822,7 @@ public class Game_Evaluation_Hashmap {
     print_configuration(bconfig, max_x, max_y);
   }
 
-  public void print_configuration(boolean[][] config, int max_x, int max_y) {
+  protected void print_configuration(boolean[][] config, int max_x, int max_y) {
     Log.d(tag, "----");
     for (int i = max_y - 1; i > -1; --i) {
       String output = "";

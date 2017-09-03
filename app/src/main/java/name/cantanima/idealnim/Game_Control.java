@@ -52,10 +52,12 @@ public class Game_Control implements DialogInterface.OnClickListener {
 
   public void new_game(Playfield p, int max_x, int max_y, int level, boolean generate_ideals) {
     playfield = p;
-    p.reset_view();
+    playfield.reset_view();
     main_activity = (MainActivity) p.getContext();
 
-    if (generate_ideals) {
+    if ((playfield.opponent_is_computer() && generate_ideals) ||
+        (!playfield.opponent_is_computer() && main_activity.i_host_the_game())
+    ) {
 
       max_x = (max_x > 10) ? 10 : max_x;
       max_y = (max_y > 10) ? 10 : max_y;
@@ -103,15 +105,19 @@ public class Game_Control implements DialogInterface.OnClickListener {
       for (Position P : I.T)
         J.add_generator_fast(P.get_x() - x_offset, P.get_y() - y_offset);
       playfield.set_to(J);
-      playfield.invalidate();
 
-      AlertDialog.Builder first_builder = new AlertDialog.Builder(main_activity);
-      first_builder.setTitle(main_activity.getString(R.string.new_game));
-      first_builder.setMessage(main_activity.getString(R.string.who_first));
-      first_builder.setPositiveButton(main_activity.getString(R.string.human), this);
-      first_builder.setNegativeButton(main_activity.getString(R.string.computer), this);
-      first_builder.show();
-      last_dialog = NEW_GAME;
+      if (!playfield.opponent_is_computer())
+        playfield.opponent.choose_a_position();
+      else {
+        AlertDialog.Builder first_builder = new AlertDialog.Builder(main_activity);
+        first_builder.setTitle(main_activity.getString(R.string.new_game));
+        first_builder.setMessage(main_activity.getString(R.string.who_first));
+        first_builder.setPositiveButton(main_activity.getString(R.string.human), this);
+        first_builder.setNegativeButton(main_activity.getString(R.string.computer), this);
+        first_builder.show();
+        last_dialog = NEW_GAME;
+      }
+
 
     }
 
@@ -307,11 +313,12 @@ public class Game_Control implements DialogInterface.OnClickListener {
         last_player = HUMAN;
       else {
         last_player = COMPUTER;
-        playfield.evaluator.choose_computer_move();
+        playfield.opponent.choose_a_position();
       }
     } else if (last_dialog == PLAY_AGAIN) {
-      if (which == BUTTON_POSITIVE)
+      if (which == BUTTON_POSITIVE) {
         new_game(playfield, playfield.view_xmax, playfield.view_ymax, level, true);
+      }
     }
 
   }

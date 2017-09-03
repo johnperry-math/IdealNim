@@ -1,5 +1,7 @@
 package name.cantanima.idealnim;
 
+import android.app.AlertDialog;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Canvas;
@@ -20,13 +22,19 @@ import android.widget.SeekBar;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import name.cantanima.idealnim.Game_Control.Player_Kind;
+import name.cantanima.idealnim.MainActivity.Bluetooth_Reading_Thread;
+import name.cantanima.idealnim.MainActivity.Bluetooth_Writing_Thread;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.BLUE;
 import static android.graphics.Color.GRAY;
-import static android.graphics.Color.GREEN;
 import static android.graphics.Color.RED;
 import static android.graphics.Color.YELLOW;
 import static android.graphics.Paint.Style.FILL;
@@ -34,9 +42,10 @@ import static android.graphics.Paint.Style.STROKE;
 import static android.view.MotionEvent.ACTION_DOWN;
 import static android.view.MotionEvent.ACTION_MOVE;
 import static android.view.MotionEvent.ACTION_UP;
+import static name.cantanima.idealnim.Game_Control.Dialog_Id.NEW_GAME;
 import static name.cantanima.idealnim.Game_Control.Player_Kind.COMPUTER;
 import static name.cantanima.idealnim.Game_Control.Player_Kind.HUMAN;
-import static name.cantanima.idealnim.Game_Evaluation_Hashmap.ORIGIN;
+import static name.cantanima.idealnim.Position.ORIGIN;
 
 /**
  * Created by cantanima on 8/8/17.
@@ -45,7 +54,8 @@ import static name.cantanima.idealnim.Game_Evaluation_Hashmap.ORIGIN;
 public class Playfield
     extends View
     implements OnTouchListener, OnClickListener, SeekBar.OnSeekBarChangeListener,
-        SharedPreferences.OnSharedPreferenceChangeListener
+        SharedPreferences.OnSharedPreferenceChangeListener,
+        MainActivity.BTR_Listener
 {
 
   public Playfield(Context context, AttributeSet attrs) {
@@ -130,8 +140,9 @@ public class Playfield
 
   }
 
-  public void start_game() {
+  public void start_game(Player_Kind kind) {
 
+    kind_of_opponent = kind;
     game_control = new Game_Control();
     game_control.new_game(this, view_xmax, view_ymax, game_level, true);
 
@@ -179,7 +190,16 @@ public class Playfield
     if (value_text != null)
       value_text.setText(getContext().getString(R.string.unknown_game_value));
 
-    evaluator = new Game_Evaluation_Hashmap(getContext(), playable, null, game_level);
+    switch (kind_of_opponent) {
+      case COMPUTER:
+        opponent = new Computer_Opponent(getContext(), playable, null, game_level);
+        break;
+      case HUMAN:
+        opponent = new Human_Opponent(getContext(), playable, null, game_level);
+        break;
+    }
+
+    invalidate();
 
   }
 
@@ -191,8 +211,7 @@ public class Playfield
     playable = new Ideal(old_playable);
     played = new Ideal(old_played);
     game_level = level;
-    evaluator = new Game_Evaluation_Hashmap(getContext(), playable, played, game_level);
-    evaluator.game_value();
+    opponent = new Computer_Opponent(getContext(), playable, played, game_level);
     game_control = new Game_Control();
     game_control.new_game(this, view_xmax, view_ymax, game_level, false);
     invalidate();
@@ -354,7 +373,7 @@ public class Playfield
     boolean stupid_turn = computer_sometimes_dumb && game_control.random.nextBoolean();
 
     if (hint_position == null)
-      evaluator.choose_computer_move();
+      opponent.choose_a_position();
     else {
       int i, j;
       if (hint_position == ORIGIN || stupid_turn || played.contains(hint_position)) {
@@ -370,14 +389,48 @@ public class Playfield
         view_xmax = view_ymax = (i > j) ? i + 1 : j + 1;
         scale_seekbar.setProgress(view_xmax - view_min_absolute);
       }
-      evaluator.play_point(i, j);
       played.add_generator(i, j, true);
+      invalidate();
+      opponent.update_with_position(i, j);
       last_played_position = new Position(i, j);
     }
 
     game_control.set_player_kind(HUMAN);
-    evaluator.computer_move = false;
+
+  }
+
+  public void get_human_move(Position P) {
+    played.add_generator(P.get_x(), P.get_y(), true);
     invalidate();
+    last_played_position = P;
+    if (!playable.equals(played))
+     game_control.set_player_kind(HUMAN);
+    else game_control.notify_game_over();
+  }
+
+  public void setup_human_game(BluetoothSocket socket, boolean i_am_hosting) {
+
+    Human_Opponent other = new Human_Opponent(getContext(), playable, null, game_level);
+    opponent = other;
+    other.acquired_human_opponent(socket);
+    if (i_am_hosting) {
+      played = new Ideal();
+      invalidate();
+      bt_ideal_raw[0] = (byte) playable.T.size();
+      int i = 1;
+      for (Position P : playable.T) {
+        bt_ideal_raw[i] = (byte) P.get_x();
+        bt_ideal_raw[i + 1] = (byte) P.get_y();
+        i += 2;
+      }
+      writing_thread = new Bluetooth_Writing_Thread(getContext(), socket);
+      writing_thread.execute(bt_ideal_raw);
+      game_control.set_player_kind(COMPUTER);
+      opponent.choose_a_position();
+    } else {
+      reading_thread = new Bluetooth_Reading_Thread(getContext(), socket, this);
+      reading_thread.execute();
+    }
 
   }
 
@@ -408,10 +461,12 @@ public class Playfield
               // add generator
               last_played_position = new Position(i, j);
               played.add_generator(i, j, true);
-              evaluator.play_point(i, j);
-              if (!playable.equals(played)) {
+              opponent.update_with_position(i, j);
+              if (playable.equals(played))
+                game_control.notify_game_over();
+              else {
                 game_control.set_player_kind(COMPUTER);
-                evaluator.choose_computer_move();
+                opponent.choose_a_position();
               }
             }
             break;
@@ -428,8 +483,8 @@ public class Playfield
             if (playable.contains(i, j) && !played.contains(i, j)) highlight_color = YELLOW;
             else highlight_color = BLACK;
         }
-        invalidate();
       }
+      invalidate();
     }
     return true;
   }
@@ -445,11 +500,25 @@ public class Playfield
     if (v == new_game_button) {
       game_control.new_game(this, view_xmax, view_ymax, game_level, true);
     } else if (v == hint_button) {
-      value_text.setText(String.valueOf(evaluator.game_value()));
-      hint_position = evaluator.hint_position();
-      hinting = true;
-      game_control.notify_requested_a_hint();
-      invalidate();
+      switch (kind_of_opponent) {
+        case COMPUTER:
+          Computer_Opponent computer = (Computer_Opponent) opponent;
+          value_text.setText(String.valueOf(computer.game_value()));
+          hint_position = computer.hint_position();
+          hinting = true;
+          game_control.notify_requested_a_hint();
+          invalidate();
+          break;
+        case HUMAN:
+        default:
+          Context context = getContext();
+          new AlertDialog.Builder(getContext())
+              .setTitle(context.getString(R.string.no_hints_title))
+              .setMessage(context.getString(R.string.no_hint_message))
+              .setPositiveButton(context.getString(R.string.understood), null)
+              .show();
+          break;
+      }
     }
 
   }
@@ -510,16 +579,6 @@ public class Playfield
         hint_button.setVisibility(VISIBLE);
         value_text.setVisibility(VISIBLE);
         value_label.setVisibility(VISIBLE);
-      }
-    } else if (key.equals(context.getString(R.string.max_pref_key))) {
-      int max = pref.getInt(context.getString(R.string.max_pref_key), 7);
-      max = (max < 7) ? 7 : max;
-      if (max != view_xmax) {
-        view_xmax = view_ymax = max;
-        scale_seekbar.setProgress(view_xmax - view_min_absolute);
-        evaluator = new Game_Evaluation_Hashmap(context, playable, played, game_level);
-        game_control.notify_changed_board_size();
-        invalidate();
       }
     } else if (key.equals(context.getString(R.string.stupid_pref_key)))
       computer_sometimes_dumb = pref.getBoolean(context.getString(R.string.stupid_pref_key), true);
@@ -616,6 +675,21 @@ public class Playfield
     reset_last_played_position();
   }
 
+  @Override
+  public void received_data(int size, byte [] data) {
+    int num_positions = data[0];
+    ArrayList<Integer> positions = new ArrayList<>(num_positions);
+    for (int i = 1; i < 2*num_positions + 1; ++i)
+      positions.add((int) data[i]);
+    playable = new Ideal(positions);
+    opponent.set_playable(playable);
+    invalidate();
+    game_control.set_player_kind(HUMAN);
+
+  }
+
+  public boolean opponent_is_computer() { return kind_of_opponent == COMPUTER; }
+
   protected int view_xmax = 7, view_ymax = 7;
   protected int view_min_absolute, view_max_absolute;
   protected float step_x, step_y;
@@ -638,11 +712,18 @@ public class Playfield
   protected boolean computer_sometimes_dumb = false;
   protected int consecutive_wins = 0;
 
-  protected Game_Evaluation_Hashmap evaluator;
+  protected Player_Kind kind_of_opponent;
+  protected Opponent opponent = null;
+  
+  //protected Computer_Opponent opponent;
 
   protected Button new_game_button, hint_button;
   protected TextView value_text, scale_label, value_label;
   protected SeekBar scale_seekbar;
+  
+  protected Bluetooth_Reading_Thread reading_thread = null;
+  protected Bluetooth_Writing_Thread writing_thread = null;
+  private final Byte [] bt_ideal_raw = new Byte[20];
 
   final protected static String tag = "Playfield";
 

@@ -30,22 +30,19 @@ import static java.util.Calendar.DAY_OF_MONTH;
 import static java.util.Calendar.HOUR;
 import static java.util.Calendar.MINUTE;
 import static java.util.Calendar.SECOND;
+import static name.cantanima.idealnim.Position.ORIGIN;
 
 /**
  * Created by cantanima on 8/15/17.
  */
 
-public class Game_Evaluation_Hashmap {
+public class Computer_Opponent extends Opponent {
 
-  public Game_Evaluation_Hashmap(
+  public Computer_Opponent(
       Context context, Ideal I, Ideal J, int level
   ) {
 
-    overall_context = (Activity) context;
-    game_level = level;
-
-    base_playable = new Ideal(I);
-    base_playable.sort_ideal();
+    super(context, I, J, level);
 
     int view_xmax = base_playable.T.peekLast().get_x();
     int view_ymax = base_playable.T.peekFirst().get_y();
@@ -53,7 +50,6 @@ public class Game_Evaluation_Hashmap {
       base_played = new Ideal(J);
     else {
       base_played = new Ideal();
-      Resources Res = context.getResources();
     }
     base_max_x = view_xmax + 5;
     base_max_y = view_ymax + 5;
@@ -70,9 +66,10 @@ public class Game_Evaluation_Hashmap {
 
   }
 
-  public void play_point(int i, int j) {
+  @Override
+  public void update_with_position(int i, int j) {
 
-    base_played.add_generator(i, j, true);
+    super.update_with_position(i,j);
     // adjust base_max_y
     boolean checking_y = true;
     int old_base_max_y = base_max_y;
@@ -94,14 +91,11 @@ public class Game_Evaluation_Hashmap {
       else --base_max_x;
     }
 
-    if (base_playable.equals(base_played))
-      ((Playfield) overall_context.findViewById(R.id.playfield)).game_control.notify_game_over();
-
   }
 
   Position hint_position() { return zero_position; }
 
-  public void choose_computer_move() {
+  public void choose_a_position() {
     computer_move = true;
     game_value();
   }
@@ -134,6 +128,7 @@ public class Game_Evaluation_Hashmap {
     if (decided && computer_move) {
       Playfield playfield = (Playfield) overall_context.findViewById(R.id.playfield);
       playfield.hint_position = zero_position;
+      computer_move = false;
       playfield.get_computer_move();
     }
 
@@ -171,6 +166,7 @@ public class Game_Evaluation_Hashmap {
           if (computer_move) {
             Playfield playfield = (Playfield) overall_context.findViewById(R.id.playfield);
             playfield.hint_position = zero_position;
+            computer_move = false;
             playfield.get_computer_move();
           }
         }
@@ -181,6 +177,7 @@ public class Game_Evaluation_Hashmap {
         if (computer_move) {
           Playfield playfield = (Playfield) overall_context.findViewById(R.id.playfield);
           playfield.hint_position = zero_position;
+          computer_move = false;
           playfield.get_computer_move();
         }
       }
@@ -327,8 +324,8 @@ public class Game_Evaluation_Hashmap {
       super.onPostExecute(integer);
       ((TextView) overall_context.findViewById(R.id.value_view)).setText(integer.toString());
       Playfield p = ((Playfield) overall_context.findViewById(R.id.playfield));
-      Log.d(tag, "times: " + String.valueOf(end_time.getTime()) + ", " + start_time.getTime());
-      Log.d(tag, "entries: " + String.valueOf(cache.size()));
+      /*Log.d(tag, "times: " + String.valueOf(end_time.getTime()) + ", " + start_time.getTime());
+      Log.d(tag, "entries: " + String.valueOf(cache.size()));*/
       if (end_time.getTime() - start_time.getTime() > 60000) {
         p.game_control.notify_large_board();
       }
@@ -847,19 +844,14 @@ public class Game_Evaluation_Hashmap {
     return new Position(i, j);
   }
 
-  protected Ideal base_playable, base_played;
   protected int base_max_x, base_max_y;
   protected HashMap<ArrayList<Integer>, Pair<Integer, Position>> cache;
 
-  protected static final Position ORIGIN = new Position(0,0);
   protected Position zero_position = ORIGIN;
-  protected int configuration_value, omega = 32003;
-
-  protected Activity overall_context;
-  protected int game_level;
+  protected int configuration_value;
 
   protected boolean computer_move;
 
-  final private static String tag = "Game_Evaluation";
+  final private static String tag = "Computer_Opponent";
 
 }

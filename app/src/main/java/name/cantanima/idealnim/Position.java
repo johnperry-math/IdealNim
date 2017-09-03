@@ -14,6 +14,8 @@ import java.util.HashMap;
  */
 public class Position implements Comparable<Position> {
 
+  public final static Position ORIGIN = new Position(0,0);
+
   /**
    * Initializes position to the given values.
    * @param x x-value of new position

@@ -15,7 +15,7 @@ import java.util.Set;
 
 import name.cantanima.idealnim.MainActivity.Bluetooth_Reading_Thread;
 import name.cantanima.idealnim.MainActivity.Bluetooth_Writing_Thread;
-import name.cantanima.idealnim.MainActivity.BTR_Listener;
+import name.cantanima.idealnim.BTR_Listener;
 
 /**
  * Created by cantanima on 9/2/17.
@@ -35,7 +35,7 @@ public class Human_Opponent extends Opponent implements BTR_Listener {
   @Override
   public void choose_a_position() {
     Bluetooth_Reading_Thread bt_reader = new Bluetooth_Reading_Thread(
-        overall_context, bt_socket, this
+        overall_context, bt_socket, this, true
     );
     bt_reader.execute();
   }

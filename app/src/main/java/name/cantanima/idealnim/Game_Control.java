@@ -53,6 +53,7 @@ public class Game_Control implements DialogInterface.OnClickListener {
   public void new_game(Playfield p, int max_x, int max_y, int level, boolean generate_ideals) {
     playfield = p;
     playfield.reset_view();
+    playfield.reset_played();
     main_activity = (MainActivity) p.getContext();
 
     if ((playfield.opponent_is_computer() && generate_ideals) ||
@@ -126,6 +127,11 @@ public class Game_Control implements DialogInterface.OnClickListener {
   public void notify_game_over() {
 
     handle_achievements();
+
+    if (main_activity.is_two_player_game()) {
+      main_activity.two_player_game_ended();
+      playfield.set_opponent_to_computer();
+    }
 
     AlertDialog.Builder last_builder = new AlertDialog.Builder(main_activity);
     last_builder.setTitle(main_activity.getString(R.string.game_over));

@@ -61,7 +61,8 @@ import java.util.Vector;
 public class MainActivity
     extends AppCompatActivity
     implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener,
-        GoogleApiClient.ConnectionCallbacks, DialogInterface.OnClickListener
+        GoogleApiClient.ConnectionCallbacks, DialogInterface.OnClickListener,
+        BTR_Listener
 {
 
   @Override
@@ -243,6 +244,8 @@ public class MainActivity
       Log.d(tag, "bluetooth requests enable");
       if (resultCode == RESULT_OK) {
         Log.d(tag, "bluetooth enable OK");
+        if (bt_thread == null)
+          bt_thread = new Bluetooth_Setup_Thread(this);
         bt_thread.host_or_join();
       } else if (resultCode == RESULT_CANCELED) {
         Log.d(tag, "canceled, aborting");
@@ -310,9 +313,10 @@ public class MainActivity
       } else {
         // connect to device
         bt_thread.join_game(which);
-        ((Playfield) findViewById(R.id.playfield)).start_game(HUMAN);
+        //((Playfield) findViewById(R.id.playfield)).start_game(HUMAN);
       }
     } else if (dialog == host_or_join_dialog) {
+      two_player_game = true;
       if (which == DialogInterface.BUTTON_POSITIVE) {
         bt_thread.start_hosting();
       } else {
@@ -426,6 +430,16 @@ public class MainActivity
 
   public boolean i_host_the_game() { return i_am_hosting; }
 
+  @Override
+  public void received_data(int size, byte[] data) {
+    if (data[0] == 1 && data[1] == 0 && data[2] == 0)
+      try {
+        communication_socket.close();
+      } catch (IOException e) {
+        // I don't care at this point
+      }
+  }
+
 
   public static class Bluetooth_Writing_Thread extends AsyncTask<Byte [], Integer, Boolean> {
 
@@ -475,11 +489,12 @@ public class MainActivity
   public static class Bluetooth_Reading_Thread extends AsyncTask<Object, Integer, Boolean> {
 
     public Bluetooth_Reading_Thread(
-        Context main, BluetoothSocket socket, BTR_Listener listener
+        Context main, BluetoothSocket socket, BTR_Listener listener, boolean show_dialog
     ) {
       context = main;
       bt_socket = socket;
       notify = listener;
+      show_progress_dialog = show_dialog;
     }
 
     @Override
@@ -498,16 +513,20 @@ public class MainActivity
 
     @Override
     public void onPreExecute() {
-      progress_dialog = new ProgressDialog(context);
-      progress_dialog.setTitle(context.getString(R.string.bt_progress_title));
-      progress_dialog.setMessage(context.getString(R.string.bt_progress_message));
-      progress_dialog.setIndeterminate(true);
-      //progress_dialog.show();
+      if (show_progress_dialog) {
+        progress_dialog = new ProgressDialog(context);
+        progress_dialog.setTitle(context.getString(R.string.bt_progress_title));
+        progress_dialog.setMessage(context.getString(R.string.bt_progress_message));
+        progress_dialog.setIndeterminate(true);
+        progress_dialog.setCancelable(false);
+        progress_dialog.show();
+      }
     }
 
     @Override
     public void onPostExecute(Boolean success) {
-      //progress_dialog.dismiss();
+      if (show_progress_dialog)
+        progress_dialog.dismiss();
       if (success)
         notify.received_data(size, info);
       else {
@@ -524,14 +543,12 @@ public class MainActivity
     BluetoothSocket bt_socket;
     BTR_Listener notify;
     Context context;
-    boolean success;
+    boolean success, show_progress_dialog = false;
     final byte [] info = new byte[21];
     int size;
     String failure_message;
 
   }
-
-  public interface BTR_Listener { public void received_data(int size, byte[] data); }
 
   public class Bluetooth_Setup_Thread extends Thread {
 
@@ -672,6 +689,24 @@ public class MainActivity
 
   }
 
+  public boolean is_two_player_game() { return two_player_game; }
+
+  public void two_player_game_ended() {
+    two_player_game = false;
+    if (communication_socket.isConnected()) {
+      if (i_host_the_game()) {
+        Bluetooth_Reading_Thread bt_thread = new Bluetooth_Reading_Thread(this, communication_socket, this, false);
+        bt_thread.execute();
+      } else {
+        Bluetooth_Writing_Thread bt_thread = new Bluetooth_Writing_Thread(this, communication_socket);
+        Byte[] ack = new Byte[3];
+        ack[0] = 1; ack[1] = 0; ack[2] = 0;
+        bt_thread.execute(ack);
+      }
+      Log.d(tag, "closing socket");
+    }
+  }
+
   private GoogleApiClient games_client = null;
   private boolean resolving_failure = false, auto_start_signin = false, sign_in_clicked = false;
   private SignInButton sign_in_button;
@@ -706,7 +741,7 @@ public class MainActivity
   private BluetoothServerSocket server_socket = null;
   private BluetoothSocket communication_socket = null;
   private Bluetooth_Setup_Thread bt_thread = null;
-  protected boolean i_am_hosting;
+  protected boolean i_am_hosting, two_player_game = false;
 
   private String tag = "Main activity";
 

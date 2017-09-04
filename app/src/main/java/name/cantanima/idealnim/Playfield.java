@@ -55,7 +55,7 @@ public class Playfield
     extends View
     implements OnTouchListener, OnClickListener, SeekBar.OnSeekBarChangeListener,
         SharedPreferences.OnSharedPreferenceChangeListener,
-        MainActivity.BTR_Listener
+        BTR_Listener
 {
 
   public Playfield(Context context, AttributeSet attrs) {
@@ -400,7 +400,12 @@ public class Playfield
   }
 
   public void get_human_move(Position P) {
-    played.add_generator(P.get_x(), P.get_y(), true);
+    int i = P.get_x(), j = P.get_y();
+    played.add_generator(i, j, true);
+    if (i >= view_xmax || j >= view_ymax) {
+      view_xmax = view_ymax = (i > j) ? i + 1 : j + 1;
+      scale_seekbar.setProgress(view_xmax - view_min_absolute);
+    }
     invalidate();
     last_played_position = P;
     if (!playable.equals(played))
@@ -413,8 +418,9 @@ public class Playfield
     Human_Opponent other = new Human_Opponent(getContext(), playable, null, game_level);
     opponent = other;
     other.acquired_human_opponent(socket);
+    played = new Ideal();
+    reset_view();
     if (i_am_hosting) {
-      played = new Ideal();
       invalidate();
       bt_ideal_raw[0] = (byte) playable.T.size();
       int i = 1;
@@ -423,12 +429,13 @@ public class Playfield
         bt_ideal_raw[i + 1] = (byte) P.get_y();
         i += 2;
       }
-      writing_thread = new Bluetooth_Writing_Thread(getContext(), socket);
+      Bluetooth_Writing_Thread writing_thread = new Bluetooth_Writing_Thread(getContext(), socket);
       writing_thread.execute(bt_ideal_raw);
       game_control.set_player_kind(COMPUTER);
       opponent.choose_a_position();
     } else {
-      reading_thread = new Bluetooth_Reading_Thread(getContext(), socket, this);
+      Bluetooth_Reading_Thread reading_thread =
+          new Bluetooth_Reading_Thread(getContext(), socket, this, false);
       reading_thread.execute();
     }
 
@@ -522,6 +529,8 @@ public class Playfield
     }
 
   }
+
+  public void set_opponent_to_computer() { kind_of_opponent = COMPUTER; }
 
   public void set_buttons_to_listen(
       Button ng_button, TextView vt_view, TextView vt_label, Button h_button,
@@ -675,6 +684,8 @@ public class Playfield
     reset_last_played_position();
   }
 
+  public void reset_played() { played = new Ideal(); }
+
   @Override
   public void received_data(int size, byte [] data) {
     int num_positions = data[0];
@@ -721,8 +732,6 @@ public class Playfield
   protected TextView value_text, scale_label, value_label;
   protected SeekBar scale_seekbar;
   
-  protected Bluetooth_Reading_Thread reading_thread = null;
-  protected Bluetooth_Writing_Thread writing_thread = null;
   private final Byte [] bt_ideal_raw = new Byte[20];
 
   final protected static String tag = "Playfield";

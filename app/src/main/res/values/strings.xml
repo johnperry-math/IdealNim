@@ -26,7 +26,7 @@
     </string>
     <string name="bluetooth_not_available">which is not available on this device.</string>
     <string name="bluetooth_canceled">
-        and Android says you canceled Bluetooth. Don\'t do that if you want to play a two-player game!
+        and Android says you canceled Bluetooth. Don&#8217;t do that if you want to play a two-player game!
     </string>
     <string name="no_discovery_title">No discovery</string>
     <string name="no_discovery_message">
@@ -38,7 +38,7 @@
     <string name="cancel">Cancel</string>
     <string name="bt_host_or_join_title">Host or join?</string>
     <string name="bt_host_or_join_message">
-        Do you want to host or join a game? The game will be played at the host\'s settings,
+        Do you want to host or join a game? The game will be played at the host&#8217;s settings,
         but the host goes second.
     </string>
     <string name="host">Host</string>
@@ -69,8 +69,10 @@
         Unable to read a message from the other device.
         Your best option from here is probably to start a new game.
     </string>
-    <string name="bt_progress_title">Waiting for data</string>
-    <string name="bt_progress_message">Waiting for other player to send information</string>
+    <string name="bt_progress_title">Listening</string>
+    <string name="bt_progress_message">Waiting for opponent to choose a position.</string>
+    <string name="bt_waiting_to_host_title">Listening</string>
+    <string name="bt_waiting_to_host_message">Waiting for an opponent to join the game.</string>
 
     <string name="game_over">Game over!</string>
     <string name="computer_won">I won!&#160;</string>
@@ -91,6 +93,17 @@
         <item>Changed the level to cheat your way to victory, dincha?</item>
         <item>You spent so much time with &#8220;Winning Ways for Your Mathematical Plays&#8221; that you killed your social life, didn&#8217;t you?</item>
     </string-array>
+    <string name="two_player_won">
+        You won! We make a great team, don&#8217;t we? Let&#8217;s take that clown on again!
+    </string>
+    <string name="two_player_lost">
+        Your opponent won! Maybe you should practice more?
+        I&#8217;m always available to put you in your place.
+    </string>
+    <string name="two_player_won_lost">
+        (The two devices are no longer connected.
+        To play again, press the two-player icon.)
+    </string>
     <string name="play_again">&#160;Start a new game, with the same settings?</string>
     <string name="another_game">New game!</string>
     <string name="dont_play_again_win">Contemplate victory.</string>
@@ -178,9 +191,9 @@
     <string name="everyone_get_a_trophy">everyone_gets_a_trophy</string>
     <string name="honorable_mention">honorable_mention</string>
     <string name="one_hand_behind_my_back">one_hand_behind_my_back</string>
-    <string name="won_level_3">won_level_3</string>
-    <string name="won_level_4">won_level_4</string>
     <string name="won_level_5">won_level_5</string>
+    <string name="won_level_7">won_level_7</string>
+    <string name="won_level_9">won_level_9</string>
     <string name="fair_play">fair_play</string>
     <string name="patience_a_virtue">patience_a_virtue</string>
     <string name="changed_board_size">changed_board_size</string>
@@ -189,6 +202,10 @@
     <string name="craftsman">craftsman</string>
     <string name="master_craftsman">master_craftsman</string>
     <string name="doctor_ideal_nim">doctor_ideal_nim</string>
+    <string name="good_sport">good_sport</string>
+    <string name="only_human">only_human</string>
+    <string name="pentawin">pentawin</string>
+    <string name="legend_among_kind">legend_among_kind</string>
 
     <!-- Could run out of memory -->
 

@@ -32,8 +32,8 @@ public abstract class Opponent {
     Playfield p = (Playfield) overall_context.findViewById(R.id.playfield);
     base_played.add_generator(i, j, true);
     p.invalidate();
-    if (base_playable.equals(base_played))
-      p.game_control.notify_game_over();
+    //if (base_playable.equals(base_played))
+    //  p.game_control.notify_game_over();
   }
 
   public void set_playable(Ideal I) { base_playable = I; }

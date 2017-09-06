@@ -6,12 +6,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,17 +18,13 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.images.ImageManager;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.Player;
 
@@ -42,19 +34,9 @@ import static com.google.android.gms.common.ConnectionResult.SUCCESS;
 import static com.google.android.gms.common.GoogleApiAvailability.GOOGLE_PLAY_SERVICES_VERSION_CODE;
 import static com.google.android.gms.games.GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED;
 import static name.cantanima.idealnim.Game_Control.Player_Kind.COMPUTER;
-import static name.cantanima.idealnim.Game_Control.Player_Kind.HUMAN;
-
-import com.google.android.gms.games.achievement.Achievement;
-
-import org.w3c.dom.Text;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.UUID;
 import java.util.Vector;
 
@@ -62,7 +44,7 @@ public class MainActivity
     extends AppCompatActivity
     implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener,
         GoogleApiClient.ConnectionCallbacks, DialogInterface.OnClickListener,
-        BTR_Listener
+        BTR_Listener, DialogInterface.OnCancelListener
 {
 
   @Override
@@ -151,7 +133,7 @@ public class MainActivity
             bt_thread.disconnect();
             bt_thread = null;
           }
-          bt_thread = new Bluetooth_Setup_Thread(this);
+          bt_thread = new BT_Setup_Thread(this);
           bt_thread.start();
           bt_thread.host_or_join();
         } else {
@@ -245,7 +227,7 @@ public class MainActivity
       if (resultCode == RESULT_OK) {
         Log.d(tag, "bluetooth enable OK");
         if (bt_thread == null)
-          bt_thread = new Bluetooth_Setup_Thread(this);
+          bt_thread = new BT_Setup_Thread(this);
         bt_thread.host_or_join();
       } else if (resultCode == RESULT_CANCELED) {
         Log.d(tag, "canceled, aborting");
@@ -261,7 +243,7 @@ public class MainActivity
       Log.d(tag, "bluetooth requests host");
       if (resultCode == RESULT_OK) {
         Log.d(tag, "bluetooth host ok");
-        bt_thread.start_hosting();
+        (new Host_Thread(this)).execute();
       } else {
         Log.d(tag, "canceled hosting");
         new AlertDialog.Builder(this)
@@ -318,12 +300,16 @@ public class MainActivity
     } else if (dialog == host_or_join_dialog) {
       two_player_game = true;
       if (which == DialogInterface.BUTTON_POSITIVE) {
-        bt_thread.start_hosting();
+        (new Host_Thread(this)).execute();
       } else {
         bt_thread.select_paired_device();
       }
     }
 
+  }
+
+  public void start_human_game() {
+    ((Playfield) findViewById(R.id.playfield)).setup_human_game(communication_socket, true);
   }
 
   @Override
@@ -377,14 +363,14 @@ public class MainActivity
         case ONE_HAND_BEHIND_MY_BACK:
           Games.Achievements.unlock(games_client, getString(R.string.achievement_0ne_hand_behind_my_back));
           break;
-        case WON_LEVEL_3:
-          Games.Achievements.unlock(games_client, getString(R.string.achievement_won_a_level_3_game));
-          break;
-        case WON_LEVEL_4:
-          Games.Achievements.unlock(games_client, getString(R.string.achievement_won_a_game_at_level_4));
-          break;
         case WON_LEVEL_5:
           Games.Achievements.unlock(games_client, getString(R.string.achievement_won_a_game_at_level_5));
+          break;
+        case WON_LEVEL_7:
+          Games.Achievements.unlock(games_client, getString(R.string.achievement_won_a_game_at_level_7));
+          break;
+        case WON_LEVEL_9:
+          Games.Achievements.unlock(games_client, getString(R.string.achievement_won_a_game_at_level_9));
           break;
         case FAIR_PLAY:
           Games.Achievements.unlock(games_client, getString(R.string.achievement_fair_play_award));
@@ -397,6 +383,16 @@ public class MainActivity
           break;
         case DOCTOR_OF_IDEAL_NIM:
           Games.Achievements.unlock(games_client, getString(R.string.achievement_doctor_of_ideal_nim));
+          break;
+        case ONLY_HUMAN:
+          Games.Achievements.unlock(
+              games_client, getString(R.string.achievement_theyre_only_human)
+          );
+          break;
+        case LEGEND_AMONG_KIND:
+          Games.Achievements.unlock(
+              games_client, getString(R.string.achievement_a_legend_among_your_kind_but_not_mine)
+          );
           break;
       }
 
@@ -420,7 +416,15 @@ public class MainActivity
           Games.Achievements.increment(games_client, getString(R.string.achievement_craftsman), 1);
           break;
         case MASTER_CRAFTSMAN:
-          Games.Achievements.increment(games_client, getString(R.string.master_craftsman), 1);
+          Games.Achievements.increment(
+              games_client, getString(R.string.achievement_master_craftsman), 1
+          );
+          break;
+        case GOOD_SPORT:
+          Games.Achievements.increment(games_client, getString(R.string.achievement_good_sport), 1);
+          break;
+        case PENTAWIN:
+          Games.Achievements.increment(games_client, getString(R.string.achievement_pentawin), 1);
           break;
       }
 
@@ -440,119 +444,28 @@ public class MainActivity
       }
   }
 
-
-  public static class Bluetooth_Writing_Thread extends AsyncTask<Byte [], Integer, Boolean> {
-
-    public Bluetooth_Writing_Thread(Context main, BluetoothSocket socket) {
-      context = main;
-      bt_socket = socket;
-    }
-
-    @Override
-    protected Boolean doInBackground(Byte[] ...params) {
-      try {
-        bt_output_stream = bt_socket.getOutputStream();
-        int n = params[0][0];
-        byte [] info = new byte [2*n + 1];
-        info[0] = (byte) n;
-        for (int i = 0; i < 2*n; ++i)
-          info[i + 1] = params[0][i + 1];
-        bt_output_stream.write(info);
-        success = true;
-        failure_message = "";
+  /**
+   * This method will be invoked when the dialog is canceled.
+   *
+   * @param dialog The dialog that was canceled will be passed into the
+   *               method.
+   */
+  @Override
+  public void onCancel(DialogInterface dialog) {
+    if (dialog == bt_waiting_to_host_dialog) {
+      bt_waiting_to_host_dialog.dismiss();
+      if (communication_socket != null) try {
+        communication_socket.close();
+        communication_socket = null;
       } catch (IOException e) {
-        success = false;
-        failure_message = e.getMessage();
-      }
-      return success;
-    }
-
-    @Override
-    public void onPostExecute(Boolean success) {
-      if (!success) {
-        String message = context.getString(R.string.bt_failed_to_write) + " " + failure_message;
-        new AlertDialog.Builder(context).setTitle(context.getString(R.string.no_bluetooth_title))
-            .setMessage(message)
-            .setPositiveButton(context.getString(R.string.understood), null)
-            .show();
+        // I really don't understand the point of this
       }
     }
-
-    OutputStream bt_output_stream;
-    BluetoothSocket bt_socket;
-    Context context;
-    boolean success;
-    String failure_message;
-
   }
 
-  public static class Bluetooth_Reading_Thread extends AsyncTask<Object, Integer, Boolean> {
+  public class BT_Setup_Thread extends Thread {
 
-    public Bluetooth_Reading_Thread(
-        Context main, BluetoothSocket socket, BTR_Listener listener, boolean show_dialog
-    ) {
-      context = main;
-      bt_socket = socket;
-      notify = listener;
-      show_progress_dialog = show_dialog;
-    }
-
-    @Override
-    protected Boolean doInBackground(Object ...params) {
-      try {
-        bt_input_stream = bt_socket.getInputStream();
-        size = bt_input_stream.read(info);
-        success = true;
-        failure_message = "";
-      } catch (IOException e) {
-        success = false;
-        failure_message = e.getMessage();
-      }
-      return success;
-    }
-
-    @Override
-    public void onPreExecute() {
-      if (show_progress_dialog) {
-        progress_dialog = new ProgressDialog(context);
-        progress_dialog.setTitle(context.getString(R.string.bt_progress_title));
-        progress_dialog.setMessage(context.getString(R.string.bt_progress_message));
-        progress_dialog.setIndeterminate(true);
-        progress_dialog.setCancelable(false);
-        progress_dialog.show();
-      }
-    }
-
-    @Override
-    public void onPostExecute(Boolean success) {
-      if (show_progress_dialog)
-        progress_dialog.dismiss();
-      if (success)
-        notify.received_data(size, info);
-      else {
-        String message = context.getString(R.string.bt_failed_to_write) + " " + failure_message;
-        new AlertDialog.Builder(context).setTitle(context.getString(R.string.no_bluetooth_title))
-            .setMessage(message)
-            .setPositiveButton(context.getString(R.string.understood), null)
-            .show();
-      }
-    }
-
-    ProgressDialog progress_dialog;
-    InputStream bt_input_stream;
-    BluetoothSocket bt_socket;
-    BTR_Listener notify;
-    Context context;
-    boolean success, show_progress_dialog = false;
-    final byte [] info = new byte[21];
-    int size;
-    String failure_message;
-
-  }
-
-  public class Bluetooth_Setup_Thread extends Thread {
-
-    public Bluetooth_Setup_Thread(MainActivity my_context) { context = my_context; }
+    public BT_Setup_Thread(MainActivity my_context) { context = my_context; }
 
     public void disconnect() {
       try {
@@ -560,51 +473,6 @@ public class MainActivity
       } catch (Exception e) {
         // I don't care at this point
       }
-    }
-
-    public void start_hosting() {
-
-      i_am_hosting = true;
-      host_or_join_dialog.dismiss();
-      BluetoothServerSocket server = null;
-      try {
-        server = bt_adapter.listenUsingInsecureRfcommWithServiceRecord(
-            "Ideal Nim", UUID.fromString(my_uuid)
-        );
-        server_socket = server;
-      } catch (IOException e) {
-        String message = getString(R.string.bt_unable_to_host) + " " + e.getMessage();
-        Log.d(tag, message, e);
-        new AlertDialog.Builder(context).setTitle(R.string.no_bluetooth_title)
-            .setMessage(message)
-            .setPositiveButton(R.string.understood, context)
-            .show();
-      }
-
-      if (server_socket != null) {
-        BluetoothSocket socket = null;
-        try {
-          socket = server_socket.accept();
-          communication_socket = socket;
-          server_socket.close();
-        } catch (IOException e) {
-          String message = getString(R.string.bt_unable_to_host) + " " + e.getMessage();
-          Log.d(tag, message, e);
-          new AlertDialog.Builder(context).setTitle(R.string.no_bluetooth_title)
-              .setMessage(message)
-              .setPositiveButton(R.string.understood, context)
-              .show();
-        }
-        if (communication_socket.isConnected())
-          ((Playfield) findViewById(R.id.playfield)).setup_human_game(communication_socket, true);
-         else {
-           new AlertDialog.Builder(context).setTitle(R.string.no_bluetooth_title)
-              .setMessage(R.string.bt_unable_to_open_stream)
-              .setPositiveButton(R.string.understood, context)
-              .show();
-        }
-      }
-
     }
 
     public void join_game(int which_device) {
@@ -689,16 +557,103 @@ public class MainActivity
 
   }
 
+  private class Host_Thread extends AsyncTask<Object, Integer, Boolean> {
+
+    public Host_Thread(MainActivity main) { context = main; }
+
+    /**
+     * Runs on the UI thread before {@link #doInBackground}.
+     *
+     * @see #onPostExecute
+     * @see #doInBackground
+     */
+    @Override
+    protected void onPreExecute() {
+      super.onPreExecute();
+      bt_waiting_to_host_dialog = new ProgressDialog(context);
+      bt_waiting_to_host_dialog.setTitle(R.string.bt_waiting_to_host_title);
+      bt_waiting_to_host_dialog.setMessage(getString(R.string.bt_waiting_to_host_message));
+      bt_waiting_to_host_dialog.setIndeterminate(true);
+      bt_waiting_to_host_dialog.show();
+    }
+
+    /**
+     * <p>Runs on the UI thread after {@link #doInBackground}. The
+     * specified result is the value returned by {@link #doInBackground}.</p>
+     * <p>
+     * <p>This method won't be invoked if the task was cancelled.</p>
+     *
+     * @param aBoolean The result of the operation computed by {@link #doInBackground}.
+     * @see #onPreExecute
+     * @see #doInBackground
+     * @see #onCancelled(Object)
+     */
+    @Override
+    protected void onPostExecute(Boolean aBoolean) {
+      super.onPostExecute(aBoolean);
+      bt_waiting_to_host_dialog.dismiss();
+      if (communication_socket.isConnected())
+        context.start_human_game();
+    }
+
+    @Override
+    protected Boolean doInBackground(Object[] params) {
+
+      i_am_hosting = true;
+      host_or_join_dialog.dismiss();
+      BluetoothServerSocket server = null;
+      try {
+        server = bt_adapter.listenUsingInsecureRfcommWithServiceRecord(
+            "Ideal Nim", UUID.fromString(my_uuid)
+        );
+        server_socket = server;
+      } catch (IOException e) {
+        String message = getString(R.string.bt_unable_to_host) + " " + e.getMessage();
+        Log.d(tag, message, e);
+        new AlertDialog.Builder(context).setTitle(R.string.no_bluetooth_title)
+            .setMessage(message)
+            .setPositiveButton(R.string.understood, context)
+            .show();
+      }
+
+      if (server_socket != null) {
+        BluetoothSocket socket = null;
+        try {
+          socket = server_socket.accept();
+          communication_socket = socket;
+          server_socket.close();
+        } catch (IOException e) {
+          String message = getString(R.string.bt_unable_to_host) + " " + e.getMessage();
+          Log.d(tag, message, e);
+          new AlertDialog.Builder(context).setTitle(R.string.no_bluetooth_title)
+              .setMessage(message)
+              .setPositiveButton(R.string.understood, context)
+              .show();
+        }
+        if (!communication_socket.isConnected()) {
+          new AlertDialog.Builder(context).setTitle(R.string.no_bluetooth_title)
+              .setMessage(R.string.bt_unable_to_open_stream)
+              .setPositiveButton(R.string.understood, context)
+              .show();
+        }
+      }
+
+      return null;
+    }
+
+    private MainActivity context;
+  }
+
   public boolean is_two_player_game() { return two_player_game; }
 
   public void two_player_game_ended() {
     two_player_game = false;
-    if (communication_socket.isConnected()) {
+    if (communication_socket != null && communication_socket.isConnected()) {
       if (i_host_the_game()) {
-        Bluetooth_Reading_Thread bt_thread = new Bluetooth_Reading_Thread(this, communication_socket, this, false);
+        BT_Reading_Thread bt_thread = new BT_Reading_Thread(this, communication_socket, this, false);
         bt_thread.execute();
       } else {
-        Bluetooth_Writing_Thread bt_thread = new Bluetooth_Writing_Thread(this, communication_socket);
+        BT_Writing_Thread bt_thread = new BT_Writing_Thread(this, communication_socket);
         Byte[] ack = new Byte[3];
         ack[0] = 1; ack[1] = 0; ack[2] = 0;
         bt_thread.execute(ack);
@@ -720,9 +675,9 @@ public class MainActivity
     EVERYONE_GETS_A_TROPHY,
     HONORABLE_MENTION,
     ONE_HAND_BEHIND_MY_BACK,
-    WON_LEVEL_3,
-    WON_LEVEL_4,
     WON_LEVEL_5,
+    WON_LEVEL_7,
+    WON_LEVEL_9,
     FAIR_PLAY,
     PATIENCE_A_VIRTUE,
     CHANGED_BOARD_SIZE,
@@ -730,7 +685,11 @@ public class MainActivity
     JOURNEYMAN,
     CRAFTSMAN,
     MASTER_CRAFTSMAN,
-    DOCTOR_OF_IDEAL_NIM
+    DOCTOR_OF_IDEAL_NIM,
+    GOOD_SPORT,
+    ONLY_HUMAN,
+    PENTAWIN,
+    LEGEND_AMONG_KIND
   };
 
   // bluetooth services
@@ -740,8 +699,9 @@ public class MainActivity
   private AlertDialog bluetooth_dialog = null, host_or_join_dialog = null;
   private BluetoothServerSocket server_socket = null;
   private BluetoothSocket communication_socket = null;
-  private Bluetooth_Setup_Thread bt_thread = null;
+  private BT_Setup_Thread bt_thread = null;
   protected boolean i_am_hosting, two_player_game = false;
+  ProgressDialog bt_waiting_to_host_dialog = null;
 
   private String tag = "Main activity";
 

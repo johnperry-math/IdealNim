@@ -1,21 +1,8 @@
 package name.cantanima.idealnim;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.LinkedList;
-import java.util.Set;
-
-import name.cantanima.idealnim.MainActivity.Bluetooth_Reading_Thread;
-import name.cantanima.idealnim.MainActivity.Bluetooth_Writing_Thread;
-import name.cantanima.idealnim.BTR_Listener;
 
 /**
  * Created by cantanima on 9/2/17.
@@ -34,7 +21,7 @@ public class Human_Opponent extends Opponent implements BTR_Listener {
 
   @Override
   public void choose_a_position() {
-    Bluetooth_Reading_Thread bt_reader = new Bluetooth_Reading_Thread(
+    BT_Reading_Thread bt_reader = new BT_Reading_Thread(
         overall_context, bt_socket, this, true
     );
     bt_reader.execute();
@@ -45,7 +32,7 @@ public class Human_Opponent extends Opponent implements BTR_Listener {
     bt_raw_data[0] = (byte) 1;
     bt_raw_data[1] = (byte) i;
     bt_raw_data[2] = (byte) j;
-    Bluetooth_Writing_Thread bt_writer = new Bluetooth_Writing_Thread(overall_context, bt_socket);
+    BT_Writing_Thread bt_writer = new BT_Writing_Thread(overall_context, bt_socket);
     bt_writer.execute(bt_raw_data);
     super.update_with_position(i, j);
   }

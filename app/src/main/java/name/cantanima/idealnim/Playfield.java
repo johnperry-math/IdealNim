@@ -12,7 +12,6 @@ import android.graphics.Path;
 import android.graphics.Shader;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,15 +21,10 @@ import android.widget.SeekBar;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import name.cantanima.idealnim.Game_Control.Player_Kind;
-import name.cantanima.idealnim.MainActivity.Bluetooth_Reading_Thread;
-import name.cantanima.idealnim.MainActivity.Bluetooth_Writing_Thread;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.BLUE;
@@ -42,7 +36,6 @@ import static android.graphics.Paint.Style.STROKE;
 import static android.view.MotionEvent.ACTION_DOWN;
 import static android.view.MotionEvent.ACTION_MOVE;
 import static android.view.MotionEvent.ACTION_UP;
-import static name.cantanima.idealnim.Game_Control.Dialog_Id.NEW_GAME;
 import static name.cantanima.idealnim.Game_Control.Player_Kind.COMPUTER;
 import static name.cantanima.idealnim.Game_Control.Player_Kind.HUMAN;
 import static name.cantanima.idealnim.Position.ORIGIN;
@@ -87,9 +80,9 @@ public class Playfield
         editor.remove(context.getString(R.string.everyone_get_a_trophy));
         editor.remove(context.getString(R.string.honorable_mention));
         editor.remove(context.getString(R.string.one_hand_behind_my_back));
-        editor.remove(context.getString(R.string.won_level_3));
-        editor.remove(context.getString(R.string.won_level_4));
         editor.remove(context.getString(R.string.won_level_5));
+        editor.remove(context.getString(R.string.won_level_7));
+        editor.remove(context.getString(R.string.won_level_9));
         editor.remove(context.getString(R.string.fair_play));
         editor.remove(context.getString(R.string.patience_a_virtue));
         editor.remove(context.getString(R.string.apprentice));
@@ -395,7 +388,10 @@ public class Playfield
       last_played_position = new Position(i, j);
     }
 
-    game_control.set_player_kind(HUMAN);
+    if (!playable.equals(played))
+      game_control.set_player_kind(HUMAN);
+    else
+      game_control.notify_game_over();
 
   }
 
@@ -410,11 +406,13 @@ public class Playfield
     last_played_position = P;
     if (!playable.equals(played))
      game_control.set_player_kind(HUMAN);
-    else game_control.notify_game_over();
+    else
+      game_control.notify_game_over();
   }
 
   public void setup_human_game(BluetoothSocket socket, boolean i_am_hosting) {
 
+    kind_of_opponent = HUMAN;
     Human_Opponent other = new Human_Opponent(getContext(), playable, null, game_level);
     opponent = other;
     other.acquired_human_opponent(socket);
@@ -429,13 +427,13 @@ public class Playfield
         bt_ideal_raw[i + 1] = (byte) P.get_y();
         i += 2;
       }
-      Bluetooth_Writing_Thread writing_thread = new Bluetooth_Writing_Thread(getContext(), socket);
+      BT_Writing_Thread writing_thread = new BT_Writing_Thread(getContext(), socket);
       writing_thread.execute(bt_ideal_raw);
       game_control.set_player_kind(COMPUTER);
       opponent.choose_a_position();
     } else {
-      Bluetooth_Reading_Thread reading_thread =
-          new Bluetooth_Reading_Thread(getContext(), socket, this, false);
+      BT_Reading_Thread reading_thread =
+          new BT_Reading_Thread(getContext(), socket, this, false);
       reading_thread.execute();
     }
 

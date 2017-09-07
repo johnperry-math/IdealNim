@@ -4,7 +4,7 @@
     <string name="app_version">0.3</string>
 
     <string name="action_bar_settings">Settings</string>
-    <string name="action_bar_info">Information</string>
+    <string name="action_bar_info">Help</string>
     <string name="action_bar_achievements">Achievements</string>
     <string name="action_bar_twoplayer">Two-player game</string>
 
@@ -184,6 +184,7 @@
     <!-- Sign-in -->
     <string name="sign_in">Sign in</string>
     <string name="sign_in_why">Sign in to enable achievements!</string>
+    <string name="signed_in_as">Signed in as</string>
     <string name="sign_out">Sign out</string>
     <string name="understood">Understood</string>
 

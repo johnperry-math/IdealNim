@@ -4,26 +4,26 @@
       tools:context="name.cantanima.idealnim.MainActivity">
     <item
         android:id="@+id/action_achievements"
-        android:icon="@android:drawable/ic_menu_myplaces"
+        android:icon="@drawable/ic_grade_black_24dp"
         android:orderInCategory="100"
         android:title="@string/action_bar_achievements"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="always"/>
     <item
         android:id="@+id/action_twoplayer"
-        android:icon="@android:drawable/ic_menu_share"
+        android:icon="@drawable/ic_people_black_24dp"
         android:orderInCategory="100"
         android:title="@string/action_bar_twoplayer"
         app:showAsAction="always"/>
     <item
         android:id="@+id/action_settings"
-        android:icon="@android:drawable/ic_menu_preferences"
+        android:icon="@drawable/ic_settings_black_24dp"
         android:orderInCategory="101"
         android:title="@string/action_bar_settings"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/action_information"
-        android:icon="@android:drawable/ic_menu_help"
+        android:icon="@drawable/ic_help_black_24dp"
         android:orderInCategory="300"
         android:title="@string/action_bar_info"
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom"/>
 </menu>

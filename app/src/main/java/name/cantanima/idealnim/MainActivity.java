@@ -331,7 +331,7 @@ public class MainActivity
     sign_out_button.setVisibility(VISIBLE);
     sign_in_button.setVisibility(INVISIBLE);
     Player p = Games.Players.getCurrentPlayer(games_client);
-    sign_in_message_view.setText(p.getDisplayName());
+    sign_in_message_view.setText(getString(R.string.signed_in_as) + " " + p.getName());
   }
 
   @Override

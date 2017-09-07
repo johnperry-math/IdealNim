@@ -266,7 +266,9 @@ public class Computer_Opponent extends Opponent {
       }
       if (result) zero_position = S;
 
-    }
+    } else // case of degenerate ideal
+
+      zero_position = S;
 
     return result;
 

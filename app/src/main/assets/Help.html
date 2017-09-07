@@ -3,6 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Ideal Nim</title>
+    <style>
+        body {
+            background: rgb(224, 224, 240) none repeat scroll 0% 50%;
+            border: 4px groove rgb(204, 204, 204);
+            border-radius: 10px;
+            padding: 4px;
+            font-family: serif;
+        }
+    </style>
 </head>
 <body>
 <a name="top"/><h1>Ideal Nim</h1>
@@ -16,8 +25,8 @@
 
 <h2><a name="idea">The idea</a> </h2>
 
-Ideal Nim is a very simple example of an
-&ldquo;impartial, two-player, perfect-information, combinatorial game&rdquo;
+<img style="float:right;" src="screenshot_for_help_opening.png" width="33%">
+Ideal Nim is an &ldquo;impartial, two-player, perfect-information, combinatorial game&rdquo;
 that challenges the mind while illustrating some advanced mathematical ideas.
 It can be difficult to defeat the computer even when you know what you&rsquo;re doing,
 so when you manage it you should be proud of yourself.
@@ -42,21 +51,45 @@ This section is divided into two subsections:
 <h3><a name="basic">Basic gameplay</a></h3>
 A game of Ideal Nim takes place on a finite gameboard
 (but see a remark in the <a href="#options">discussion of options</a>).
+<p align="center"><img align="center" src="screenshot_for_help_no_moves.png" width="50%"></p>
 Gameplay consists in selecting valid squares.
 Once a player selects a valid square,
 all squares &ldquo;northeast&rdquo; of it become invalid.
+Initially, valid positions are colored <span style="color:blue;">blue</span>,
+while invalid positions are colored <span style="color:red;">red</span> or
+<span style="color:#ff8000;">orange</span>,
+depending on whether the invalid square is <span style="color:red;">unplayable</span> or
+<span style="color:#ff8000;">already played</span>.
+This can be changed in the preferences.
+<p/>
 To help identify valid and invalid squares,
 you can drag your finger across the board, and the square underneath it
 will change color according to whether the square is valid.
 By default, black is invalid, but you can change this in the <a href="#options">Options</a>.
 <p/>
-<center><b><i>The player who takes the last valid square wins.</i></b></center>
+<table width="75%" align="center"><tbody>
+<tr>
+    <td align="center"><img src="screenshot_for_help_valid_move_crop.png" width="100%"></td>
+    <td align="center"><img src="screenshot_for_help_invalid_move_played_crop.png" width="100%"></td>
+    <td align="center"><img src="screenshot_for_help_invalid_move_unplayable_crop.png" width="100%"></td>
+</tr>
+<tr>
+    <td align="center">valid</td>
+    <td align="center">invalid (played)</td>
+    <td align="center">invalid (unplayable)</td>
+</tr>
+</tbody></table>
 <p/>
-(Initially, valid positions are colored <span style="color:blue;">blue</span>,
-while invalid positions are colored <span style="color:red;">red</span>.
-This can be changed in the preferences.)
+Notice that the last played position is highlighted;
+this makes clear which position your opponent chose.
+<p/>
+<center>
+    <b><i>The player who takes the last valid square wins:</i></b><p/>
+    <img src="screenshot_for_game_over_crop.png" width="50%">
+</center>
 
 <h3><a name="hints">Hints and game values</a></h3>
+<p align="center"><img src="screenshot_for_hint_and_value_crop.png"></p>
 On odd-numbered levels, when you play the computer, you can ask for a hint, and
 the computer will mark the square it would choose.
 (Hints are not available when playing a human.)
@@ -78,6 +111,7 @@ it is not strictly necessary.
 (You can read more about <a href="https://en.wikipedia.org/wiki/Nimber">nimbers</a> if you like.)
 
 <h3><a name="thinking">&ldquo;Thinking&rdquo;</a></h3>
+<p align="center"><img src="screenshot_for_help_computer_thinks_crop.png" align="center"></p>
 Before the computer can move or give you a hint (assuming you ask for one)
 it has to analyze the game board. This is both good news and bad news.
 <p/>
@@ -101,6 +135,7 @@ with caution.
 <h3><a name="human">Playing a human</a></h3>
 You can play a nearby human using Bluetooth!
 To do so, touch the two-player icon in the toolbar.
+<p align="center"><img src="people.png"></p>
 The app will automatically enable Bluetooth if it is available on your device,
 but you can only play a device with which you are already paired,
 and the app will not pair two devices for you.
@@ -126,7 +161,8 @@ You can do that in your device&rsquo;s Settings (<i>not</i> the app&rsquo;s Opti
 
 If you select the &ldquo;Settings&rdquo; (wrench) icon in the toolbar, several options will appear,
 along with some explanations. Here&rsquo;s a little more detail on how they work.
-
+<p/>
+<img style="float:right;" src="screenshot_for_settings.png" width="40%"><p/>
 <ul>
     <li> <b>One arm behind my back</b> &mdash;
         If a winning move is available, the computer will find it.

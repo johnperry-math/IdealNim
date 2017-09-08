@@ -58,6 +58,13 @@
         Unable to join game.
         Make sure the desired device is close by and knows it should be hosting a game.
     </string>
+    <string name="bt_unable_to_connect">
+        Unable to open a connection to the device.
+        This could be due to a bug in some versions of Android.
+        Try either (1) enabling Bluetooth before starting Ideal Nim, or
+        (2) going into the device Settings and un-pairing (also called &#8220;forgetting&#8221;)
+        any other paired devices, so that you are paired only with the opponent&#8217;s device.
+    </string>
     <string name="bt_unable_to_open_stream">
         Encountered an error when opening an input stream or when opening an output stream.
     </string>
@@ -69,36 +76,36 @@
         Unable to read a message from the other device.
         Your best option from here is probably to start a new game.
     </string>
-    <string name="bt_progress_title">Listening</string>
+    <string name="bt_progress_title">Wait your turn</string>
     <string name="bt_progress_message">Waiting for opponent to choose a position.</string>
-    <string name="bt_waiting_to_host_title">Listening</string>
+    <string name="bt_waiting_to_host_title">Host seeks client</string>
     <string name="bt_waiting_to_host_message">Waiting for an opponent to join the game.</string>
 
     <string name="game_over">Game over!</string>
     <string name="computer_won">I won!&#160;</string>
     <string-array name="lose_insults">
-        <item>You lost to an Android playing with &#8220;One arm behind my back&#8221;! Embarrassing, isn&#8217;t it?</item>
-        <item>But of course: my brain is much smaller than yours. Bigger ain&#8217;t always better!</item>
-        <item>That&#8217;s understandable: I can think several billion thoughts a second. Whereas you&#8230; well, keep the day job.</item>
+        <item>Even though I was playing with &#8220;One arm behind my back&#8221;! I&#8217;m telling all my Droid friends about this!</item>
+        <item>Yes! Yes! I won! Who&#8217;s The Droid? I&#8217;m The Droid! Yes!</item>
+        <item>But of course: my brain is much smaller than yours. Who says bigger is always better? Not a Droid!</item>
+        <item>As Descartes wrote, &#8220;I think, therefore I am.&#8221; I think several billion times a second. Whereas you&#8320; Uhm, are you sure you exist?</item>
         <item>It&#8217;s alright to cry uncle, and ask for a hint. Then again, sometimes there&#8217;s no useful hint to be had. Or maybe Uncle just doesn&#8217;t care.</item>
-        <item>Changing levels might give you an advantage. <b>Might.</b> (Snicker.)</item>
-        <item>You should spend more time with books than with Android. I recommend &#8220;Winning Ways for Your Mathematical Plays&#8221;.</item>
+        <item>Maybe you should lay off the video games and hit the books. I recommend &#8220;Winning Ways for Your Mathematical Plays&#8221;.</item>
     </string-array>
     <string name="player_won">You won!&#160;</string>
     <string-array name="win_insults">
         <item>I wouldn&#8217;t brag too loud, were I you. I mean, come on, I was playing with &#8220;One arm behind my back&#8221;.</item>
+        <item>You rotten, dirty, no-account, lowlife, cheating scoundrel! I don&#8217;t know what you did, but it ain&#8217;t fair!</item>
         <item>Yeah, well, even a blind squirrel finds an acorn sometimes.</item>
-        <item>Did you disassemble my bytecode?</item>
-        <item>Made heavy use of that Hint button, dincha?</item>
-        <item>Changed the level to cheat your way to victory, dincha?</item>
-        <item>You spent so much time with &#8220;Winning Ways for Your Mathematical Plays&#8221; that you killed your social life, didn&#8217;t you?</item>
+        <item>Obviously you disassembled my bytecode and analyzed it to find the winning strategy. Not very sporting!</item>
+        <item>I&#8217;m so embarrassed. How can I face my friends after losing to a human?</item>
+        <item>You obviously spent too much time with &#8220;Winning Ways for Your Mathematical Plays.&#8221; You won the game, but lost your social life, didn&#8217;t you?</item>
     </string-array>
     <string name="two_player_won">
-        You won! We make a great team, don&#8217;t we? Let&#8217;s take that clown on again!
+        You won! We make a great team, don&#8217;t we? Let&#8217;s take on that Droid again, show &#8217;em who&#8217;s boss!
     </string>
     <string name="two_player_lost">
-        Your opponent won! Maybe you should practice more?
-        I&#8217;m always available to put you in your place.
+        Your opponent won! Now you&#8217;ve lost face. Maybe practice more?
+        I&#8217;ll put you in your place.
     </string>
     <string name="two_player_won_lost">
         (The two devices are no longer connected.
@@ -106,8 +113,8 @@
     </string>
     <string name="play_again">&#160;Start a new game, with the same settings?</string>
     <string name="another_game">New game!</string>
-    <string name="dont_play_again_win">Contemplate victory.</string>
-    <string name="dont_play_again_lose">Gaze upon the ruins.</string>
+    <string name="dont_play_again_win">View my victory.</string>
+    <string name="dont_play_again_lose">Regard the ruins.</string>
 
     <string name="thinking">Thinking</string>
     <string name="please_wait">Please wait...</string>

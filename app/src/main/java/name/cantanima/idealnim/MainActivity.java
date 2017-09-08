@@ -28,6 +28,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.Player;
 
+import static android.bluetooth.BluetoothAdapter.STATE_ON;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static com.google.android.gms.common.ConnectionResult.SUCCESS;
@@ -295,7 +296,6 @@ public class MainActivity
       } else {
         // connect to device
         bt_thread.join_game(which);
-        //((Playfield) findViewById(R.id.playfield)).start_game(HUMAN);
       }
     } else if (dialog == host_or_join_dialog) {
       two_player_game = true;
@@ -493,22 +493,21 @@ public class MainActivity
       }
 
       if (communication_socket != null) {
-        bt_adapter.cancelDiscovery();
         try {
           communication_socket.connect();
+          if (communication_socket.isConnected())
+            ((Playfield) findViewById(R.id.playfield)).setup_human_game(communication_socket, false);
+          else {
+            new AlertDialog.Builder(context).setTitle(R.string.no_bluetooth_title)
+                .setMessage(R.string.bt_unable_to_open_stream)
+                .setPositiveButton(R.string.understood, context)
+                .show();
+          }
         } catch (IOException e) {
-          String message = getString(R.string.bt_unable_to_join) + " " + e.getMessage();
+          String message = getString(R.string.bt_unable_to_connect) + " " + e.getMessage();
           Log.d(tag, message, e);
           new AlertDialog.Builder(context).setTitle(R.string.no_bluetooth_title)
               .setMessage(message)
-              .setPositiveButton(R.string.understood, context)
-              .show();
-        }
-        if (communication_socket.isConnected())
-          ((Playfield) findViewById(R.id.playfield)).setup_human_game(communication_socket, false);
-        else {
-          new AlertDialog.Builder(context).setTitle(R.string.no_bluetooth_title)
-              .setMessage(R.string.bt_unable_to_open_stream)
               .setPositiveButton(R.string.understood, context)
               .show();
         }
@@ -592,6 +591,12 @@ public class MainActivity
     protected void onPostExecute(Boolean aBoolean) {
       super.onPostExecute(aBoolean);
       bt_waiting_to_host_dialog.dismiss();
+      try {
+        server_socket.close();
+      } catch (IOException e) {
+        // don't care now
+      }
+      Log.d(tag, "disconnected server socket");
       if (communication_socket.isConnected())
         context.start_human_game();
     }
@@ -621,7 +626,6 @@ public class MainActivity
         try {
           socket = server_socket.accept();
           communication_socket = socket;
-          server_socket.close();
         } catch (IOException e) {
           String message = getString(R.string.bt_unable_to_host) + " " + e.getMessage();
           Log.d(tag, message, e);

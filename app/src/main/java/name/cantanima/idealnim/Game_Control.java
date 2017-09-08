@@ -148,7 +148,7 @@ public class Game_Control implements DialogInterface.OnClickListener {
         String[] insults = main_activity.getResources().getStringArray(R.array.lose_insults);
         if (playfield.computer_sometimes_dumb && random.nextBoolean()) insult = insults[0];
         else insult = insults[random.nextInt(insults.length - 1) + 1];
-        message = main_activity.getString(R.string.player_won) + insult;
+        message = main_activity.getString(R.string.computer_won) + insult;
       }
       last_builder.setNegativeButton(main_activity.getString(R.string.dont_play_again_lose), this);
     } else {

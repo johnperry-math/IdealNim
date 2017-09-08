@@ -9,9 +9,9 @@ Save this file as res/values/games-ids.xml in your project.
     <string name="achievement_everyone_gets_a_trophy" translatable="false">CgkI5LCzr9YbEAIQDg</string>
     <string name="achievement_honorable_mention" translatable="false">CgkI5LCzr9YbEAIQAQ</string>
     <string name="achievement_0ne_hand_behind_my_back" translatable="false">CgkI5LCzr9YbEAIQAg</string>
-    <string name="achievement_won_a_game_at_level_5" translatable="false">CgkI5LCzr9YbEAIQAw</string>
-    <string name="achievement_won_a_game_at_level_7" translatable="false">CgkI5LCzr9YbEAIQBA</string>
-    <string name="achievement_won_a_game_at_level_9" translatable="false">CgkI5LCzr9YbEAIQBQ</string>
+    <string name="achievement_won_a_game_against_the_computer_at_level_5" translatable="false">CgkI5LCzr9YbEAIQAw</string>
+    <string name="achievement_won_a_game_against_the_computer_at_level_7" translatable="false">CgkI5LCzr9YbEAIQBA</string>
+    <string name="achievement_won_a_game_against_the_computer_at_level_9" translatable="false">CgkI5LCzr9YbEAIQBQ</string>
     <string name="achievement_fair_play_award" translatable="false">CgkI5LCzr9YbEAIQBg</string>
     <string name="achievement_patience_is_a_virtue" translatable="false">CgkI5LCzr9YbEAIQDQ</string>
     <string name="achievement_toyed_with_infinity" translatable="false">CgkI5LCzr9YbEAIQDw</string>
@@ -23,5 +23,5 @@ Save this file as res/values/games-ids.xml in your project.
     <string name="achievement_good_sport" translatable="false">CgkI5LCzr9YbEAIQEA</string>
     <string name="achievement_theyre_only_human" translatable="false">CgkI5LCzr9YbEAIQEQ</string>
     <string name="achievement_pentawin" translatable="false">CgkI5LCzr9YbEAIQEg</string>
-    <string name="achievement_a_legend_among_your_kind_but_not_mine" translatable="false">CgkI5LCzr9YbEAIQEw</string>
+    <string name="achievement_a_legend_among_your_kind" translatable="false">CgkI5LCzr9YbEAIQEw</string>
 </resources>

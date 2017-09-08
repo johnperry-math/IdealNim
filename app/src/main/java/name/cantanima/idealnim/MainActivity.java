@@ -78,14 +78,14 @@ public class MainActivity
     GoogleApiAvailability api_avail = GoogleApiAvailability.getInstance();
     int availability = api_avail.isGooglePlayServicesAvailable(this);
     if (availability == SUCCESS) {
-      Log.d(tag, "Play services available, version " + GOOGLE_PLAY_SERVICES_VERSION_CODE);
+      //Log.d(tag, "Play services available, version " + GOOGLE_PLAY_SERVICES_VERSION_CODE);
       games_client = new GoogleApiClient.Builder(this)
           .addConnectionCallbacks(this)
           .addOnConnectionFailedListener(this)
           .addApi(Games.API).addScope(Games.SCOPE_GAMES)
           .build();
     } else {
-      Log.d(tag, "Play services NOT available " + api_avail.isGooglePlayServicesAvailable(this));
+      //Log.d(tag, "Play services NOT available " + api_avail.isGooglePlayServicesAvailable(this));
       if (api_avail.isUserResolvableError(availability))
         api_avail.getErrorDialog(this, availability, PLAY_SERVICES_RESOLUTION_REQUEST).show();
     }
@@ -165,11 +165,11 @@ public class MainActivity
 
   @Override
   public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-    Log.d(tag, "Connection failed");
-    Log.d(tag, connectionResult.toString() + " " + String.valueOf(connectionResult.getErrorCode()));
-    if (resolving_failure)
-      Log.d(tag, "already resolving");
-    else if (sign_in_clicked || auto_start_signin) {
+    //Log.d(tag, "Connection failed");
+    //Log.d(tag, connectionResult.toString() + " " + String.valueOf(connectionResult.getErrorCode()));
+    if (resolving_failure) {
+      //Log.d(tag, "already resolving");
+    } else if (sign_in_clicked || auto_start_signin) {
       auto_start_signin = sign_in_clicked = false;
       resolving_failure = true;
       if (connectionResult.hasResolution()) {
@@ -201,19 +201,19 @@ public class MainActivity
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
-    Log.d(tag, "In activity result with code " + String.valueOf(resultCode));
+    //Log.d(tag, "In activity result with code " + String.valueOf(resultCode));
     if (requestCode == GAME_SIGN_IN_CODE || requestCode == PLAY_SERVICES_RESOLUTION_REQUEST) {
-      Log.d(tag, "activity result requests sign in");
+      //Log.d(tag, "activity result requests sign in");
       sign_in_clicked = false;
       resolving_failure = false;
       if (resultCode == RESULT_OK) {
-        Log.d(tag, "activity result OK, trying to connect");
+        //Log.d(tag, "activity result OK, trying to connect");
         games_client.connect();
       } else if (resultCode == RESULT_RECONNECT_REQUIRED) {
-        Log.d(tag, "reconnect required, retrying");
+        //Log.d(tag, "reconnect required, retrying");
         games_client.connect();
       } else if (resultCode == RESULT_CANCELED){
-        Log.d(tag, "canceled, disconnecting");
+        //Log.d(tag, "canceled, disconnecting");
         AlertDialog cancel_dialog = new AlertDialog.Builder(this)
             .setTitle(getString(R.string.conn_fail_title))
             .setMessage(getString(R.string.conn_fail_summ))
@@ -221,17 +221,17 @@ public class MainActivity
             .show();
         games_client.disconnect();
       } else {
-        Log.d(tag, "unsolved resolution");
+        //Log.d(tag, "unsolved resolution");
       }
     } else if (requestCode == REQUEST_ENABLE_BT) {
-      Log.d(tag, "bluetooth requests enable");
+      //Log.d(tag, "bluetooth requests enable");
       if (resultCode == RESULT_OK) {
-        Log.d(tag, "bluetooth enable OK");
+        //Log.d(tag, "bluetooth enable OK");
         if (bt_thread == null)
           bt_thread = new BT_Setup_Thread(this);
         bt_thread.host_or_join();
       } else if (resultCode == RESULT_CANCELED) {
-        Log.d(tag, "canceled, aborting");
+        //Log.d(tag, "canceled, aborting");
         new AlertDialog.Builder(this)
             .setTitle(R.string.no_bluetooth_title)
             .setMessage(getString(R.string.no_bluetooth_message) + " " +
@@ -241,12 +241,12 @@ public class MainActivity
             .show();
       }
     } else if (requestCode == REQUEST_HOST) {
-      Log.d(tag, "bluetooth requests host");
+      //Log.d(tag, "bluetooth requests host");
       if (resultCode == RESULT_OK) {
-        Log.d(tag, "bluetooth host ok");
+        //Log.d(tag, "bluetooth host ok");
         (new Host_Thread(this)).execute();
       } else {
-        Log.d(tag, "canceled hosting");
+        //Log.d(tag, "canceled hosting");
         new AlertDialog.Builder(this)
             .setTitle(R.string.no_bluetooth_title)
             .setMessage(getString(R.string.no_bluetooth_message) + " "
@@ -266,12 +266,12 @@ public class MainActivity
   @Override
   public void onClick(View v) {
     if (v == findViewById(R.id.sign_in_button)) {
-      Log.d(tag, "Logging into package" + getPackageName());
+      //Log.d(tag, "Logging into package" + getPackageName());
       sign_in_clicked = true;
       if (games_client != null) games_client.connect();
       if (games_client.isConnected()) onConnected(null);
     } else if (v == findViewById(R.id.sign_out_button)) {
-      Log.d(tag, "Logging out of package");
+      //Log.d(tag, "Logging out of package");
       sign_in_clicked = false;
       if (games_client != null) Games.signOut(games_client);
       sign_out_button.setVisibility(INVISIBLE);
@@ -327,7 +327,7 @@ public class MainActivity
   @Override
   public void onConnected(@Nullable Bundle bundle) {
     resolving_failure = false;
-    Log.d(tag, "connected!");
+    //Log.d(tag, "connected!");
     sign_out_button.setVisibility(VISIBLE);
     sign_in_button.setVisibility(INVISIBLE);
     Player p = Games.Players.getCurrentPlayer(games_client);
@@ -336,7 +336,7 @@ public class MainActivity
 
   @Override
   public void onConnectionSuspended(int i) {
-    Log.d(tag, "connection suspended, trying to reconnect");
+    //Log.d(tag, "connection suspended, trying to reconnect");
     if (games_client != null) games_client.connect();
   }
 
@@ -364,13 +364,13 @@ public class MainActivity
           Games.Achievements.unlock(games_client, getString(R.string.achievement_0ne_hand_behind_my_back));
           break;
         case WON_LEVEL_5:
-          Games.Achievements.unlock(games_client, getString(R.string.achievement_won_a_game_at_level_5));
+          Games.Achievements.unlock(games_client, getString(R.string.achievement_won_a_game_against_the_computer_at_level_5));
           break;
         case WON_LEVEL_7:
-          Games.Achievements.unlock(games_client, getString(R.string.achievement_won_a_game_at_level_7));
+          Games.Achievements.unlock(games_client, getString(R.string.achievement_won_a_game_against_the_computer_at_level_7));
           break;
         case WON_LEVEL_9:
-          Games.Achievements.unlock(games_client, getString(R.string.achievement_won_a_game_at_level_9));
+          Games.Achievements.unlock(games_client, getString(R.string.achievement_won_a_game_against_the_computer_at_level_9));
           break;
         case FAIR_PLAY:
           Games.Achievements.unlock(games_client, getString(R.string.achievement_fair_play_award));
@@ -391,7 +391,7 @@ public class MainActivity
           break;
         case LEGEND_AMONG_KIND:
           Games.Achievements.unlock(
-              games_client, getString(R.string.achievement_a_legend_among_your_kind_but_not_mine)
+              games_client, getString(R.string.achievement_a_legend_among_your_kind)
           );
           break;
       }
@@ -485,7 +485,7 @@ public class MainActivity
         communication_socket = socket;
       } catch (IOException e) {
         String message = getString(R.string.bt_unable_to_join) + " " + e.getMessage();
-        Log.d(tag, message, e);
+        //Log.d(tag, message, e);
         new AlertDialog.Builder(context).setTitle(R.string.no_bluetooth_title)
             .setMessage(message)
             .setPositiveButton(R.string.understood, context)
@@ -505,7 +505,7 @@ public class MainActivity
           }
         } catch (IOException e) {
           String message = getString(R.string.bt_unable_to_connect) + " " + e.getMessage();
-          Log.d(tag, message, e);
+          //Log.d(tag, message, e);
           new AlertDialog.Builder(context).setTitle(R.string.no_bluetooth_title)
               .setMessage(message)
               .setPositiveButton(R.string.understood, context)
@@ -596,7 +596,7 @@ public class MainActivity
       } catch (IOException e) {
         // don't care now
       }
-      Log.d(tag, "disconnected server socket");
+      //Log.d(tag, "disconnected server socket");
       if (communication_socket.isConnected())
         context.start_human_game();
     }
@@ -614,7 +614,7 @@ public class MainActivity
         server_socket = server;
       } catch (IOException e) {
         String message = getString(R.string.bt_unable_to_host) + " " + e.getMessage();
-        Log.d(tag, message, e);
+        //Log.d(tag, message, e);
         new AlertDialog.Builder(context).setTitle(R.string.no_bluetooth_title)
             .setMessage(message)
             .setPositiveButton(R.string.understood, context)
@@ -628,7 +628,7 @@ public class MainActivity
           communication_socket = socket;
         } catch (IOException e) {
           String message = getString(R.string.bt_unable_to_host) + " " + e.getMessage();
-          Log.d(tag, message, e);
+          //Log.d(tag, message, e);
           new AlertDialog.Builder(context).setTitle(R.string.no_bluetooth_title)
               .setMessage(message)
               .setPositiveButton(R.string.understood, context)
@@ -662,7 +662,7 @@ public class MainActivity
         ack[0] = 1; ack[1] = 0; ack[2] = 0;
         bt_thread.execute(ack);
       }
-      Log.d(tag, "closing socket");
+      //Log.d(tag, "closing socket");
     }
   }
 

@@ -63,7 +63,8 @@ public class MainActivity
     playfield.set_buttons_to_listen(
         new_game_button, value_textview, value_label, hint_button, view_seekbar, view_label
     );
-    playfield.start_game(COMPUTER);
+    if (!welcoming)
+      playfield.start_game(COMPUTER);
 
     sign_in_button = (SignInButton) findViewById(R.id.sign_in_button);
     sign_in_button.setOnClickListener(this);
@@ -90,6 +91,19 @@ public class MainActivity
         api_avail.getErrorDialog(this, availability, PLAY_SERVICES_RESOLUTION_REQUEST).show();
     }
 
+  }
+
+  public void show_welcome() {
+    welcoming = true;
+    welcome_dialog = new AlertDialog.Builder(this)
+        .setTitle(R.string.app_welcome_title)
+        .setMessage(
+            getString(R.string.app_welcome_message_start) +
+                " (v" + getString(R.string.app_version) + ") " +
+                getString(R.string.app_welcome_message_end)
+        )
+        .setPositiveButton(R.string.understood, this)
+        .show();
   }
 
   @Override
@@ -304,6 +318,9 @@ public class MainActivity
       } else {
         bt_thread.select_paired_device();
       }
+    } else if (dialog == welcome_dialog) {
+      welcoming = false;
+      ((Playfield) findViewById(R.id.playfield)).start_game(COMPUTER);
     }
 
   }
@@ -671,6 +688,8 @@ public class MainActivity
   private SignInButton sign_in_button;
   private TextView sign_in_message_view;
   private Button sign_out_button;
+  private AlertDialog welcome_dialog = null;
+  private boolean welcoming = false;
 
   // games services
   private int PLAY_SERVICES_RESOLUTION_REQUEST = 9200, REQUEST_ACHIEVEMENTS = 9300,

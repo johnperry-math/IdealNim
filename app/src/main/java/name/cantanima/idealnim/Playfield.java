@@ -77,21 +77,11 @@ public class Playfield
               )
       ) {
         SharedPreferences.Editor editor = pref.edit();
-        editor.remove(context.getString(R.string.everyone_get_a_trophy));
-        editor.remove(context.getString(R.string.honorable_mention));
-        editor.remove(context.getString(R.string.one_hand_behind_my_back));
-        editor.remove(context.getString(R.string.won_level_5));
-        editor.remove(context.getString(R.string.won_level_7));
-        editor.remove(context.getString(R.string.won_level_9));
-        editor.remove(context.getString(R.string.fair_play));
-        editor.remove(context.getString(R.string.patience_a_virtue));
-        editor.remove(context.getString(R.string.apprentice));
-        editor.remove(context.getString(R.string.journeyman));
-        editor.remove(context.getString(R.string.craftsman));
-        editor.remove(context.getString(R.string.master_craftsman));
-        editor.remove(context.getString(R.string.doctor_ideal_nim));
-        editor.putString(context.getString(R.string.version_pref), context.getString(R.string.app_version));
+        editor.putString(
+            context.getString(R.string.version_pref), context.getString(R.string.app_version)
+        );
         editor.apply();
+        ((MainActivity) context).show_welcome();
       }
       if (pref.contains(context.getString(R.string.level_pref)))
         game_level = pref.getInt(context.getString(R.string.level_pref), 1);

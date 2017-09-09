@@ -36,7 +36,7 @@ More information on this appears in the section on
 
 <h2><a name="gameplay"/>Gameplay</h2>
 
-This section is divided into two subsections:
+This section is divided into the following subsections:
 <ul>
     <li><a href="#basic">Basic gameplay</a></li>
     <li><a href="#hints">Hints and game values</a></li>
@@ -45,18 +45,34 @@ This section is divided into two subsections:
 </ul>
 
 <h3><a name="basic">Basic gameplay</a></h3>
-A game of Ideal Nim takes place on a finite gameboard
-(but see a remark in the <a href="#options">discussion of options</a>).
+A game of Ideal Nim takes place on a finite gameboard.
 <p align="center"><img align="center" src="screenshot_for_help_no_moves.png" width="50%"></p>
+In theory, the board could extend indefinitely to the northeast;
+that is, an &ldquo;ideal&rdquo; game of Ideal Nim has an infinite game board.
+In practice, this is impossible to implement, so the app limits the board size.
+The smallest board you can play on is 7&times;7, but you can extend it to 20&times;20.
+<p/>
+<table width="75%" align="center"><tbody>
+<tr>
+    <td align="center" width="50%"><img src="screenshot_for_help_highlighted_last_move.png" width="100%"></td>
+    <td align="center" width="50%"><img src="screenshot_for_altered_size.png" width="100%"></td>
+</tr>
+<tr><td colspan="2" align="center"><img src="screenshot_for_altered_size_detail.png" width="100%"></td></tr>
+</tbody></table>
+</p>
 Gameplay consists in selecting valid squares.
 Once a player selects a valid square,
 all squares &ldquo;northeast&rdquo; of it become invalid.
+<center>
+    <b><i>The player who takes the last valid square wins.</i></b><p/>
+    <img src="screenshot_for_game_over_crop.png" width="50%">
+</center>
 Initially, valid positions are colored <span style="color:blue;">blue</span>,
 while invalid positions are colored <span style="color:red;">red</span> or
 <span style="color:#ff8000;">orange</span>,
 depending on whether the invalid square is <span style="color:red;">unplayable</span> or
 <span style="color:#ff8000;">already played</span>.
-This can be changed in the preferences.
+You can change this in the <a href="#options">Options</a>.
 <p/>
 To help identify valid and invalid squares,
 you can drag your finger across the board, and the square underneath it
@@ -65,9 +81,9 @@ By default, black is invalid, but you can change this in the <a href="#options">
 <p/>
 <table width="75%" align="center"><tbody>
 <tr>
-    <td align="center"><img src="screenshot_for_help_valid_move_crop.png" width="100%"></td>
-    <td align="center"><img src="screenshot_for_help_invalid_move_played_crop.png" width="100%"></td>
-    <td align="center"><img src="screenshot_for_help_invalid_move_unplayable_crop.png" width="100%"></td>
+    <td align="center" width="33%"><img src="screenshot_for_help_valid_move_crop.png" width="100%"></td>
+    <td align="center" width="33%"><img src="screenshot_for_help_invalid_move_played_crop.png" width="100%"></td>
+    <td align="center" width="33%"><img src="screenshot_for_help_invalid_move_unplayable_crop.png" width="100%"></td>
 </tr>
 <tr>
     <td align="center">valid</td>
@@ -79,10 +95,6 @@ By default, black is invalid, but you can change this in the <a href="#options">
 Notice that the last played position is highlighted;
 this makes clear which position your opponent chose.
 <p/>
-<center>
-    <b><i>The player who takes the last valid square wins:</i></b><p/>
-    <img src="screenshot_for_game_over_crop.png" width="50%">
-</center>
 
 <h3><a name="hints">Hints and game values</a></h3>
 <p align="center"><img src="screenshot_for_hint_and_value_crop.png"></p>
@@ -94,8 +106,7 @@ If the position is playable, then it is a winning move; that is,
 <p/>
 Oftentimes, the computer will mark the lower left square, which is not playable!
 In these cases, <i>no move will guarantee a win</i>, and the computer would choose a random square.
-You might as well do the same&hellip; or employ one of at least two methods to cheat.
-(We drop hints on these methods here and there.)
+You might as well do the same.
 <p/>
 The computer will also indicate the game&rsquo;s <b>value</b>,
 which is a &ldquo;nimber&rdquo; (not a &ldquo;number&rdquo;).
@@ -156,7 +167,7 @@ You can do that in your device&rsquo;s Settings (<i>not</i> the app&rsquo;s Opti
 <h2><a name="options"/>Options</h2>
 
 If you select the &ldquo;Settings&rdquo; (wrench) icon in the toolbar, several options will appear,
-along with some explanations. Here&rsquo;s a little more detail on how they work.
+along with some explanations. Here&rsquo;s a little more detail on how some of them work.
 <p/>
 <img style="float:right;" src="screenshot_for_settings.png" width="40%"><p/>
 <ul>
@@ -186,15 +197,6 @@ along with some explanations. Here&rsquo;s a little more detail on how they work
         So, while ten levels are listed,
         there are really only five levels of different configurations.
         <p/>
-    </li>
-    <li>
-        <b>Board size</b> &mdash; In theory, the board could extend indefinitely to the northeast;
-        that is, an &ldquo;ideal&rdquo; game of Ideal Nim has an infinite game board.
-        In practice, this is impossible to implement, so the app limits the board size.
-        The smallest board you can play on is 7&times;7, but you can extend it to 20&times;20.
-        In some cases, this may allow you to snatch victory from the jaws of defeat,
-        as the computer&rsquo;s analysis is limited to much less than 20&times;20,
-        so in some cases it may prefer a position that is not, in fact, the best one!
     </li>
 </ul>
 

@@ -1,7 +1,18 @@
 <resources>
 
     <string name="app_name">Ideal Nim</string>
-    <string name="app_version">0.3</string>
+    <string name="app_version">1.0.2</string>
+    <string name="app_welcome_title">Welcome!</string>
+    <string name="app_welcome_message_start">
+        Thank you for trying Ideal Nim!
+    </string>
+    <string name="app_welcome_message_end">
+        On your turn, select a valid position.
+        Positions &#8220;northeast&#8221; of it will no longer be playable.
+        Then your opponent selects a position.
+        Whoever takes the last piece wins.
+        You can find more information via the &#8220;Help&#8221; item in the menu (a question mark).
+    </string>
 
     <string name="action_bar_settings">Settings</string>
     <string name="action_bar_info">Help</string>

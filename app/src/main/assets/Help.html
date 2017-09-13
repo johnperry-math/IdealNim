@@ -63,6 +63,10 @@ The smallest board you can play on is 7&times;7, but you can extend it to 20&tim
 Gameplay consists in selecting valid squares.
 Once a player selects a valid square,
 all squares &ldquo;northeast&rdquo; of it become invalid.
+<p/>
+Notice that the game highlights which squares the last played position removes;
+this makes clear which position your opponent chose.
+<p/>
 <center>
     <b><i>The player who takes the last valid square wins.</i></b><p/>
     <img src="screenshot_for_game_over_crop.png" width="50%">
@@ -91,10 +95,6 @@ By default, black is invalid, but you can change this in the <a href="#options">
     <td align="center">invalid (unplayable)</td>
 </tr>
 </tbody></table>
-<p/>
-Notice that the last played position is highlighted;
-this makes clear which position your opponent chose.
-<p/>
 
 <h3><a name="hints">Hints and game values</a></h3>
 <p align="center"><img src="screenshot_for_hint_and_value_crop.png"></p>
@@ -108,13 +108,15 @@ Oftentimes, the computer will mark the lower left square, which is not playable!
 In these cases, <i>no move will guarantee a win</i>, and the computer would choose a random square.
 You might as well do the same.
 <p/>
-The computer will also indicate the game&rsquo;s <b>value</b>,
+The computer will also indicate its estimation of the game&rsquo;s <b>value</b>,
 which is a &ldquo;nimber&rdquo; (not a &ldquo;number&rdquo;).
 Nimber arithmetic is consistent but unusual: you have
 4&nbsp;+&nbsp;2&nbsp;=&nbsp;6 and thus both
 6&nbsp;+&nbsp;2&nbsp;=&nbsp;4 and 4&nbsp;+&nbsp;6&nbsp;=&nbsp;2.
 While an understanding of nimber arithmetic will help you immensely,
 it is not strictly necessary.
+In any case, the computer can only guess at values of most unbounded configurations,
+so you should not usually rely on those.
 (You can read more about <a href="https://en.wikipedia.org/wiki/Nimber">nimbers</a> if you like.)
 
 <h3><a name="thinking">&ldquo;Thinking&rdquo;</a></h3>
@@ -142,7 +144,7 @@ with caution.
 <h3><a name="human">Playing a human</a></h3>
 You can play a nearby human using Bluetooth!
 To do so, touch the two-player icon in the toolbar.
-<p align="center"><img src="people.png"></p>
+<p align="center"><img src="people.png" width="20%"></p>
 The app will automatically enable Bluetooth if it is available on your device,
 but you can only play a device with which you are already paired,
 and the app will not pair two devices for you.
@@ -164,7 +166,7 @@ You can do that in your device&rsquo;s Settings (<i>not</i> the app&rsquo;s Opti
 
 <a href="#top">Back to the top</a>
 
-<h2><a name="options"/>Options</h2>
+<h2><a name="options">Options</a></h2>
 
 If you select the &ldquo;Settings&rdquo; (wrench) icon in the toolbar, several options will appear,
 along with some explanations. Here&rsquo;s a little more detail on how some of them work.
@@ -203,7 +205,7 @@ along with some explanations. Here&rsquo;s a little more detail on how some of t
 <p/>
 <a href="#top">Back to the top</a>
 
-<h2><a name="mathematics"/>Mathematical ideas behind the game</h2>
+<h2><a name="mathematics">Mathematical ideas behind the game</a></h2>
 
 Ideal Nim incorporates ideas from
 <b>commutative algebra</b> and <b>combinatorial game theory</b>.
@@ -283,7 +285,7 @@ especially if you can find in your area a university that carries <i>Mathematics
 <p/>
 <a href="#top">Back to the top</a>
 
-<h2><a name="credits"/>Credits</h2>
+<h2><a name="credits">Credits</a></h2>
 Ideal Nim, Version 1.0 &#169; 2017
 <br/>App by <a href="http://www.math.usm.edu/perry/">John Perry</a>.
 <p/>
@@ -302,5 +304,6 @@ The Preference used to select levels is
 used under the conditions of the Apache License 2.0.
 <p/>
 <a href="#top">Back to the top</a>
+<center><img src="matematikon.png" width="25%"></center>
 </body>
 </html>

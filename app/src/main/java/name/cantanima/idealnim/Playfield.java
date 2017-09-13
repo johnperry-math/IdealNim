@@ -59,6 +59,7 @@ public class Playfield
         context.getResources().getInteger(R.integer.view_seek_max);
     playable = new Ideal();
     played = new Ideal();
+    previous_played = new Ideal();
     if (isInEditMode()) {
       played.add_generator_fast(3, 8);
       played.add_generator_fast(8, 2);
@@ -285,11 +286,28 @@ public class Playfield
       canvas.drawPath(playable_path, playable_paint);
     }
 
-    if (played.T.size() != 0) {
+    if (last_played_position != null) {
+      last_played_path.rewind();
+      Position P = last_played_position;
+      last_played_path.moveTo(P.get_x() * step_x, h - P.get_y() * step_y);
+      last_played_path.lineTo(P.get_x() * step_x, h - view_ymax * step_y);
+      last_played_path.lineTo(view_xmax * step_x, h - view_ymax * step_y);
+      last_played_path.lineTo(view_xmax * step_x, h - P.get_y() * step_y);
+      last_played_path.close();
+      /*last_played_path.lineTo(P.get_x() * step_x, h - (P.get_y() + 1) * step_y);
+      last_played_path.lineTo((P.get_x() + 1) * step_x, h - (P.get_y() + 1) * step_y);
+      last_played_path.lineTo((P.get_x() + 1) * step_x, h - P.get_y() * step_y);*/
+      last_played_path.close();
+      canvas.drawPath(last_played_path, last_played_paint);
+    }
+
+    if (previous_played.T.size() != 0) {
       played_path.rewind();
       played_path.moveTo(w, 0);
-      Iterator<Position> Ti = played.iterator();
+      Iterator<Position> Ti = previous_played.iterator();
       Position P = Ti.next();
+      if (P.equals(last_played_position) && Ti.hasNext())
+        P = Ti.next();
       if (P.get_x() == 0) {
         played_path.lineTo(0, 0);
         played_path.lineTo(0, h - P.get_y() * step_y);
@@ -299,9 +317,11 @@ public class Playfield
       }
       while (Ti.hasNext()) {
         Position Q = Ti.next();
-        played_path.lineTo(Q.get_x() * step_x, h - P.get_y() * step_y);
-        played_path.lineTo(Q.get_x() * step_x, h - Q.get_y() * step_y);
-        P = Q;
+        if (!Q.equals(last_played_position)) {
+          played_path.lineTo(Q.get_x() * step_x, h - P.get_y() * step_y);
+          played_path.lineTo(Q.get_x() * step_x, h - Q.get_y() * step_y);
+          P = Q;
+        }
       }
       if (P.get_x() != w) {
         played_path.lineTo(w, h - P.get_y() * step_y);
@@ -309,17 +329,6 @@ public class Playfield
       }
       played_path.close();
       canvas.drawPath(played_path, played_paint);
-    }
-
-    if (last_played_position != null) {
-      last_played_path.rewind();
-      Position P = last_played_position;
-      last_played_path.moveTo(P.get_x() * step_x, h - P.get_y() * step_y);
-      last_played_path.lineTo(P.get_x() * step_x, h - (P.get_y() + 1) * step_y);
-      last_played_path.lineTo((P.get_x() + 1) * step_x, h - (P.get_y() + 1) * step_y);
-      last_played_path.lineTo((P.get_x() + 1) * step_x, h - P.get_y() * step_y);
-      last_played_path.close();
-      canvas.drawPath(last_played_path, last_played_paint);
     }
 
     if (highlighting) {
@@ -372,6 +381,7 @@ public class Playfield
         view_xmax = view_ymax = (i > j) ? i + 1 : j + 1;
         scale_seekbar.setProgress(view_xmax - view_min_absolute);
       }
+      previous_played = new Ideal(played);
       played.add_generator(i, j, true);
       invalidate();
       opponent.update_with_position(i, j);
@@ -387,6 +397,7 @@ public class Playfield
 
   public void get_human_move(Position P) {
     int i = P.get_x(), j = P.get_y();
+    previous_played = new Ideal(played);
     played.add_generator(i, j, true);
     if (i >= view_xmax || j >= view_ymax) {
       view_xmax = view_ymax = (i > j) ? i + 1 : j + 1;
@@ -455,6 +466,7 @@ public class Playfield
             if (playable.contains(i, j) && !played.contains(i, j)) {
               // add generator
               last_played_position = new Position(i, j);
+              previous_played = new Ideal(played);
               played.add_generator(i, j, true);
               opponent.update_with_position(i, j);
               if (playable.equals(played))
@@ -664,7 +676,10 @@ public class Playfield
 
   }
 
-  public void reset_last_played_position() { last_played_position = null; }
+  public void reset_last_played_position() {
+    last_played_position = null;
+    previous_played = new Ideal();
+  }
 
   public void reset_view() {
     view_xmax = view_ymax = 7;
@@ -702,7 +717,7 @@ public class Playfield
       bg_paint = new Paint(), line_paint = new Paint(), invalid_paint = new Paint();
   protected Path playable_path = new Path(), played_path = new Path(), last_played_path = new Path();
 
-  protected Ideal playable, played;
+  protected Ideal playable, played, previous_played;
 
   protected Position hint_position, last_played_position = null;
 

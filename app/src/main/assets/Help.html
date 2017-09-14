@@ -10,7 +10,7 @@
     </style>
 </head>
 <body>
-<a name="top"/><h1>Ideal Nim</h1>
+<h1><a name="top">Ideal Nim</a></h1>
 <ul>
     <li><a href="#idea">The idea</a></li>
     <li><a href="#gameplay">Gameplay</a></li>
@@ -34,7 +34,7 @@ More information on this appears in the section on
 <p/>
 <a href="#top">Back to the top</a>
 
-<h2><a name="gameplay"/>Gameplay</h2>
+<h2><a name="gameplay">Gameplay</a></h2>
 
 This section is divided into the following subsections:
 <ul>
@@ -46,7 +46,7 @@ This section is divided into the following subsections:
 
 <h3><a name="basic">Basic gameplay</a></h3>
 A game of Ideal Nim takes place on a finite gameboard.
-<p align="center"><img align="center" src="screenshot_for_help_no_moves.png" width="50%"></p>
+<p align="center"><img align="center" src="screenshot_for_help_no_moves_crop.png" width="50%"></p>
 In theory, the board could extend indefinitely to the northeast;
 that is, an &ldquo;ideal&rdquo; game of Ideal Nim has an infinite game board.
 In practice, this is impossible to implement, so the app limits the board size.
@@ -71,11 +71,9 @@ this makes clear which position your opponent chose.
     <b><i>The player who takes the last valid square wins.</i></b><p/>
     <img src="screenshot_for_game_over_crop.png" width="50%">
 </center>
-Initially, valid positions are colored <span style="color:blue;">blue</span>,
-while invalid positions are colored <span style="color:red;">red</span> or
-<span style="color:#ff8000;">orange</span>,
-depending on whether the invalid square is <span style="color:red;">unplayable</span> or
-<span style="color:#ff8000;">already played</span>.
+Initially, valid positions are colored white,
+while invalid positions are colored red, gray, or blue,
+depending on whether the invalid square is unplayable, already played, or just played.
 You can change this in the <a href="#options">Options</a>.
 <p/>
 To help identify valid and invalid squares,
@@ -83,16 +81,18 @@ you can drag your finger across the board, and the square underneath it
 will change color according to whether the square is valid.
 By default, black is invalid, but you can change this in the <a href="#options">Options</a>.
 <p/>
-<table width="75%" align="center"><tbody>
+<table width="80%" align="center"><tbody>
 <tr>
-    <td align="center" width="33%"><img src="screenshot_for_help_valid_move_crop.png" width="100%"></td>
-    <td align="center" width="33%"><img src="screenshot_for_help_invalid_move_played_crop.png" width="100%"></td>
-    <td align="center" width="33%"><img src="screenshot_for_help_invalid_move_unplayable_crop.png" width="100%"></td>
+    <td align="center" width="25%"><img src="screenshot_for_help_valid_move_crop.png" width="100%"></td>
+    <td align="center" width="25%"><img src="screenshot_for_help_invalid_move_unplayable_crop.png" width="100%"></td>
+    <td align="center" width="25%"><img src="screenshot_for_help_invalid_move_played_crop.png" width="100%"></td>
+    <td align="center" width="25%"><img src="screenshot_for_help_invalid_move_just_played_crop.png" width="100%"></td>
 </tr>
 <tr>
     <td align="center">valid</td>
-    <td align="center">invalid (played)</td>
     <td align="center">invalid (unplayable)</td>
+    <td align="center">invalid (previously played)</td>
+    <td align="center">invalid (just played)</td>
 </tr>
 </tbody></table>
 
@@ -131,7 +131,7 @@ A message will pop up, indicating the computer&rsquo;s progress in analyzing the
 through both a percentage and a ratio of positions analyzed.
 <p/>
 <b>The good news:</b>
-Once it&rsquo;s done, <b>the analysis is complete</b>.
+Once it&rsquo;s done, <b>the majority of the analysis is complete</b>.
 If you can wait out that first analysis,
 it will be near-instantaneous for the rest of that game.
 <p/>
@@ -199,6 +199,15 @@ along with some explanations. Here&rsquo;s a little more detail on how some of t
         So, while ten levels are listed,
         there are really only five levels of different configurations.
         <p/>
+    </li>
+    <li>
+        <b>Theme</b> &mdash; It is possible to select from two major color schemes.
+        &ldquo;Rowdy&rdquo; is the scheme used during app development
+        (and then I forgot to remove it when I published the app).
+        Its colors are rather bold.
+        &ldquo;Pastel&rdquo; is a somewhat more subdued scheme,
+        meant to be a little easier on the eyes.
+        <p>You can, of course, choose other colors, but they will not affect the themes.</p>
     </li>
 </ul>
 
@@ -288,6 +297,7 @@ especially if you can find in your area a university that carries <i>Mathematics
 <h2><a name="credits">Credits</a></h2>
 Ideal Nim, Version 1.0 &#169; 2017
 <br/>App by <a href="http://www.math.usm.edu/perry/">John Perry</a>.
+<br>Thanks to Antonella Perucca for helpful comments.
 <p/>
 Please report any bugs to the author.
 <p/>

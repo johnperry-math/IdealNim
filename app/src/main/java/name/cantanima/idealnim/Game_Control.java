@@ -4,6 +4,9 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.view.Gravity;
+import android.view.Window;
+import android.view.WindowManager;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -118,7 +121,14 @@ public class Game_Control implements DialogInterface.OnClickListener {
         first_builder.setMessage(main_activity.getString(R.string.who_first));
         first_builder.setPositiveButton(main_activity.getString(R.string.human), this);
         first_builder.setNegativeButton(main_activity.getString(R.string.computer), this);
-        first_builder.show();
+        AlertDialog dialog = first_builder.create();
+        Window dialog_window = dialog.getWindow();
+        WindowManager.LayoutParams win_attr = dialog_window.getAttributes();
+        //win_attr.gravity = Gravity.BOTTOM;
+        win_attr.alpha = 0.85f;
+        dialog_window.setAttributes(win_attr);
+        dialog_window.setDimAmount(0.25f);
+        dialog.show();
         last_dialog = NEW_GAME;
       }
 

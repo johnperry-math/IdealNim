@@ -32,8 +32,16 @@
     <PreferenceCategory
         android:title="@string/pref_category_color"
         tools:summary="@string/colors_category_summary">
+        <ListPreference
+            android:title="@string/theme_title"
+            android:summary="@string/theme_summary"
+            android:entries="@array/color_themes"
+            android:entryValues="@array/color_theme_values"
+            android:defaultValue="0"
+            android:key="@string/theme_key"
+            />
         <yuku.ambilwarna.widget.AmbilWarnaPreference
-            android:key="@string/bg_color"
+            android:key="@string/bg_color_key"
             android:defaultValue="0xffff0000"
             android:title="@string/bg_color_text"
             android:summary="@string/bg_color_text"/>

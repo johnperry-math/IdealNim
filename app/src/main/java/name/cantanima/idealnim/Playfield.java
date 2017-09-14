@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
@@ -25,11 +26,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import name.cantanima.idealnim.Game_Control.Player_Kind;
+import yuku.ambilwarna.widget.AmbilWarnaPreference;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.BLUE;
 import static android.graphics.Color.GRAY;
 import static android.graphics.Color.RED;
+import static android.graphics.Color.WHITE;
 import static android.graphics.Color.YELLOW;
 import static android.graphics.Paint.Style.FILL;
 import static android.graphics.Paint.Style.STROKE;
@@ -152,12 +155,12 @@ public class Playfield
         w + getPaddingLeft() + getPaddingRight(), h + getPaddingTop() + getPaddingBottom()
     );
 
-    bg_paint.setShader(
+    /*bg_paint.setShader(
         new LinearGradient(0, h, w, 0, background_color, disappear_color, Shader.TileMode.CLAMP)
     );
     played_paint.setShader(
         new LinearGradient(0, h, w, 0, played_color, disappear_color, Shader.TileMode.CLAMP)
-    );
+    );*/
 
   }
 
@@ -605,6 +608,35 @@ public class Playfield
       invalid_color = pref.getInt(context.getString(R.string.invalid_color_key), invalid_color);
     else if (key.equals(context.getString(R.string.last_played_color_key)))
       last_played_color = pref.getInt(context.getString(R.string.last_played_color_key), last_played_color);
+    else if (key.equals(context.getString(R.string.theme_key))) {
+      boolean changed = true;
+      switch (Integer.valueOf(pref.getString(context.getString(R.string.theme_key), "0"))) {
+        case 0:
+        default:
+          changed = false;
+          break;
+        case 1:
+          playable_color = Color.rgb(0xf8, 0xf8, 0xf8);
+          played_color = Color.rgb(0xd8, 0xd8, 0xd8);
+          last_played_color = Color.rgb(0xc0, 0xc0, 0xff);
+          background_color = Color.rgb(0xff, 0x80, 0x80);
+          break;
+        case 2:
+          playable_color = BLUE;
+          played_color = Color.rgb(0xff, 0x80, 0x00);
+          last_played_color = Color.rgb(0xff, 0xa0, 0x80);
+          background_color = RED;
+          break;
+      }
+      if (changed) {
+        Editor edit = pref.edit();
+        edit.putInt(context.getString(R.string.playable_color_key), playable_color);
+        edit.putInt(context.getString(R.string.played_color_key), played_color);
+        edit.putInt(context.getString(R.string.last_played_color_key), last_played_color);
+        edit.putInt(context.getString(R.string.bg_color_key), background_color);
+        edit.commit();
+      }
+    }
     bg_paint.setShader(
         new LinearGradient(
             0, getHeight(), getWidth(), 0, background_color, disappear_color, Shader.TileMode.CLAMP
@@ -709,9 +741,12 @@ public class Playfield
   protected float step_x, step_y;
   protected int highlight_x, highlight_y;
   protected boolean highlighting = false, hinting = false;
-  protected int playable_color = BLUE, played_color = Color.rgb(0xff, 0x80, 0x00),
-      disappear_color = GRAY, invalid_color = BLACK, last_played_color = Color.rgb(0xff, 0xa0, 0x80),
-      background_color = RED, highlight_color = YELLOW, hint_color = Color.rgb(0xff, 0x80, 0x00);
+  protected int playable_color = Color.rgb(0xf8, 0xf8, 0xf8), //played_color = Color.rgb(0xff, 0x80, 0x00),
+      played_color = Color.rgb(0xd8, 0xd8, 0xd8),
+      disappear_color = GRAY, invalid_color = BLACK, //last_played_color = Color.rgb(0xff, 0xa0, 0x80),
+      last_played_color = Color.rgb(0xc0, 0xc0, 0xff), //Color.rgb(0x80, 0x80, 0xff),
+      background_color = Color.rgb(0xff, 0x80, 0x80), //Color.rgb(0xff, 0xa0, 0xa0),
+      highlight_color = YELLOW, hint_color = Color.rgb(0xff, 0x80, 0x00);
   protected Paint highlight_paint = new Paint(), hint_paint = new Paint(),
       played_paint = new Paint(), playable_paint = new Paint(), last_played_paint = new Paint(),
       bg_paint = new Paint(), line_paint = new Paint(), invalid_paint = new Paint();

@@ -1,7 +1,7 @@
 <resources>
 
     <string name="app_name">Ideal Nim</string>
-    <string name="app_version">1.0.2</string>
+    <string name="app_version">1.0.4</string>
     <string name="app_welcome_title">Welcome!</string>
     <string name="app_welcome_message_start">
         Thank you for trying Ideal Nim!
@@ -167,6 +167,20 @@
         or for your first hint.
     </string>
 
+    <string-array name="color_themes">
+        <item>None</item>
+        <item>Pastel</item>
+        <item>Rowdy</item>
+    </string-array>
+    <string-array name="color_theme_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="theme_title">Themes</string>
+    <string name="theme_key">theme_key</string>
+    <string name="theme_summary">Select a color theme</string>
     <string name="bg_color">Background</string>
     <string name="bg_color_key">bg_color_key</string>
     <string name="bg_color_text">Squares that are never valid</string>

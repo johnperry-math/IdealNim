@@ -128,7 +128,7 @@
     <string name="dont_play_again_lose">Regard the ruins.</string>
 
     <string name="thinking">Thinking</string>
-    <string name="please_wait">Please wait...</string>
+    <string name="please_wait">Please wait&#8230;</string>
     <string name="value_label_text">Value:</string>
     <string name="unknown_game_value">\?</string>
 

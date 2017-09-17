@@ -22,16 +22,15 @@
 <h2><a name="idea">The idea</a> </h2>
 
 <img style="float:right;" src="screenshot_for_help_opening.png" width="33%">
-Ideal Nim is an &ldquo;impartial, two-player, perfect-information, combinatorial game&rdquo;
-that challenges the mind while illustrating some advanced mathematical ideas.
-It can be difficult to defeat the computer even when you know what you&rsquo;re doing,
-so when you manage it you should be proud of yourself.
-<p/>
+Ideal Nim is a game that challenges the mind while illustrating some advanced mathematical ideas.
+It can be difficult to defeat the computer at higher levels even when you know what you&rsquo;re doing,
+so if you manage it you should be proud of yourself.
+<p></p>
 If you are familiar with Nim, then you are familiar with the basic principles behind Ideal Nim.
 More information on this appears in the section on
 <a href="#mathematics">Mathematical ideas behind the game</a>.
 
-<p/>
+<p></p>
 <a href="#top">Back to the top</a>
 
 <h2><a name="gameplay">Gameplay</a></h2>
@@ -51,7 +50,7 @@ In theory, the board could extend indefinitely to the northeast;
 that is, an &ldquo;ideal&rdquo; game of Ideal Nim has an infinite game board.
 In practice, this is impossible to implement, so the app limits the board size.
 The smallest board you can play on is 7&times;7, but you can extend it to 20&times;20.
-<p/>
+<p></p>
 <table width="75%" align="center"><tbody>
 <tr>
     <td align="center" width="50%"><img src="screenshot_for_help_highlighted_last_move.png" width="100%"></td>
@@ -59,38 +58,40 @@ The smallest board you can play on is 7&times;7, but you can extend it to 20&tim
 </tr>
 <tr><td colspan="2" align="center"><img src="screenshot_for_altered_size_detail.png" width="100%"></td></tr>
 </tbody></table>
-</p>
+<p></p>
 Gameplay consists in selecting valid squares.
 Once a player selects a valid square,
 all squares &ldquo;northeast&rdquo; of it become invalid.
-<p/>
-Notice that the game highlights which squares the last played position removes;
-this makes clear which position your opponent chose.
-<p/>
+<p></p>
+Notice that the game highlights the squares removed in the previous turn,
+which helps you see your opponent&rsquo;s move.
+<p></p>
 <center>
-    <b><i>The player who takes the last valid square wins.</i></b><p/>
+    <b><i>The player who takes the last valid square wins.</i></b><p></p>
     <img src="screenshot_for_game_over_crop.png" width="50%">
 </center>
 Initially, valid positions are colored white,
 while invalid positions are colored red, gray, or blue,
 depending on whether the invalid square is unplayable, already played, or just played.
 You can change this in the <a href="#options">Options</a>.
-<p/>
+<p></p>
 To help identify valid and invalid squares,
 you can drag your finger across the board, and the square underneath it
 will change color according to whether the square is valid.
 By default, black is invalid, but you can change this in the <a href="#options">Options</a>.
-<p/>
+<p></p>
 <table width="80%" align="center"><tbody>
 <tr>
-    <td align="center" width="25%"><img src="screenshot_for_help_valid_move_crop.png" width="100%"></td>
-    <td align="center" width="25%"><img src="screenshot_for_help_invalid_move_unplayable_crop.png" width="100%"></td>
-    <td align="center" width="25%"><img src="screenshot_for_help_invalid_move_played_crop.png" width="100%"></td>
-    <td align="center" width="25%"><img src="screenshot_for_help_invalid_move_just_played_crop.png" width="100%"></td>
-</tr>
-<tr>
+    <td align="center" width="50%"><img src="screenshot_for_help_valid_move_crop.png" width="100%"></td>
+    <td align="center" width="50%"><img src="screenshot_for_help_invalid_move_unplayable_crop.png" width="100%"></td>
+</tr><tr>
     <td align="center">valid</td>
     <td align="center">invalid (unplayable)</td>
+</tr><tr>
+    <td align="center" width="50%"><img src="screenshot_for_help_invalid_move_played_crop.png" width="100%"></td>
+    <td align="center" width="50%"><img src="screenshot_for_help_invalid_move_just_played_crop.png" width="100%"></td>
+</tr>
+<tr>
     <td align="center">invalid (previously played)</td>
     <td align="center">invalid (just played)</td>
 </tr>
@@ -98,16 +99,17 @@ By default, black is invalid, but you can change this in the <a href="#options">
 
 <h3><a name="hints">Hints and game values</a></h3>
 <p align="center"><img src="screenshot_for_hint_and_value_crop.png"></p>
+Be advised that hints are not available when playing a human.
+<p></p>
 On odd-numbered levels, when you play the computer, you can ask for a hint, and
 the computer will mark the square it would choose.
-(Hints are not available when playing a human.)
 If the position is playable, then it is a winning move; that is,
-<i>if you play according to the computer&rsquo;s hints, you will win.</i>
-<p/>
+<i>if you play according to the computer&rsquo;s hints, you should win.</i>
+<p></p>
 Oftentimes, the computer will mark the lower left square, which is not playable!
 In these cases, <i>no move will guarantee a win</i>, and the computer would choose a random square.
 You might as well do the same.
-<p/>
+<p></p>
 The computer will also indicate its estimation of the game&rsquo;s <b>value</b>,
 which is a &ldquo;nimber&rdquo; (not a &ldquo;number&rdquo;).
 Nimber arithmetic is consistent but unusual: you have
@@ -123,23 +125,21 @@ so you should not usually rely on those.
 <p align="center"><img src="screenshot_for_help_computer_thinks_crop.png" align="center"></p>
 Before the computer can move or give you a hint (assuming you ask for one)
 it has to analyze the game board. This is both good news and bad news.
-<p/>
+<p></p>
 <b>The bad news:</b>
 Depending on the number of playable pieces,
 <b>this analysis can take anywhere from a split second to several minutes.</b>
 A message will pop up, indicating the computer&rsquo;s progress in analyzing the board
 through both a percentage and a ratio of positions analyzed.
-<p/>
+<p></p>
 <b>The good news:</b>
 Once it&rsquo;s done, <b>the majority of the analysis is complete</b>.
 If you can wait out that first analysis,
 it will be near-instantaneous for the rest of that game.
-<p/>
+<p></p>
 There is a remote possibility that in larger boards, your device will lack memory sufficient
-to store the analysis, but for that matter'
+to store the analysis, but for that matter
 your device will probably take far too long in the analysis, anyway!
-The precise limit is device-dependent, so advance &ldquo;up the ladder,&rdquo; so to speak,
-with caution.
 
 <h3><a name="human">Playing a human</a></h3>
 You can play a nearby human using Bluetooth!
@@ -148,172 +148,153 @@ To do so, touch the two-player icon in the toolbar.
 The app will automatically enable Bluetooth if it is available on your device,
 but you can only play a device with which you are already paired,
 and the app will not pair two devices for you.
-To pair two devices, go into your device&rsquo;s Settings (<i>not</i> the app&rsquo;s Options),
+To pair devices, go into your device&rsquo;s Settings (<i>not</i> the app&rsquo;s Options),
 select Bluetooth, and select a device you want to pair.
 Both you and your opponent must pair your devices before you can play!
-<p/>
+<p></p>
 Once your devices are paired, you can decide whether to host or join a game.
 One player will host the game, while the other player will join.
 The player who joins has to play whatever game is on the host&rsquo;s device,
 which puts him at a disadvantage, to counter that, the player who joins gets to go first.
-<p/>
+<p></p>
 When the game ends, the Bluetooth connection is disconnected, but Bluetooth is left on.
-If you want to play again, you will need to touch the two-player icon again,
-and decide whether to host or join again. (You will not need to re-pair your devices.)
-If you do not want to play again, you should probably turn off your Bluetooth radio
+To play again, you need to touch the two-player icon again,
+and decide whether to host or join. (You will not need to re-pair your devices.)
+If you do not want to play again, you should probably turn off Bluetooth,
 unless you&rsquo;re using it with other devices.
 You can do that in your device&rsquo;s Settings (<i>not</i> the app&rsquo;s Options).
-
+<p></p>
 <a href="#top">Back to the top</a>
 
 <h2><a name="options">Options</a></h2>
 
 If you select the &ldquo;Settings&rdquo; (wrench) icon in the toolbar, several options will appear,
 along with some explanations. Here&rsquo;s a little more detail on how some of them work.
-<p/>
-<img style="float:right;" src="screenshot_for_settings.png" width="40%"><p/>
-<ul>
-    <li> <b>One arm behind my back</b> &mdash;
-        If a winning move is available, the computer will find it.
-        Now, a computer can think a lot faster than you,
-        and is much better at keeping track of all possible locations.
-        If you check this box, however, the computer will sometimes &mdash; <i>sometimes</i> &mdash;
-        &ldquo;make a mistake&rdquo; and choose a random square
-        even when it knows a different square would guarantee a win!
-        <p/>
-        (This does not affect the hints: the machine will be honest in those cases.
-        &mdash; Unless there&rsquo;s a bug in the program, of course,
-        but we&rsquo;ve spent a lot of time on debugging, honest!)
-        <p/>
-    </li>
-    <li>
-        <b>Level</b> &mdash; Each level offers a number of random configurations.
-        The level&rsquo;s number is related to the number of &ldquo;southwest corners&rdquo;
-        the region of playable squares will have.
-        Levels 1-2 have only one corner; levels 2-3 have two corners; levels 3-4 have three corners,
-        and so forth.
-        <p/>
-        <b>Even-numbered levels disable hints.</b>
-        Each even-numbered level offers the same configurations as the previous odd-numbered level,
-        but the lack of a hint can make it harder to play.
-        So, while ten levels are listed,
-        there are really only five levels of different configurations.
-        <p/>
-    </li>
-    <li>
-        <b>Theme</b> &mdash; It is possible to select from two major color schemes.
-        &ldquo;Rowdy&rdquo; is the scheme used during app development
-        (and then I forgot to remove it when I published the app).
-        Its colors are rather bold.
-        &ldquo;Pastel&rdquo; is a somewhat more subdued scheme,
-        meant to be a little easier on the eyes.
-        <p>You can, of course, choose other colors, but they will not affect the themes.</p>
-    </li>
-</ul>
+<p></p>
+<img style="float:right;" src="screenshot_for_settings.png" width="40%"><p></p>
+<b>One arm behind my back</b> &mdash;
+If a winning move is available, the computer will find it.
+Now, a computer can think a lot faster than you,
+and is much better at keeping track of all possible locations.
+If you check this box, however, the computer will sometimes &mdash; <i>sometimes</i> &mdash;
+&ldquo;make a mistake&rdquo; and choose a random square
+even when it knows a different square would guarantee a win!
+<p></p>
+This does not affect the hints: the machine will be honest in those cases.
+&mdash; Unless there&rsquo;s a bug in the program, of course,
+but we&rsquo;ve spent a lot of time on debugging, honest!
+<p></p>
+<b>Level</b> &mdash; Each level offers a number of random configurations.
+The level&rsquo;s number is related to the number of &ldquo;southwest corners&rdquo;
+the region of playable squares will have.
+Levels 1-2 have only one corner; levels 2-3 have two corners; levels 3-4 have three corners,
+and so forth.
+<p></p>
+<b>Even-numbered levels disable hints.</b>
+Each even-numbered level offers the same configurations as the previous odd-numbered level,
+but the lack of a hint can make it harder to play.
+So, while ten levels are listed,
+there are really only five levels of different configurations.
+<p></p>
+<b>Theme</b> &mdash; It is possible to select from two major color schemes.
+&ldquo;Rowdy&rdquo; is the scheme used during app development
+(and then I forgot to remove it when I published the app).
+Its colors are rather bold.
+&ldquo;Pastel&rdquo; is a somewhat more subdued scheme,
+meant to be a little easier on the eyes.
+<p>You can, of course, choose other colors, but they will not affect the themes.</p>
 
-<p/>
+<p></p>
 <a href="#top">Back to the top</a>
 
 <h2><a name="mathematics">Mathematical ideas behind the game</a></h2>
 
 Ideal Nim incorporates ideas from
 <b>commutative algebra</b> and <b>combinatorial game theory</b>.
+<p></p>
+The game board combines two <b>diagrams of monomial ideals</b>.
+Playable points correspond to an ideal <i>P</i>,
+while played points correspond to an ideal <i>G</i>.
+During gameplay, <i>G</i> expands until it agrees with <i>P</i>.
+This resembles what happens to a &ldquo;leading monomial ideal&rdquo;
+during the computation of a Gr&ouml;bner basis.
+(You can read about
+<a href="http://en.wikipedia.org/wiki/Monomial_ideal">monomial ideals</a> and
+<a href="http://en.wikipedia.org/wiki/Gröbner_basis">Gr&ouml;bner bases</a> if you like.)
+<p></p>
+The fact that this game cannot go on indefinitely,
+regardless of the gameboard&rsquo;s dimension,
+is due to <b>the Hilbert basis theorem</b>, or <b>Dickson&rsquo;s Lemma</b>,
+depending on how you look at it. These apply because &ldquo;polynomial rings&rdquo;
+are <b>Noetherian</b>.
+(You can read more about
+<a href="http://en.wikipedia.org/wiki/David_Hilbert">David Hilbert</a>,
+<a href="http://en.wikipedia.org/wiki/Leonard_Dickson">Leonard Dickson</a>, and
+<a href="http://en.wikipedia.org/wiki/Emmy_Noether">Emmy Noether</a>, and
+the <a href="http://en.wikipedia.org/wiki/Noetherian_ring">Noetherian rings</a>
+if you like.)
+<p></p>
+Ideal Nim illustrates these ideas in the framework of an <b>impartial, two-player,
+perfect-information, combinatorial game</b>. What do these words mean?<p></p>
 
-<ul>
-    <li>
-        The game board involves two <b>diagrams of monomial ideals</b>.
-        Playable points correspond to an ideal <i>P</i>,
-        while played points correspond to an ideal <i>G</i>.
-        During gameplay, <i>G</i> expands until it agrees with <i>P</i>.
-        This resembles what happens to a &ldquo;leading monomial ideal&rdquo;
-        during the computation of a Gr&ouml;bner basis.
-        (You can read about
-        <a href="http://en.wikipedia.org/wiki/Monomial_ideal">monomial ideals</a> and
-        <a href="http://en.wikipedia.org/wiki/Gröbner_basis">Gr&ouml;bner bases</a> if you like.)
-        <p/>
-    </li>
-    <li>
-        The fact that this game cannot go on indefinitely,
-        regardless of the gameboard&rsquo;s dimension,
-        is due to <b>the Hilbert basis theorem</b>, or <b>Dickson&rsquo;s Lemma</b>,
-        depending on how you look at it. These apply because &ldquo;polynomial rings&rdquo;
-        are <b>Noetherian</b>.
-        (You can read more about
-        <a href="http://en.wikipedia.org/wiki/David_Hilbert">David Hilbert</a>,
-        <a href="http://en.wikipedia.org/wiki/Leonard_Dickson">Leonard Dickson</a>, and
-        <a href="http://en.wikipedia.org/wiki/Emmy_Noether">Emmy Noether</a>, and
-        the <a href="http://en.wikipedia.org/wiki/Noetherian_ring">Noetherian rings</a>
-        if you like.)
-        <p/>
-    </li>
-    <li>
-        Ideal Nim illustrates these ideas in the framework of an impartial, two-player,
-        perfect-information, combinatorial game. What does this mean?<p/>
-        <ul>
-            <li>
-                <b>Impartial</b> means that any move available to one player
-                is also available to the other.
-                The only difference between the players is in whose turn it is.
-                Any play the computer makes on its turn, you could also make if it were your turn.
-                <p/>
-                Chess is an example of a &ldquo;non-impartial game&rdquo;,
-                properly called &ldquo;partizan&rdquo;,
-                because you can&rsquo;t move your opponent&rsquo;s pieces.
-            </li>
-            <li>
-                <b>Two-player</b> is probably obvious.
-                (If it isn&rsquo;t, this might not be the right game for you.)
-                <p/>
-            </li>
-            <li>
-                <b>Perfect-information</b> means that all information about the game
-                is equally available to all players.
-                In theory, the computer knows nothing more about the game than you do.
-                The computer&rsquo;s only advantage
-                is that it can analyze the game much faster and more carefully.
-                <p/>
-                Most card games are examples of &ldquo;non-perfect-information&rdquo; games,
-                because you don&rsquo;t know your opponents&rsquo; cards.
-            </li>
-            <li>
-                <b>Combinatorial</b> means that the game&rsquo;s structure is <i>discrete</i>
-                and <i>countable</i>; that is, you could in theory analyze the game using integers.
-                <p/>
-            </li>
-        </ul>
-        (You can read more about
-        <a href="https://en.wikipedia.org/wiki/Combinatorial_game_theory">combinatorial games</a>
-        if you like.)
-    </li>
-</ul>
-
+&ldquo;Impartial&rdquo; means that any move available to one player
+is also available to the other.
+The only difference between the players is in whose turn it is.
+Any play the computer makes on its turn, you could also make if it were your turn.
+<p></p>
+Chess is an example of a &ldquo;non-impartial game&rdquo;,
+properly called &ldquo;partizan&rdquo;,
+because you can&rsquo;t move your opponent&rsquo;s pieces.
+<p></p>
+&ldquo;Two-player&rdquo; is probably obvious.
+(If it isn&rsquo;t, this might not be the right game for you.)
+<p></p>
+&ldquo;Perfect-information&rdquo; means that all information about the game
+is equally available to all players.
+In theory, the computer knows nothing more about the game than you do.
+The computer&rsquo;s only advantage
+is that it can analyze the game much faster and more carefully.
+<p></p>
+Most card games are examples of &ldquo;non-perfect-information&rdquo; games,
+because you don&rsquo;t know your opponents&rsquo; cards.
+<p></p>
+&ldquo;Combinatorial&rdquo; means that the game&rsquo;s structure is <i>discrete</i>
+and <i>countable</i>; that is, you could in theory analyze the game using integers.
+<p></p>
+(You can read more about
+<a href="https://en.wikipedia.org/wiki/Combinatorial_game_theory">combinatorial games</a>
+if you like.)
+<p></p>
 (You can read more about the mathematics of
 <a href="http://dx.doi.org/10.4169/math.mag.89.4.235">Ideal Nim</a> if you like,
 especially if you can find in your area a university that carries <i>Mathematics Magazine</i>.
-(A large number of universities do have at least an online subscription!)
-<p/>
+A large number of universities do have at least an online subscription!)
+<p></p>
 <a href="#top">Back to the top</a>
 
 <h2><a name="credits">Credits</a></h2>
+<center>
 Ideal Nim, Version 1.0 &#169; 2017
 <br/>App by <a href="http://www.math.usm.edu/perry/">John Perry</a>.
 <br>Thanks to Antonella Perucca for helpful comments.
-<p/>
+<p></p>
 Please report any bugs to the author.
-<p/>
+<p></p>
 The source code is available at
 <a href="https://github.com/johnperry-math/IdealNim">GitHub</a>
 under the GPL license.
-<p/>
+<p></p>
 The Preference used to pick colors is
 <a href="https://github.com/yukuku/ambilwarna">AmbilWarnaPreference</a>,
 used under the conditions of the Apache License 2.0.
-<p/>
+<p></p>
 The Preference used to select levels is
 <a href="https://github.com/MrBIMC/MaterialSeekBarPreference/">MaterialSeekBarPreference</a>,
 used under the conditions of the Apache License 2.0.
-<p/>
+<p></p>
 <a href="#top">Back to the top</a>
-<center><img src="matematikon.png" width="25%"></center>
+<p></p>
+<img src="matematikon.png" width="25%">
+</center>
 </body>
 </html>

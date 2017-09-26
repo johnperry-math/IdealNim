@@ -1,6 +1,5 @@
 package name.cantanima.idealnim;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -9,8 +8,6 @@ import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.util.Pair;
-import android.util.SparseArray;
-import android.util.SparseIntArray;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -21,24 +18,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeSet;
-import java.util.Vector;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-import static java.util.Calendar.DAY_OF_MONTH;
-import static java.util.Calendar.HOUR;
-import static java.util.Calendar.MINUTE;
-import static java.util.Calendar.SECOND;
 import static name.cantanima.idealnim.Position.ORIGIN;
 
 /**
- * Created by cantanima on 8/15/17.
+ * A computer opponent that uses a little more elegance than brute force.
  */
 
-public class Computer_Opponent extends Opponent {
+class Computer_Opponent extends Opponent {
 
-  public Computer_Opponent(
+  Computer_Opponent(
       Context context, Ideal I, Ideal J, int level
   ) {
 
@@ -58,10 +47,11 @@ public class Computer_Opponent extends Opponent {
     try {
       cache = new HashMap<>(initial_map_size);
     } catch (OutOfMemoryError e) {
-      AlertDialog.Builder builder = new AlertDialog.Builder(overall_context)
+      new AlertDialog.Builder(overall_context)
           .setTitle(R.string.out_of_memory_title)
           .setMessage(R.string.out_of_memory_message)
-          .setPositiveButton(R.string.understood, null);
+          .setPositiveButton(R.string.understood, null)
+          .show();
     }
 
   }
@@ -76,7 +66,7 @@ public class Computer_Opponent extends Opponent {
     while (base_max_y > 0 && checking_y) {
       boolean found_position = false;
       for (int k = 0; !found_position && k < base_max_x; ++k)
-        found_position |= base_played.contains(k, base_max_y - 1);
+        found_position = base_played.contains(k, base_max_y - 1);
       if (found_position) checking_y = false;
       else --base_max_y;
     }
@@ -86,7 +76,7 @@ public class Computer_Opponent extends Opponent {
     while (base_max_x > 0 && checking_x) {
       boolean found_position = false;
       for (int l = 0; !found_position && l < old_base_max_y; ++l)
-        found_position |= base_played.contains(base_max_x - 1, l);
+        found_position = base_played.contains(base_max_x - 1, l);
       if (found_position) checking_x = false;
       else --base_max_x;
     }
@@ -100,11 +90,10 @@ public class Computer_Opponent extends Opponent {
     game_value();
   }
 
-  public int game_value() {
+  int game_value() {
 
     int result = 0;
     boolean decided = false;
-    Position winning_position = ORIGIN;
 
     if (game_level == 1 || game_level == 2) {
 
@@ -126,7 +115,7 @@ public class Computer_Opponent extends Opponent {
     }
 
     if (decided && computer_move) {
-      Playfield playfield = (Playfield) overall_context.findViewById(R.id.playfield);
+      Playfield playfield = overall_context.findViewById(R.id.playfield);
       playfield.hint_position = zero_position;
       computer_move = false;
       playfield.get_computer_move();
@@ -164,7 +153,7 @@ public class Computer_Opponent extends Opponent {
           } while (position.equals(invalid_position));
           zero_position = position;
           if (computer_move) {
-            Playfield playfield = (Playfield) overall_context.findViewById(R.id.playfield);
+            Playfield playfield = overall_context.findViewById(R.id.playfield);
             playfield.hint_position = zero_position;
             computer_move = false;
             playfield.get_computer_move();
@@ -175,7 +164,7 @@ public class Computer_Opponent extends Opponent {
         zero_position = p.second;
         result = configuration_value = p.first;
         if (computer_move) {
-          Playfield playfield = (Playfield) overall_context.findViewById(R.id.playfield);
+          Playfield playfield = overall_context.findViewById(R.id.playfield);
           playfield.hint_position = zero_position;
           computer_move = false;
           playfield.get_computer_move();
@@ -188,7 +177,7 @@ public class Computer_Opponent extends Opponent {
 
   }
 
-  public boolean quickly_analyze_three_corner_game() {
+  private boolean quickly_analyze_three_corner_game() {
 
     // first find the optimal first position, which forces symmetric moves -- IF IT EXISTS
     Iterator<Position> Ti = base_playable.iterator();
@@ -209,7 +198,7 @@ public class Computer_Opponent extends Opponent {
 
   }
 
-  public boolean quickly_analyze_two_corner_game() {
+  private boolean quickly_analyze_two_corner_game() {
 
     boolean result = true;
 
@@ -279,7 +268,7 @@ public class Computer_Opponent extends Opponent {
     /**
      * Creates a new asynchronous task. This constructor must be invoked on the UI thread.
      */
-    public Compute_Task(Activity activity, int count) {
+    Compute_Task(Activity activity, int count) {
 
       super();
 
@@ -325,7 +314,7 @@ public class Computer_Opponent extends Opponent {
       Date end_time = end_calendar.getTime();
       super.onPostExecute(integer);
       ((TextView) overall_context.findViewById(R.id.value_view)).setText(integer.toString());
-      Playfield p = ((Playfield) overall_context.findViewById(R.id.playfield));
+      Playfield p = overall_context.findViewById(R.id.playfield);
       /*Log.d(tag, "times: " + String.valueOf(end_time.getTime()) + ", " + start_time.getTime());
       Log.d(tag, "entries: " + String.valueOf(cache.size()));*/
       if (end_time.getTime() - start_time.getTime() > 60000) {
@@ -333,7 +322,7 @@ public class Computer_Opponent extends Opponent {
       }
       p.hint_position = zero_position;
       p.invalidate();
-      TextView tv = (TextView) overall_context.findViewById(R.id.value_view);
+      TextView tv = overall_context.findViewById(R.id.value_view);
       tv.setText(String.valueOf(configuration_value));
       update_dialog.dismiss();
       if (computer_move) {
@@ -374,13 +363,12 @@ public class Computer_Opponent extends Opponent {
     protected Integer doInBackground(Object... params) {
       calendar = new GregorianCalendar();
       start_time = calendar.getTime();
-      Integer result = this.compute_scores(
+      return this.compute_scores(
           base_played, (Integer) params[1], (Integer) params[2] - 1, (Integer) params[3] - 1, 0
       );
-      return result;
     }
 
-    public int compute_scores(Ideal just_played, int count, int max_x, int max_y, int level) {
+    int compute_scores(Ideal just_played, int count, int max_x, int max_y, int level) {
 
       int result, completed = 0;
 
@@ -451,7 +439,7 @@ public class Computer_Opponent extends Opponent {
             int mex = 0;
             while (options.contains(mex)) ++mex;
             result = mex;
-            cache.put(gens, new Pair<Integer, Position>(result, winning_position));
+            cache.put(gens, new Pair<>(result, winning_position));
             if (result == 0 && level == 0)
               zero_position = ORIGIN;
             //Log.d(tag, "final value " + String.valueOf(result));
@@ -471,7 +459,7 @@ public class Computer_Opponent extends Opponent {
 
   }
 
-  public void seed_cache_with_known_values() {
+  private void seed_cache_with_known_values() {
 
     seed_with_dozier_configurations();
     seed_with_border_configurations();
@@ -480,6 +468,8 @@ public class Computer_Opponent extends Opponent {
 
   private void seed_with_dozier_configurations() {
 
+    boolean horizontal_dozier = false, vertical_dozier = false;
+    
     Ideal I = base_playable;
     if (I.T.size() < 3) return;
     Iterator<Position> Ti = I.T.iterator();
@@ -489,19 +479,17 @@ public class Computer_Opponent extends Opponent {
 
     // Haley Dozier's configurations: vertical version
     if (second.get_x() == first.get_x() + 1) {
+      horizontal_dozier = true;
       ArrayList<Integer> gens = new ArrayList<>(I.T.size() * 2 - 2);
       Iterator<Position> Ui = I.T.iterator();
       Ui.next(); Ui.next();
-      int iter_offset;
       if (third.get_x() == second.get_x() + 1) {
         gens.add(third.get_x());
         gens.add(third.get_y());
         Ui.next();
-        iter_offset = 3;
       } else {
         gens.add(second.get_x() + 1);
         gens.add(second.get_y());
-        iter_offset = 2;
       }
       while (Ui.hasNext()) {
         Position Q = Ui.next();
@@ -513,7 +501,9 @@ public class Computer_Opponent extends Opponent {
       //print_configuration(gens, base_max_x, base_max_y);
       cache.put(gens, new Pair<>(0, ORIGIN));
       // easy zeros
-      for (int i = 1; i < first.get_y() + base_max_y; ++i) {
+      Resources res = overall_context.getResources();
+      int max_val = res.getInteger(R.integer.view_min) + res.getInteger(R.integer.view_seek_max);
+      for (int i = 1; i < max_val; ++i) {
         ArrayList<Integer> future_gens = new ArrayList<>(I.T.size() * 2 + 2);
         future_gens.add(first.get_x());
         future_gens.add(first.get_y() + i);
@@ -557,7 +547,9 @@ public class Computer_Opponent extends Opponent {
       //print_configuration(gens, base_max_x, base_max_y);
       cache.put(gens, new Pair<>(1, first));
       // easy 1's
-      for (int i = 1; i < base_max_y; ++i) {
+      Resources res = overall_context.getResources();
+      int max_val = res.getInteger(R.integer.view_min) + res.getInteger(R.integer.view_seek_max);
+      for (int i = 1; i < max_val; ++i) {
         ArrayList<Integer> future_gens = new ArrayList<>(I.T.size() * 2 + 2);
         future_gens.add(first.get_x());
         future_gens.add(first.get_y() + i);
@@ -584,7 +576,7 @@ public class Computer_Opponent extends Opponent {
         cache.put(future_gens, new Pair<>(1, first));
       }
       // easy non-1's
-      for (int i = 1; i < base_max_y; ++i) {
+      for (int i = 1; i < max_val; ++i) {
         ArrayList<Integer> future_gens = new ArrayList<>(I.T.size() * 2 + 2);
         future_gens.add(first.get_x());
         future_gens.add(first.get_y() + i);
@@ -620,6 +612,7 @@ public class Computer_Opponent extends Opponent {
 
     // Haley Dozier's configurations: horizontal version
     if (second.get_y() == third.get_y() + 1) {
+      vertical_dozier = true;
       ArrayList<Integer> gens = new ArrayList<>(I.T.size() * 2 - 2);
       Iterator<Position> Ui = I.T.iterator();
       Position U = Ui.next();
@@ -637,7 +630,9 @@ public class Computer_Opponent extends Opponent {
       //print_configuration(gens, base_max_x, base_max_y);
       cache.put(gens, new Pair<>(0, ORIGIN));
       // easy zeros
-      for (int i = 1; i < third.get_x() + base_max_x; ++i) {
+      Resources res = overall_context.getResources();
+      int max_val = res.getInteger(R.integer.view_min) + res.getInteger(R.integer.view_seek_max);
+      for (int i = 1; i < max_val; ++i) {
         ArrayList<Integer> future_gens = new ArrayList<>(I.T.size() * 2 + 2);
         Ui = I.T.iterator();
         U = Ui.next();
@@ -677,7 +672,9 @@ public class Computer_Opponent extends Opponent {
       //print_configuration(gens, base_max_x, base_max_y);
       cache.put(gens, new Pair<>(1, third));
       // easy 1's
-      for (int i = 1; i < base_max_y; ++i) {
+      Resources res = overall_context.getResources();
+      int max_val = res.getInteger(R.integer.view_min) + res.getInteger(R.integer.view_seek_max);
+      for (int i = 1; i < max_val; ++i) {
         ArrayList<Integer> future_gens = new ArrayList<>(I.T.size() * 2 + 2);
         Ui = I.T.iterator();
         P = Ui.next();
@@ -700,7 +697,7 @@ public class Computer_Opponent extends Opponent {
         cache.put(future_gens, new Pair<>(1, first));
       }
       // easy non-1's
-      for (int i = 1; i < base_max_y; ++i) {
+      for (int i = 1; i < max_val; ++i) {
         ArrayList<Integer> future_gens = new ArrayList<>(I.T.size() * 2 + 2);
         Ui = I.T.iterator();
         P = Ui.next();
@@ -720,6 +717,66 @@ public class Computer_Opponent extends Opponent {
         //Log.d(tag, String.valueOf(value));
         //print_configuration(future_gens, base_max_x, base_max_y);
         cache.put(future_gens, new Pair<>(value, first));
+      }
+
+    }
+    
+    if (horizontal_dozier && vertical_dozier) {
+      // more easy zeros!
+      ArrayList<Integer> gens = new ArrayList<>();
+      Ti = I.T.iterator();
+      Position P = Ti.next(); int x0 = P.get_x(), y0 = P.get_y();
+      P = Ti.next(); int x1 = P.get_x(), y1 = P.get_y();
+      int delta_y = y0 - y1;
+      P = Ti.next();
+      if (P.get_x() != x1 + 1) {
+        gens.add(x1 + 1); gens.add(y1);
+      } else if (P != second){
+        gens.add(P.get_x()); gens.add(P.get_y());
+        P = Ti.next();
+      } else {
+        gens.add(x1 + 1); gens.add(P.get_y() + 1);
+      }
+      while (P != second) {
+        gens.add(P.get_x()); gens.add(P.get_y());
+        P = Ti.next();
+      }
+      if (gens.get(gens.size() - 1) != P.get_y() + 1) {
+        gens.add(P.get_x()); gens.add(P.get_y() + 1);
+      }
+      cache.put(gens, new Pair<>(0, ORIGIN));
+      int x_pen = P.get_x(), y_pen = P.get_y();
+      P = Ti.next(); int x_last = P.get_x(), y_last = P.get_y();
+      int delta_x = x_last - x_pen;
+      Resources res = overall_context.getResources();
+      int max_val = res.getInteger(R.integer.view_min) + res.getInteger(R.integer.view_seek_max);
+      for (int i = y0; i < max_val; ++i) {
+        ArrayList<Integer> future_gens = new ArrayList<>(gens.size() + 4);
+        future_gens.add(x0); future_gens.add(i);
+        future_gens.add(x1); future_gens.add(i - delta_y);
+        for (Integer gen : gens) future_gens.add(gen);
+        cache.put(future_gens, new Pair<>(0, ORIGIN));
+        for (int j = x_pen; j < max_val; ++j) {
+          ArrayList<Integer> zero_future_gens = new ArrayList<>(future_gens.size() + 2);
+          for (int gen : future_gens) zero_future_gens.add(gen);
+          zero_future_gens.add(j); zero_future_gens.add(y_pen);
+          zero_future_gens.add(j+delta_x); zero_future_gens.add(y_last);
+          cache.put(zero_future_gens, new Pair<>(0, ORIGIN));
+        }
+      }
+      for (int j = x_pen; j < max_val; ++j) {
+        ArrayList<Integer> future_gens = new ArrayList<>(gens.size() + 4);
+        for (Integer gen: gens) future_gens.add(gen);
+        future_gens.add(j); future_gens.add(y_pen);
+        future_gens.add(j + delta_x); future_gens.add(y_last);
+        cache.put(future_gens, new Pair<>(0, ORIGIN));
+        for (int i = y0; i < max_val; ++i) {
+          ArrayList<Integer> zero_future_gens = new ArrayList<>(future_gens.size() + 2);
+          zero_future_gens.add(x0); zero_future_gens.add(i);
+          zero_future_gens.add(x1); zero_future_gens.add(i - delta_y);
+          for (int gen : future_gens) zero_future_gens.add(gen);
+          cache.put(zero_future_gens, new Pair<>(0, ORIGIN));
+        }
       }
 
     }
@@ -779,7 +836,7 @@ public class Computer_Opponent extends Opponent {
       n = temp;
     }
 
-    int i = 0, j = 0, k = 0;
+    int i = 0, j, k;
     while (m != 0 && ((m % 2 != 0) || (n % 2 != 0))) {
       m /= 2;
       n /= 2;
@@ -821,7 +878,7 @@ public class Computer_Opponent extends Opponent {
     print_configuration(bconfig, max_x, max_y);
   }
 
-  protected void print_configuration(boolean[][] config, int max_x, int max_y) {
+  void print_configuration(boolean[][] config, int max_x, int max_y) {
     Log.d(tag, "----");
     for (int i = max_y - 1; i > -1; --i) {
       String output = "";
@@ -846,13 +903,13 @@ public class Computer_Opponent extends Opponent {
     return new Position(i, j);
   }
 
-  protected int base_max_x, base_max_y;
-  protected HashMap<ArrayList<Integer>, Pair<Integer, Position>> cache;
+  private int base_max_x, base_max_y;
+  private HashMap<ArrayList<Integer>, Pair<Integer, Position>> cache;
 
-  protected Position zero_position = ORIGIN;
-  protected int configuration_value;
+  private Position zero_position = ORIGIN;
+  private int configuration_value;
 
-  protected boolean computer_move;
+  private boolean computer_move;
 
   final private static String tag = "Computer_Opponent";
 

@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.view.Gravity;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -42,12 +41,12 @@ import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.PENTAW
 import static name.cantanima.idealnim.MainActivity.Achievements_to_unlock.LEGEND_AMONG_KIND;
 
 /**
- * Created by cantanima on 8/8/17.
+ * Controls a game.
  */
 
-public class Game_Control implements DialogInterface.OnClickListener {
+class Game_Control implements DialogInterface.OnClickListener {
 
-  public Game_Control() {
+  Game_Control() {
 
     Calendar cal = new GregorianCalendar();
     current_seed = cal.get(MINUTE) * 59 + cal.get(HOUR_OF_DAY) * 23 + cal.get(SECOND) * 43
@@ -56,7 +55,7 @@ public class Game_Control implements DialogInterface.OnClickListener {
 
   }
 
-  public void new_game(Playfield p, int max_x, int max_y, int level, boolean generate_ideals) {
+  void new_game(Playfield p, int max_x, int max_y, int level, boolean generate_ideals) {
     playfield = p;
     playfield.reset_view();
     playfield.reset_played();
@@ -137,7 +136,7 @@ public class Game_Control implements DialogInterface.OnClickListener {
 
   }
 
-  public void notify_game_over() {
+  void notify_game_over() {
 
     handle_achievements();
 
@@ -179,7 +178,7 @@ public class Game_Control implements DialogInterface.OnClickListener {
     last_dialog = PLAY_AGAIN;
   }
 
-  public void handle_achievements() {
+  private void handle_achievements() {
 
     if (main_activity.can_handle_achievements()) {
 
@@ -369,9 +368,9 @@ public class Game_Control implements DialogInterface.OnClickListener {
 
   }
 
-  public void set_player_kind(Player_Kind kind) { last_player = kind; }
+  void set_player_kind(Player_Kind kind) { last_player = kind; }
 
-  public Player_Kind get_player_kind() { return last_player; }
+  Player_Kind get_player_kind() { return last_player; }
 
   /**
    * This method will be invoked when a button in the dialog is clicked.
@@ -398,28 +397,28 @@ public class Game_Control implements DialogInterface.OnClickListener {
 
   }
 
-  public void notify_requested_a_hint() { used_hint = true; }
+  void notify_requested_a_hint() { used_hint = true; }
 
   public void notify_changed_board_size() { changed_size = true;}
 
-  public void notify_computer_sometimes_dumb() { used_one_hand_behind_back = true; }
+  void notify_computer_sometimes_dumb() { used_one_hand_behind_back = true; }
 
-  public void notify_large_board() { computed_large_board = true; }
+  void notify_large_board() { computed_large_board = true; }
 
-  protected int level = 1;
-  protected long current_seed;
-  protected Playfield playfield;
-  protected MainActivity main_activity;
-  protected Random random = new Random();
+  private int level = 1;
+  private long current_seed;
+  private Playfield playfield;
+  private MainActivity main_activity;
+  Random random = new Random();
 
-  protected enum Player_Kind { COMPUTER, HUMAN };
-  protected Player_Kind last_player;
+  enum Player_Kind { COMPUTER, HUMAN };
+  private Player_Kind last_player;
 
-  protected enum Dialog_Id { NEW_GAME, PLAY_AGAIN };
-  protected Dialog_Id last_dialog;
+  enum Dialog_Id { NEW_GAME, PLAY_AGAIN };
+  private Dialog_Id last_dialog;
 
   // for achievements
-  protected boolean
+  private boolean
       changed_size = false, used_hint = false, used_one_hand_behind_back = false,
       computed_large_board = false
   ;

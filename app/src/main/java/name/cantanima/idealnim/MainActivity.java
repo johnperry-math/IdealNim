@@ -28,11 +28,9 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.Player;
 
-import static android.bluetooth.BluetoothAdapter.STATE_ON;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static com.google.android.gms.common.ConnectionResult.SUCCESS;
-import static com.google.android.gms.common.GoogleApiAvailability.GOOGLE_PLAY_SERVICES_VERSION_CODE;
 import static com.google.android.gms.games.GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED;
 import static name.cantanima.idealnim.Game_Control.Player_Kind.COMPUTER;
 
@@ -53,28 +51,25 @@ public class MainActivity
 
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    Button new_game_button = (Button) findViewById(R.id.new_game_button);
-    SeekBar view_seekbar = (SeekBar) findViewById(R.id.view_scale);
-    TextView view_label = (TextView) findViewById(R.id.view_label);
-    TextView value_textview = (TextView) findViewById(R.id.value_view);
-    TextView value_label = (TextView) findViewById(R.id.value_label);
-    Button hint_button = (Button) findViewById(R.id.hint_button);
-    Playfield playfield = (Playfield) findViewById(R.id.playfield);
+    Button new_game_button = findViewById(R.id.new_game_button);
+    SeekBar view_seekbar = findViewById(R.id.view_scale);
+    TextView view_label = findViewById(R.id.view_label);
+    TextView value_textview = findViewById(R.id.value_view);
+    TextView value_label = findViewById(R.id.value_label);
+    Button hint_button = findViewById(R.id.hint_button);
+    Playfield playfield = findViewById(R.id.playfield);
     playfield.set_buttons_to_listen(
         new_game_button, value_textview, value_label, hint_button, view_seekbar, view_label
     );
     if (!welcoming)
       playfield.start_game(COMPUTER);
 
-    sign_in_button = (SignInButton) findViewById(R.id.sign_in_button);
+    sign_in_button = findViewById(R.id.sign_in_button);
     sign_in_button.setOnClickListener(this);
-    sign_in_message_view = (TextView) findViewById(R.id.sign_in_message);
-    sign_out_button = (Button) findViewById(R.id.sign_out_button);
+    sign_in_message_view = findViewById(R.id.sign_in_message);
+    sign_out_button = findViewById(R.id.sign_out_button);
     sign_out_button.setVisibility(INVISIBLE);
     sign_out_button.setOnClickListener(this);
-
-    //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-    //setSupportActionBar(toolbar);
 
     GoogleApiAvailability api_avail = GoogleApiAvailability.getInstance();
     int availability = api_avail.isGooglePlayServicesAvailable(this);
@@ -165,7 +160,7 @@ public class MainActivity
     bt_adapter = BluetoothAdapter.getDefaultAdapter();
     boolean result = bt_adapter != null;
     if (!result) {
-      AlertDialog no_bt_dialog = new AlertDialog.Builder(this)
+      new AlertDialog.Builder(this)
           .setTitle(R.string.no_bluetooth_title)
           .setMessage(
               getString(R.string.no_bluetooth_message) + " " +
@@ -194,7 +189,7 @@ public class MainActivity
           resolving_failure = false;
         }
       } else {
-        AlertDialog cancel_dialog = new AlertDialog.Builder(this)
+        new AlertDialog.Builder(this)
             .setTitle(getString(R.string.conn_fail_title))
             .setMessage(getString(R.string.conn_fail_summ))
             .setPositiveButton(getString(R.string.conn_fail_pos), this)
@@ -208,9 +203,9 @@ public class MainActivity
   /**
    * Dispatch incoming result to the correct fragment.
    *
-   * @param requestCode
-   * @param resultCode
-   * @param data
+   * @param requestCode code requested to identify activity's result
+   * @param resultCode  code describing result
+   * @param data        related data
    */
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -228,7 +223,7 @@ public class MainActivity
         games_client.connect();
       } else if (resultCode == RESULT_CANCELED){
         //Log.d(tag, "canceled, disconnecting");
-        AlertDialog cancel_dialog = new AlertDialog.Builder(this)
+        new AlertDialog.Builder(this)
             .setTitle(getString(R.string.conn_fail_title))
             .setMessage(getString(R.string.conn_fail_summ))
             .setPositiveButton(getString(R.string.conn_fail_pos), this)
@@ -288,6 +283,7 @@ public class MainActivity
       //Log.d(tag, "Logging out of package");
       sign_in_clicked = false;
       if (games_client != null) Games.signOut(games_client);
+      games_client.disconnect();
       sign_out_button.setVisibility(INVISIBLE);
       sign_in_button.setVisibility(VISIBLE);
       sign_in_message_view.setText(getString(R.string.sign_in_why));
@@ -480,11 +476,11 @@ public class MainActivity
     }
   }
 
-  public class BT_Setup_Thread extends Thread {
+  private class BT_Setup_Thread extends Thread {
 
-    public BT_Setup_Thread(MainActivity my_context) { context = my_context; }
+    BT_Setup_Thread(MainActivity my_context) { context = my_context; }
 
-    public void disconnect() {
+    void disconnect() {
       try {
         communication_socket.close();
       } catch (Exception e) {
@@ -492,11 +488,11 @@ public class MainActivity
       }
     }
 
-    public void join_game(int which_device) {
+    void join_game(int which_device) {
 
       i_am_hosting = false;
       BluetoothDevice desired_device = available_devices.get(which_device);
-      BluetoothSocket socket = null;
+      BluetoothSocket socket;
       try {
         socket = desired_device.createRfcommSocketToServiceRecord(UUID.fromString(my_uuid));
         communication_socket = socket;
@@ -532,7 +528,7 @@ public class MainActivity
 
     }
 
-    public void host_or_join() {
+    void host_or_join() {
 
       host_or_join_dialog = new AlertDialog.Builder(context)
           .setTitle(R.string.bt_host_or_join_title)
@@ -543,7 +539,7 @@ public class MainActivity
 
     }
 
-    public void select_paired_device() {
+    void select_paired_device() {
 
       i_am_hosting = false;
       Set<BluetoothDevice> known_devices = bt_adapter.getBondedDevices();
@@ -575,7 +571,7 @@ public class MainActivity
 
   private class Host_Thread extends AsyncTask<Object, Integer, Boolean> {
 
-    public Host_Thread(MainActivity main) { context = main; }
+    Host_Thread(MainActivity main) { context = main; }
 
     /**
      * Runs on the UI thread before {@link #doInBackground}.
@@ -623,7 +619,7 @@ public class MainActivity
 
       i_am_hosting = true;
       host_or_join_dialog.dismiss();
-      BluetoothServerSocket server = null;
+      BluetoothServerSocket server;
       try {
         server = bt_adapter.listenUsingInsecureRfcommWithServiceRecord(
             "Ideal Nim", UUID.fromString(my_uuid)
@@ -639,7 +635,7 @@ public class MainActivity
       }
 
       if (server_socket != null) {
-        BluetoothSocket socket = null;
+        BluetoothSocket socket;
         try {
           socket = server_socket.accept();
           communication_socket = socket;
@@ -713,7 +709,7 @@ public class MainActivity
     ONLY_HUMAN,
     PENTAWIN,
     LEGEND_AMONG_KIND
-  };
+  }
 
   // bluetooth services
   private final String my_uuid = "baf23ef1-04db-4b6c-bf4f-09dbcfc0591f";
